@@ -1,4 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { Mic, Image as ImageIcon } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -24,6 +25,7 @@ export const Layout = () => {
                 className={navigationMenuTriggerStyle()}
                 active={location.pathname.startsWith("/scribe")}
               >
+                <Mic />
                 Local Scribe
               </NavigationMenuLink>
             </NavigationMenuItem>
@@ -33,6 +35,7 @@ export const Layout = () => {
                 className={navigationMenuTriggerStyle()}
                 active={location.pathname.startsWith("/image-classifier")}
               >
+                <ImageIcon />
                 Image Classification
               </NavigationMenuLink>
             </NavigationMenuItem>
