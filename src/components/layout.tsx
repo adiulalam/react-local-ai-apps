@@ -1,4 +1,4 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -8,27 +8,30 @@ import {
 } from "@/components/ui/navigation-menu";
 import { Suspense } from "react";
 import { Muted } from "@/components/ui/typography";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export function Layout() {
+  const location = useLocation();
+
   return (
-    <div className="bg-background text-foreground flex min-h-screen flex-col">
-      <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
-        <div className="container flex h-14 items-center px-4">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuLink
-                  render={<Link to="/scribe" />}
-                  className={navigationMenuTriggerStyle()}
-                  active={location.pathname.startsWith("/scribe")}
-                >
-                  Local Scribe
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              {/* Future apps will be added here */}
-            </NavigationMenuList>
-          </NavigationMenu>
-        </div>
+    <div className="bg-background flex min-h-screen flex-col">
+      <header className="flex h-14 w-full items-center justify-between border-b px-4">
+        <NavigationMenu>
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                render={<Link to="/scribe" />}
+                className={navigationMenuTriggerStyle()}
+                active={location.pathname.startsWith("/scribe")}
+              >
+                Local Scribe
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            {/* Future apps will be added here */}
+          </NavigationMenuList>
+        </NavigationMenu>
+
+        <ModeToggle />
       </header>
 
       <main className="flex-1 overflow-auto">

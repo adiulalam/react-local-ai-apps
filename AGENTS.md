@@ -54,3 +54,4 @@ Here are some of the design patterns that are used in the Orri application:
 - Try to use `any` types
 - Try to create too many nested divs
 - Touch the ShadCN UI components folder on `components/UI`
+- Use any tailwind animation classes
