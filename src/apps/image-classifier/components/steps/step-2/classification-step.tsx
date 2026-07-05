@@ -1,8 +1,13 @@
 import { useState, useEffect, useRef } from "react";
+import { ArrowRight } from "lucide-react";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import { Progress } from "@/components/ui/progress";
 import { H3, Muted } from "@/components/ui/typography";
-import { createWorkerMessageHandler, type WorkerStatus, type ClassificationResult } from "../../../utils/worker-message-handler";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+  type ClassificationResult,
+} from "../../../utils/worker-message-handler";
 
 import { Button } from "@/components/ui/button";
 
@@ -92,13 +97,13 @@ export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepP
               />
             </div>
           </div>
-          
+
           <div className="flex flex-col gap-4">
             <H3>Classification Results</H3>
             <ul className="space-y-3">
               {results.map((result, index) => (
                 <li key={index} className="bg-background space-y-2 rounded-lg border p-3">
-                  <div className="flex justify-between items-center text-sm">
+                  <div className="flex items-center justify-between text-sm">
                     <span className="font-medium capitalize">{result.label}</span>
                     <Muted>{(result.score * 100).toFixed(2)}%</Muted>
                   </div>
@@ -107,7 +112,10 @@ export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepP
               ))}
             </ul>
             <div className="mt-4 flex justify-end">
-              <Button onClick={() => onNext(results)}>Next: Generate Caption</Button>
+              <Button onClick={() => onNext(results)}>
+                Next: Generate Caption
+                <ArrowRight />
+              </Button>
             </div>
           </div>
         </div>
