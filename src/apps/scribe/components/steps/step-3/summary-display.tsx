@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Muted } from "@/components/ui/typography";
@@ -65,6 +66,7 @@ export const SummaryDisplay = ({
           <div className="flex justify-end">
             <Button onClick={onContinue} disabled={status !== "complete"}>
               Continue to Export
+              <ArrowRight />
             </Button>
           </div>
         </div>

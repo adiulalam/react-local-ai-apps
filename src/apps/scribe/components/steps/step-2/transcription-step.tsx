@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
@@ -111,6 +112,7 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
           <div className="flex justify-end">
             <Button onClick={() => onNext(transcription)} disabled={status !== "complete"}>
               Continue to Summarization
+              <ArrowRight />
             </Button>
           </div>
         </div>

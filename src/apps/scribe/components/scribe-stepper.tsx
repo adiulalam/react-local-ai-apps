@@ -1,6 +1,7 @@
 import { defineStepper } from "@stepperize/react";
 import { type StepStatus, useStepItemContext } from "@stepperize/react/primitives";
 import React, { useState } from "react";
+import { ArrowLeft, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { AudioInputStep } from "./steps/step-1";
@@ -158,6 +159,7 @@ export function ScribeStepper() {
                 onClick={() => stepper.navigation.prev()}
                 disabled={stepper.state.isFirst}
               >
+                <ArrowLeft />
                 Back
               </Button>
               <Button
@@ -167,6 +169,7 @@ export function ScribeStepper() {
                   stepper.navigation.reset();
                 }}
               >
+                <RotateCcw />
                 Start Over
               </Button>
             </div>

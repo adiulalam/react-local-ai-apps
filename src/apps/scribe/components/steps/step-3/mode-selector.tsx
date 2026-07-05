@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Wand2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -35,7 +36,10 @@ export const ModeSelector = ({ mode, onModeChange, onGenerate }: ModeSelectorPro
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={onGenerate}>Generate Summary</Button>
+        <Button onClick={onGenerate}>
+          <Wand2 />
+          Generate Summary
+        </Button>
       </div>
     </div>
   );
