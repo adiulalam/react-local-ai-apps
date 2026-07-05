@@ -3,6 +3,7 @@ import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuList,
+  NavigationMenuLink,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Suspense } from "react";
@@ -16,9 +17,13 @@ export function Layout() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link to="/scribe" className={navigationMenuTriggerStyle()}>
+                <NavigationMenuLink
+                  render={<Link to="/scribe" />}
+                  className={navigationMenuTriggerStyle()}
+                  active={location.pathname.startsWith("/scribe")}
+                >
                   Local Scribe
-                </Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
               {/* Future apps will be added here */}
             </NavigationMenuList>
