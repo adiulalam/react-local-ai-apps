@@ -46,7 +46,7 @@ Here are some of the design patterns that are used in the Orri application:
 - Use the custom typography components from `components/ui/typography` (e.g., `<H1>`, `<P>`, `<Muted>`) instead of raw text tailwind classes
 - Use Date-fns for all date and time manipulation
 - Use Lodash or vanilla JS/TS for all utility functions
-- Use `export const` for all exports in TypeScript files
+- Use arrow functions for all function definitions in TypeScript files
 - Use kebab-case for file names
 
 #### Don't:

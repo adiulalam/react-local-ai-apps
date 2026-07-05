@@ -10,7 +10,7 @@ import { Suspense } from "react";
 import { Muted } from "@/components/ui/typography";
 import { ModeToggle } from "@/components/mode-toggle";
 
-export function Layout() {
+export const Layout = () => {
   const location = useLocation();
 
   return (

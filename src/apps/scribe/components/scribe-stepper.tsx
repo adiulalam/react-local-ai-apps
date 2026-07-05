@@ -51,7 +51,7 @@ const StepperSeparator = ({ status, isLast }: { status: StepStatus; isLast: bool
   );
 };
 
-export function ScribeStepper() {
+export const ScribeStepper = () => {
   const [formData, setFormData] = useState<ScribeState>({});
 
   return (
