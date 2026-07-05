@@ -9,32 +9,30 @@ import {
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
-class PipelineSingleton {
-  static task: PipelineType = "automatic-speech-recognition";
-  static model = "onnx-community/whisper-base";
-  static instance: Promise<AllTasks["automatic-speech-recognition"]> | null = null;
+const task: PipelineType = "automatic-speech-recognition";
+const model = "onnx-community/whisper-base";
+let instance: Promise<AllTasks["automatic-speech-recognition"]> | null = null;
 
-  static async getInstance(progress_callback: (info: unknown) => void) {
-    if (this.instance === null) {
-      this.instance = pipeline(this.task, this.model, {
-        progress_callback,
-        device: "webgpu",
-        dtype: {
-          encoder_model: "fp32",
-          decoder_model_merged: "q4",
-        },
-      }) as Promise<AllTasks["automatic-speech-recognition"]>;
-    }
-    return this.instance;
+const getInstance = async (progress_callback: (info: unknown) => void) => {
+  if (instance === null) {
+    instance = pipeline(task, model, {
+      progress_callback,
+      device: "webgpu",
+      dtype: {
+        encoder_model: "fp32",
+        decoder_model_merged: "q4",
+      },
+    }) as Promise<AllTasks["automatic-speech-recognition"]>;
   }
-}
+  return instance;
+};
 
 self.addEventListener("message", async (event) => {
   const { type, audio } = event.data;
 
   if (type === "load") {
     try {
-      await PipelineSingleton.getInstance((x) => {
+      await getInstance((x) => {
         self.postMessage({ type: "progress", data: x });
       });
       self.postMessage({ type: "ready" });
@@ -45,7 +43,7 @@ self.addEventListener("message", async (event) => {
   } else if (type === "process") {
     try {
       self.postMessage({ type: "processing" });
-      const transcriber = await PipelineSingleton.getInstance(() => {});
+      const transcriber = await getInstance(() => {});
 
       const streamer = new TextStreamer(transcriber.tokenizer, {
         skip_prompt: true,

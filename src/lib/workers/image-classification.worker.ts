@@ -3,21 +3,19 @@ import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/tr
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
-class PipelineSingleton {
-  static task: PipelineType = "image-classification";
-  static model = "Xenova/resnet-50";
-  static instance: Promise<AllTasks["image-classification"]> | null = null;
+const task: PipelineType = "image-classification";
+const model = "Xenova/resnet-50";
+let instance: Promise<AllTasks["image-classification"]> | null = null;
 
-  static async getInstance(progress_callback: (info: unknown) => void) {
-    if (this.instance === null) {
-      this.instance = pipeline(this.task, this.model, {
-        progress_callback,
-        dtype: "fp32",
-      }) as Promise<AllTasks["image-classification"]>;
-    }
-    return this.instance;
+const getInstance = async (progress_callback: (info: unknown) => void) => {
+  if (instance === null) {
+    instance = pipeline(task, model, {
+      progress_callback,
+      dtype: "fp32",
+    }) as Promise<AllTasks["image-classification"]>;
   }
-}
+  return instance;
+};
 
 export const processImage = async (
   classifier: AllTasks["image-classification"],
@@ -43,7 +41,7 @@ self.addEventListener("message", async (event) => {
 
   if (type === "load") {
     try {
-      await PipelineSingleton.getInstance((x) => {
+      await getInstance((x) => {
         self.postMessage({ type: "progress", data: x });
       });
       self.postMessage({ type: "ready" });
@@ -53,7 +51,7 @@ self.addEventListener("message", async (event) => {
     }
   } else if (type === "process") {
     try {
-      const classifier = await PipelineSingleton.getInstance(() => {});
+      const classifier = await getInstance(() => {});
       await processImage(classifier, image, (msg) => self.postMessage(msg));
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : "Unknown error setting up classification";

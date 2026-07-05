@@ -8,21 +8,19 @@ import {
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
-class PipelineSingleton {
-  static task: PipelineType = "image-to-text";
-  static model = "Xenova/vit-gpt2-image-captioning";
-  static instance: Promise<AllTasks["image-to-text"]> | null = null;
+const task: PipelineType = "image-to-text";
+const model = "Xenova/vit-gpt2-image-captioning";
+let instance: Promise<AllTasks["image-to-text"]> | null = null;
 
-  static async getInstance(progress_callback: (info: unknown) => void) {
-    if (this.instance === null) {
-      this.instance = pipeline(this.task, this.model, {
-        progress_callback,
-        dtype: "fp32",
-      }) as Promise<AllTasks["image-to-text"]>;
-    }
-    return this.instance;
+const getInstance = async (progress_callback: (info: unknown) => void) => {
+  if (instance === null) {
+    instance = pipeline(task, model, {
+      progress_callback,
+      dtype: "fp32",
+    }) as Promise<AllTasks["image-to-text"]>;
   }
-}
+  return instance;
+};
 
 export const generateCaption = async (
   captioner: AllTasks["image-to-text"],
@@ -50,7 +48,7 @@ self.addEventListener("message", async (event) => {
 
   if (type === "load") {
     try {
-      await PipelineSingleton.getInstance((x) => {
+      await getInstance((x) => {
         self.postMessage({ type: "progress", data: x });
       });
       self.postMessage({ type: "ready" });
@@ -60,7 +58,7 @@ self.addEventListener("message", async (event) => {
     }
   } else if (type === "process") {
     try {
-      const captioner = await PipelineSingleton.getInstance(() => {});
+      const captioner = await getInstance(() => {});
       await generateCaption(captioner, image, (msg) => self.postMessage(msg));
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : "Unknown error setting up captioning";

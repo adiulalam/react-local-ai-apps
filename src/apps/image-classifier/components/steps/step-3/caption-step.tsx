@@ -14,9 +14,10 @@ export const CaptionStep = ({ imageDataUrl }: CaptionStepProps) => {
   const [caption, setCaption] = useState<string | null>(null);
 
   const worker = useRef<Worker | null>(null);
-  const processingStarted = useRef(false);
 
   useEffect(() => {
+    let processingStarted = false;
+
     if (!imageDataUrl) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus("error");
@@ -36,8 +37,8 @@ export const CaptionStep = ({ imageDataUrl }: CaptionStepProps) => {
         setStatus,
         setProgressItems,
         onReady: () => {
-          if (!processingStarted.current) {
-            processingStarted.current = true;
+          if (!processingStarted) {
+            processingStarted = true;
             worker.current?.postMessage({ type: "process", image: imageDataUrl });
           }
         },

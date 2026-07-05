@@ -18,7 +18,6 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
   const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
 
   const worker = useRef<Worker | null>(null);
-  const transcriptionStarted = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -28,6 +27,8 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
   }, [transcription]);
 
   useEffect(() => {
+    let transcriptionStarted = false;
+
     if (!audioData) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus("error");
@@ -49,8 +50,8 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
         setProgressItems,
         setResultText: setTranscription,
         onReady: () => {
-          if (!transcriptionStarted.current) {
-            transcriptionStarted.current = true;
+          if (!transcriptionStarted) {
+            transcriptionStarted = true;
             worker.current?.postMessage({ type: "process", audio: audioData });
           }
         },

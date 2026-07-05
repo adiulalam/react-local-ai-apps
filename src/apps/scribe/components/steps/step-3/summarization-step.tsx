@@ -18,7 +18,6 @@ export const SummarizationStep = ({ transcription, onNext }: SummarizationStepPr
   const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
 
   const worker = useRef<Worker | null>(null);
-  const summarizationStarted = useRef(false);
 
   useEffect(() => {
     if (!transcription || transcription.trim() === "") {
@@ -34,38 +33,41 @@ export const SummarizationStep = ({ transcription, onNext }: SummarizationStepPr
   }, [transcription]);
 
   const handleGenerate = () => {
-    if (!worker.current) {
-      worker.current = new Worker(
-        new URL("../../../../../lib/workers/summary.worker.ts", import.meta.url),
-        {
-          type: "module",
-        }
-      );
-
-      const messageHandler = createWorkerMessageHandler({
-        setStatus,
-        setProgressItems,
-        setResultText: setSummary,
-        onReady: () => {
-          if (!summarizationStarted.current) {
-            summarizationStarted.current = true;
-            worker.current?.postMessage({
-              type: "process",
-              text: transcription,
-              options: SUMMARY_OPTIONS[mode],
-            });
-          }
-        },
-        onComplete: (result) => setSummary(result),
-        setErrorMsg,
-      });
-
-      worker.current.addEventListener("message", messageHandler);
+    if (worker.current) {
+      worker.current.terminate();
     }
+
+    worker.current = new Worker(
+      new URL("../../../../../lib/workers/summary.worker.ts", import.meta.url),
+      {
+        type: "module",
+      }
+    );
+
+    let summarizationStarted = false;
+
+    const messageHandler = createWorkerMessageHandler({
+      setStatus,
+      setProgressItems,
+      setResultText: setSummary,
+      onReady: () => {
+        if (!summarizationStarted) {
+          summarizationStarted = true;
+          worker.current?.postMessage({
+            type: "process",
+            text: transcription,
+            options: SUMMARY_OPTIONS[mode],
+          });
+        }
+      },
+      onComplete: (result) => setSummary(result),
+      setErrorMsg,
+    });
+
+    worker.current.addEventListener("message", messageHandler);
 
     setStatus("initializing");
     setSummary("");
-    summarizationStarted.current = false;
     worker.current.postMessage({ type: "load" });
   };
 

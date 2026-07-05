@@ -23,9 +23,10 @@ export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepP
   const [results, setResults] = useState<ClassificationResult[] | null>(null);
 
   const worker = useRef<Worker | null>(null);
-  const processingStarted = useRef(false);
 
   useEffect(() => {
+    let processingStarted = false;
+
     if (!imageDataUrl) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus("error");
@@ -45,8 +46,8 @@ export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepP
         setStatus,
         setProgressItems,
         onReady: () => {
-          if (!processingStarted.current) {
-            processingStarted.current = true;
+          if (!processingStarted) {
+            processingStarted = true;
             worker.current?.postMessage({ type: "process", image: imageDataUrl });
           }
         },
