@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Small } from "@/components/ui/typography";
 
 interface MicrophoneInputProps {
   onBlobReady: (blob: Blob) => void;
@@ -67,7 +68,7 @@ export const MicrophoneInput = ({ onBlobReady, onError, disabled }: MicrophoneIn
       ) : (
         <div className="flex items-center gap-4">
           <div className="bg-destructive h-3 w-3 rounded-full" />
-          <span className="text-sm font-medium">Recording...</span>
+          <Small>Recording...</Small>
           <Button onClick={stopRecording} variant="destructive">
             Stop Recording
           </Button>

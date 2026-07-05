@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Muted } from "@/components/ui/typography";
 
 interface SummaryDisplayProps {
   status: "idle" | "initializing" | "loading" | "processing" | "complete" | "error";
@@ -30,18 +31,18 @@ export const SummaryDisplay = ({
   return (
     <div className="mt-4 space-y-6">
       {status === "initializing" && (
-        <p className="text-muted-foreground text-sm">Initializing Summarization Worker...</p>
+        <Muted>Initializing Summarization Worker...</Muted>
       )}
 
       {status === "loading" && (
-        <p className="text-muted-foreground text-sm">
+        <Muted>
           Downloading or loading DistilBART summary model chunks...
-        </p>
+        </Muted>
       )}
 
       {status === "processing" && (
         <div className="flex items-center gap-3">
-          <p className="text-muted-foreground text-sm">Summarizing text locally...</p>
+          <Muted>Summarizing text locally...</Muted>
         </div>
       )}
 

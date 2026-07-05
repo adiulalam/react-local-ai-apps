@@ -3,6 +3,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
 import { FileUploadInput, MicrophoneInput } from ".";
+import { Muted } from "@/components/ui/typography";
 
 export const AudioInputStep = ({ onNext }: { onNext: (audioData: Float32Array) => void }) => {
   const [source, setSource] = useState<"file" | "mic">("file");
@@ -68,7 +69,7 @@ export const AudioInputStep = ({ onNext }: { onNext: (audioData: Float32Array) =
         />
       )}
 
-      {isProcessing && <p className="text-muted-foreground text-sm">Processing audio...</p>}
+      {isProcessing && <Muted>Processing audio...</Muted>}
 
       {errorMsg && <p className="text-destructive text-sm">{errorMsg}</p>}
     </div>

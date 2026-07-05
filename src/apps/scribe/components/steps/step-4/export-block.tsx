@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ExportActions } from "./export-actions";
+import { H3 } from "@/components/ui/typography";
 
 interface ExportBlockProps {
   title: string;
@@ -37,7 +38,7 @@ export const ExportBlock = ({ title, content, prefix }: ExportBlockProps) => {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between border-b pb-2">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <H3>{title}</H3>
         <ExportActions onCopy={handleCopy} onDownload={handleDownload} copied={copied} />
       </div>
       <div className="bg-secondary/20 max-h-64 overflow-y-auto rounded-lg p-4 text-sm leading-relaxed whitespace-pre-wrap">

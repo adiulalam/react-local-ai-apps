@@ -43,6 +43,7 @@ Here are some of the design patterns that are used in the Orri application:
 - Use Lucide icons for all icons
 - Use ShadCN UI components for all UI components
 - Use Tailwind CSS for all styling
+- Use the custom typography components from `components/ui/typography` (e.g., `<H1>`, `<P>`, `<Muted>`) instead of raw text tailwind classes
 - Use Date-fns for all date and time manipulation
 - Use Lodash or vanilla JS/TS for all utility functions
 - Use `export const` for all exports in TypeScript files

@@ -6,11 +6,12 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Suspense } from "react";
+import { Muted } from "@/components/ui/typography";
 
 export function Layout() {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="bg-background text-foreground flex min-h-screen flex-col">
+      <header className="bg-background/95 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
         <div className="container flex h-14 items-center px-4">
           <NavigationMenu>
             <NavigationMenuList>
@@ -26,7 +27,13 @@ export function Layout() {
       </header>
 
       <main className="flex-1 overflow-auto">
-        <Suspense fallback={<div className="flex items-center justify-center h-full p-8 text-muted-foreground">Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex h-full items-center justify-center p-8">
+              <Muted>Loading...</Muted>
+            </div>
+          }
+        >
           <Outlet />
         </Suspense>
       </main>

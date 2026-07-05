@@ -1,4 +1,5 @@
 import { ExportBlock } from "./export-block";
+import { Muted } from "@/components/ui/typography";
 
 interface ExportStepProps {
   transcription?: string;
@@ -8,8 +9,10 @@ interface ExportStepProps {
 export const ExportStep = ({ transcription, summary }: ExportStepProps) => {
   if (!transcription && !summary) {
     return (
-      <div className="text-muted-foreground p-8 text-center">
-        No transcription or summary data available to export.
+      <div className="p-8 text-center">
+        <Muted>
+          No transcription or summary data available to export.
+        </Muted>
       </div>
     );
   }

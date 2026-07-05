@@ -7,6 +7,7 @@ import { AudioInputStep } from "./steps/step-1";
 import { TranscriptionStep } from "./steps/step-2";
 import { SummarizationStep } from "./steps/step-3";
 import { ExportStep } from "./steps/step-4";
+import { H2, Muted, Small } from "@/components/ui/typography";
 
 // Define the steps
 const { Stepper } = defineStepper(
@@ -55,10 +56,10 @@ export function ScribeStepper() {
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
       <div className="mb-4">
-        <h2 className="text-2xl font-bold tracking-tight">Local Scribe</h2>
-        <p className="text-muted-foreground text-sm">
+        <H2>Local Scribe</H2>
+        <Muted>
           Transcribe and summarize audio completely offline.
-        </p>
+        </Muted>
       </div>
 
       <Stepper.Root className="w-full space-y-4" orientation="vertical">
@@ -81,16 +82,16 @@ export function ScribeStepper() {
                       <div className="flex flex-col items-start gap-1">
                         <Stepper.Title
                           render={(props) => (
-                            <h4 className="text-sm font-medium" {...props}>
+                            <Small className="block" {...props}>
                               {stepData.title}
-                            </h4>
+                            </Small>
                           )}
                         />
                         <Stepper.Description
                           render={(props) => (
-                            <p className="text-muted-foreground text-xs" {...props}>
+                            <Muted className="text-xs" {...props}>
                               {stepData.description}
-                            </p>
+                            </Muted>
                           )}
                         />
                       </div>

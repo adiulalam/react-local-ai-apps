@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
+import { Muted } from "@/components/ui/typography";
 
 interface TranscriptionStepProps {
   audioData: Float32Array;
@@ -91,20 +92,20 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
       <DownloadProgress progressItems={progressItems} />
 
       {status === "initializing" && (
-        <p className="text-muted-foreground text-sm">Initializing Web Worker...</p>
+        <Muted>Initializing Web Worker...</Muted>
       )}
 
       {status === "loading" && (
-        <p className="text-muted-foreground text-sm">
+        <Muted>
           Checking cache and downloading required model chunks...
-        </p>
+        </Muted>
       )}
 
       {status === "processing" && (
         <div className="flex items-center gap-3">
-          <p className="text-muted-foreground text-sm">
+          <Muted>
             Transcribing audio locally... This may take a moment.
-          </p>
+          </Muted>
         </div>
       )}
 
