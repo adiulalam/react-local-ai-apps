@@ -17,7 +17,7 @@ export const Layout = () => {
     <div className="bg-background flex min-h-screen flex-col">
       <header className="flex h-14 w-full items-center justify-between border-b px-4">
         <NavigationMenu>
-          <NavigationMenuList>
+          <NavigationMenuList className="gap-4">
             <NavigationMenuItem>
               <NavigationMenuLink
                 render={<Link to="/scribe" />}
@@ -25,6 +25,15 @@ export const Layout = () => {
                 active={location.pathname.startsWith("/scribe")}
               >
                 Local Scribe
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                render={<Link to="/image-classifier" />}
+                className={navigationMenuTriggerStyle()}
+                active={location.pathname.startsWith("/image-classifier")}
+              >
+                Image Classification
               </NavigationMenuLink>
             </NavigationMenuItem>
             {/* Future apps will be added here */}
@@ -47,4 +56,4 @@ export const Layout = () => {
       </main>
     </div>
   );
-}
+};
