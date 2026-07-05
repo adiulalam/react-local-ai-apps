@@ -1,21 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
-import { Progress } from "@/components/ui/progress";
 import { H3, Muted } from "@/components/ui/typography";
-import { createWorkerMessageHandler, type WorkerStatus, type ClassificationResult } from "../../../utils/worker-message-handler";
+import { createWorkerMessageHandler, type WorkerStatus } from "../../../utils/worker-message-handler";
 
-import { Button } from "@/components/ui/button";
-
-interface ClassificationStepProps {
+interface CaptionStepProps {
   imageDataUrl: string;
-  onNext: (results: ClassificationResult[]) => void;
 }
 
-export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepProps) => {
+export const CaptionStep = ({ imageDataUrl }: CaptionStepProps) => {
   const [status, setStatus] = useState<WorkerStatus>("initializing");
   const [errorMsg, setErrorMsg] = useState("");
   const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
-  const [results, setResults] = useState<ClassificationResult[] | null>(null);
+  const [caption, setCaption] = useState<string | null>(null);
 
   const worker = useRef<Worker | null>(null);
   const processingStarted = useRef(false);
@@ -24,19 +20,19 @@ export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepP
     if (!imageDataUrl) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setStatus("error");
-      setErrorMsg("No image data provided. Please ensure Step 1 completed successfully.");
+      setErrorMsg("No image data provided. Please ensure previous steps completed successfully.");
       return;
     }
 
     if (!worker.current) {
       worker.current = new Worker(
-        new URL("../../../../../lib/workers/image-classification.worker.ts", import.meta.url),
+        new URL("../../../../../lib/workers/image-captioning.worker.ts", import.meta.url),
         {
           type: "module",
         }
       );
 
-      const messageHandler = createWorkerMessageHandler({
+      const messageHandler = createWorkerMessageHandler<string>({
         setStatus,
         setProgressItems,
         onReady: () => {
@@ -45,8 +41,8 @@ export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepP
             worker.current?.postMessage({ type: "process", image: imageDataUrl });
           }
         },
-        onComplete: (classificationResults) => {
-          setResults(classificationResults);
+        onComplete: (result) => {
+          setCaption(result);
         },
         setErrorMsg,
       });
@@ -74,40 +70,31 @@ export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepP
 
       {status === "processing" && (
         <div className="flex items-center gap-3">
-          <Muted>Classifying image locally... This may take a moment.</Muted>
+          <Muted>Generating caption locally... This may take a moment.</Muted>
         </div>
       )}
 
       {status === "error" && <p className="text-destructive text-sm">{errorMsg}</p>}
 
-      {status === "complete" && results && (
+      {status === "complete" && caption && (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-4">
             <H3>Uploaded Image</H3>
             <div className="bg-background flex items-center justify-center overflow-hidden rounded-lg border p-2">
               <img
                 src={imageDataUrl}
-                alt="Uploaded for classification"
+                alt="Uploaded for captioning"
                 className="max-h-64 rounded-md object-contain"
               />
             </div>
           </div>
           
           <div className="flex flex-col gap-4">
-            <H3>Classification Results</H3>
-            <ul className="space-y-3">
-              {results.map((result, index) => (
-                <li key={index} className="bg-background space-y-2 rounded-lg border p-3">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="font-medium capitalize">{result.label}</span>
-                    <Muted>{(result.score * 100).toFixed(2)}%</Muted>
-                  </div>
-                  <Progress value={result.score * 100} />
-                </li>
-              ))}
-            </ul>
-            <div className="mt-4 flex justify-end">
-              <Button onClick={() => onNext(results)}>Next: Generate Caption</Button>
+            <H3>Caption Description</H3>
+            <div className="bg-primary/5 rounded-lg border p-6 shadow-sm">
+              <p className="text-lg font-medium italic text-foreground text-center">
+                "{caption}"
+              </p>
             </div>
           </div>
         </div>

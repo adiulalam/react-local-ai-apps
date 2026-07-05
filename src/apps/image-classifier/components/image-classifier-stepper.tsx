@@ -6,13 +6,15 @@ import { ArrowLeft, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ImageInputStep } from "./steps/step-1";
 import { ClassificationStep } from "./steps/step-2";
+import { CaptionStep } from "./steps/step-3";
 import { H2, Muted, Small } from "@/components/ui/typography";
 import type { ClassificationResult } from "../utils/worker-message-handler";
 
 // Define the steps
 const { Stepper } = defineStepper(
   { id: "step-1", title: "Image Input", description: "Upload an image" },
-  { id: "step-2", title: "Classification", description: "Classify the image" }
+  { id: "step-2", title: "Classification", description: "Classify the image" },
+  { id: "step-3", title: "Caption Description", description: "Generate caption" }
 );
 
 export type ImageClassifierState = {
@@ -115,9 +117,12 @@ export const ImageClassifierStepper = () => {
                                 imageDataUrl={formData.imageDataUrl!}
                                 onNext={(results) => {
                                   setFormData((prev) => ({ ...prev, results }));
-                                  // Nothing to do after step 2
+                                  stepper.navigation.next();
                                 }}
                               />
+                            ),
+                            "step-3": () => (
+                              <CaptionStep imageDataUrl={formData.imageDataUrl!} />
                             ),
                           })}
                         </div>

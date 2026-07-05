@@ -7,15 +7,15 @@ export interface ClassificationResult {
   score: number;
 }
 
-export interface WorkerCallbacks {
+export interface WorkerCallbacks<T> {
   setStatus: (status: WorkerStatus) => void;
   setProgressItems: (updater: (prev: Record<string, ProgressInfo>) => Record<string, ProgressInfo>) => void;
   onReady: () => void;
-  onComplete: (result: ClassificationResult[]) => void;
+  onComplete: (result: T) => void;
   setErrorMsg: (msg: string) => void;
 }
 
-export const createWorkerMessageHandler = (callbacks: WorkerCallbacks) => {
+export const createWorkerMessageHandler = <T = ClassificationResult[]>(callbacks: WorkerCallbacks<T>) => {
   return (e: MessageEvent) => {
     const msg = e.data;
 
