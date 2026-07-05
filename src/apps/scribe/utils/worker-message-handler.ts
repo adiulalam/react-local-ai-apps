@@ -1,0 +1,43 @@
+import { type ProgressInfo } from "@/components/ui/download-progress";
+
+export type WorkerStatus = "idle" | "initializing" | "loading" | "processing" | "complete" | "error";
+
+export interface WorkerCallbacks {
+  setStatus: (status: WorkerStatus) => void;
+  setProgressItems: (updater: (prev: Record<string, ProgressInfo>) => Record<string, ProgressInfo>) => void;
+  setResultText: (updater: (prev: string) => string) => void;
+  onReady: () => void;
+  onComplete: (result: string) => void;
+  setErrorMsg: (msg: string) => void;
+}
+
+export const createWorkerMessageHandler = (callbacks: WorkerCallbacks) => {
+  return (e: MessageEvent) => {
+    const msg = e.data;
+
+    switch (msg.type) {
+      case "progress":
+        callbacks.setStatus("loading");
+        callbacks.setProgressItems((prev) => ({ ...prev, [msg.data.file]: msg.data }));
+        break;
+      case "ready":
+        callbacks.setProgressItems(() => ({}));
+        callbacks.onReady();
+        break;
+      case "processing":
+        callbacks.setStatus("processing");
+        break;
+      case "update":
+        callbacks.setResultText((prev) => prev + msg.output);
+        break;
+      case "complete":
+        callbacks.setStatus("complete");
+        callbacks.onComplete(msg.result);
+        break;
+      case "error":
+        callbacks.setStatus("error");
+        callbacks.setErrorMsg(msg.error);
+        break;
+    }
+  };
+};

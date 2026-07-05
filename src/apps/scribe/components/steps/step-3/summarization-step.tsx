@@ -3,18 +3,17 @@ import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-pr
 import { ModeSelector } from "./mode-selector";
 import { SummaryDisplay } from "./summary-display";
 import { type SummaryMode, SUMMARY_OPTIONS } from "@/types/summary";
+import { createWorkerMessageHandler, type WorkerStatus } from "@/apps/scribe/utils/worker-message-handler";
 
 interface SummarizationStepProps {
   transcription: string;
   onNext: (summary: string) => void;
 }
 
-type Status = "idle" | "initializing" | "loading" | "processing" | "complete" | "error";
-
 export const SummarizationStep = ({ transcription, onNext }: SummarizationStepProps) => {
   const [summary, setSummary] = useState("");
   const [mode, setMode] = useState<SummaryMode>("Default");
-  const [status, setStatus] = useState<Status>("idle");
+  const [status, setStatus] = useState<WorkerStatus>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
 
@@ -37,47 +36,31 @@ export const SummarizationStep = ({ transcription, onNext }: SummarizationStepPr
   const handleGenerate = () => {
     if (!worker.current) {
       worker.current = new Worker(
-        new URL("../../../lib/workers/summary.worker.ts", import.meta.url),
+        new URL("../../../../../lib/workers/summary.worker.ts", import.meta.url),
         {
           type: "module",
         }
       );
 
-      worker.current.addEventListener("message", (e) => {
-        const msg = e.data;
-
-        switch (msg.type) {
-          case "progress":
-            setStatus("loading");
-            setProgressItems((prev) => ({ ...prev, [msg.data.file]: msg.data }));
-            break;
-          case "ready":
-            setProgressItems({}); // Clear download progress
-            if (!summarizationStarted.current) {
-              summarizationStarted.current = true;
-              worker.current?.postMessage({
-                type: "process",
-                text: transcription,
-                options: SUMMARY_OPTIONS[mode],
-              });
-            }
-            break;
-          case "processing":
-            setStatus("processing");
-            break;
-          case "update":
-            setSummary((prev) => prev + msg.output);
-            break;
-          case "complete":
-            setStatus("complete");
-            setSummary(msg.result);
-            break;
-          case "error":
-            setStatus("error");
-            setErrorMsg(msg.error);
-            break;
-        }
+      const messageHandler = createWorkerMessageHandler({
+        setStatus,
+        setProgressItems,
+        setResultText: setSummary,
+        onReady: () => {
+          if (!summarizationStarted.current) {
+            summarizationStarted.current = true;
+            worker.current?.postMessage({
+              type: "process",
+              text: transcription,
+              options: SUMMARY_OPTIONS[mode],
+            });
+          }
+        },
+        onComplete: (result) => setSummary(result),
+        setErrorMsg,
       });
+
+      worker.current.addEventListener("message", messageHandler);
     }
 
     setStatus("initializing");

@@ -3,17 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import { Muted } from "@/components/ui/typography";
+import { createWorkerMessageHandler, type WorkerStatus } from "@/apps/scribe/utils/worker-message-handler";
 
 interface TranscriptionStepProps {
   audioData: Float32Array;
   onNext: (transcription: string) => void;
 }
 
-type TStatus = "initializing" | "loading" | "processing" | "complete" | "error";
-
 export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps) => {
   const [transcription, setTranscription] = useState("");
-  const [status, setStatus] = useState<TStatus>("initializing");
+  const [status, setStatus] = useState<WorkerStatus>("initializing");
   const [errorMsg, setErrorMsg] = useState("");
   const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
 
@@ -38,43 +37,27 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
     if (!worker.current) {
       // Instantiate worker
       worker.current = new Worker(
-        new URL("../../../lib/workers/whisper.worker.ts", import.meta.url),
+        new URL("../../../../../lib/workers/whisper.worker.ts", import.meta.url),
         {
           type: "module",
         }
       );
 
-      worker.current.addEventListener("message", (e) => {
-        const msg = e.data;
-
-        switch (msg.type) {
-          case "progress":
-            setStatus("loading");
-            setProgressItems((prev) => ({ ...prev, [msg.data.file]: msg.data }));
-            break;
-          case "ready":
-            setProgressItems({}); // Clear download progress
-            if (!transcriptionStarted.current) {
-              transcriptionStarted.current = true;
-              worker.current?.postMessage({ type: "process", audio: audioData });
-            }
-            break;
-          case "processing":
-            setStatus("processing");
-            break;
-          case "update":
-            setTranscription((prev) => prev + msg.output);
-            break;
-          case "complete":
-            setStatus("complete");
-            setTranscription(msg.result);
-            break;
-          case "error":
-            setStatus("error");
-            setErrorMsg(msg.error);
-            break;
-        }
+      const messageHandler = createWorkerMessageHandler({
+        setStatus,
+        setProgressItems,
+        setResultText: setTranscription,
+        onReady: () => {
+          if (!transcriptionStarted.current) {
+            transcriptionStarted.current = true;
+            worker.current?.postMessage({ type: "process", audio: audioData });
+          }
+        },
+        onComplete: (result) => setTranscription(result),
+        setErrorMsg,
       });
+
+      worker.current.addEventListener("message", messageHandler);
 
       // Start the worker model load
       worker.current.postMessage({ type: "load" });
