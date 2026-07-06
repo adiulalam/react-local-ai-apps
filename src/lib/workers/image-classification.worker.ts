@@ -1,7 +1,7 @@
 import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "../utils";
 
-env.allowLocalModels = false;
+env.allowLocalModels = isTestEnv;
 env.useBrowserCache = true;
 
 const task: PipelineType = "image-classification";

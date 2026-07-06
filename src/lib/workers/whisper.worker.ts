@@ -7,7 +7,7 @@ import {
 } from "@huggingface/transformers";
 import { isTestEnv } from "../utils";
 
-env.allowLocalModels = false;
+env.allowLocalModels = isTestEnv;
 env.useBrowserCache = true;
 
 const task: PipelineType = "automatic-speech-recognition";
