@@ -30,7 +30,7 @@ export const generateCaption = async (
     // results is typically an array of objects like [{ generated_text: "a cat sitting on a couch" }]
     const caption =
       Array.isArray(results) && results.length > 0
-        ? (results[0] as { generated_text: string }).generated_text
+        ? results[0].generated_text
         : "No caption generated.";
 
     postMessage({ type: "complete", result: caption });
