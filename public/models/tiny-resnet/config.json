@@ -1,0 +1,49 @@
+{
+  "_name_or_path": "temp/dummy/resnet/ResNetForImageClassification",
+  "architectures": [
+    "ResNetForImageClassification"
+  ],
+  "depths": [
+    1,
+    1,
+    2,
+    1
+  ],
+  "downsample_in_first_stage": false,
+  "embedding_size": 64,
+  "embeddings_size": 10,
+  "hidden_act": "relu",
+  "hidden_sizes": [
+    10,
+    20,
+    30,
+    40
+  ],
+  "id2label": {
+    "0": "LABEL_0",
+    "1": "LABEL_1",
+    "2": "LABEL_2"
+  },
+  "label2id": {
+    "LABEL_0": 0,
+    "LABEL_1": 1,
+    "LABEL_2": 2
+  },
+  "layer_type": "bottleneck",
+  "model_type": "resnet",
+  "num_channels": 3,
+  "out_features": [
+    "stage2",
+    "stage3",
+    "stage4"
+  ],
+  "stage_names": [
+    "stem",
+    "stage1",
+    "stage2",
+    "stage3",
+    "stage4"
+  ],
+  "torch_dtype": "float32",
+  "transformers_version": "4.25.0.dev0"
+}

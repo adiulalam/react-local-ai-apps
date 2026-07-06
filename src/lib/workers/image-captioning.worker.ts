@@ -11,7 +11,7 @@ env.useBrowserCache = true;
 
 const task: PipelineType = "image-to-text";
 const model = isTestEnv
-  ? "/model/hf-internal-testing/tiny-random-VisionEncoderDecoderModel-vit-gpt2"
+  ? "/models/tiny-vit-gpt2"
   : "Xenova/vit-gpt2-image-captioning";
 let instance: Promise<AllTasks["image-to-text"]> | null = null;
 

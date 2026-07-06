@@ -6,7 +6,7 @@ env.useBrowserCache = true;
 
 const task: PipelineType = "image-classification";
 const model = isTestEnv
-  ? "/model/hf-internal-testing/tiny-random-ResNetForImageClassification"
+  ? "/models/tiny-resnet"
   : "Xenova/resnet-50";
 let instance: Promise<AllTasks["image-classification"]> | null = null;
 

@@ -12,7 +12,7 @@ env.useBrowserCache = true;
 
 const task: PipelineType = "automatic-speech-recognition";
 const model = isTestEnv
-  ? "/model/hf-internal-testing/tiny-random-WhisperForConditionalGeneration"
+  ? "/models/tiny-whisper"
   : "onnx-community/whisper-base";
 let instance: Promise<AllTasks["automatic-speech-recognition"]> | null = null;
 

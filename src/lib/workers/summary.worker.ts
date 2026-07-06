@@ -12,7 +12,7 @@ env.useBrowserCache = true;
 
 const task: PipelineType = "summarization";
 const model = isTestEnv
-  ? "/model/hf-internal-testing/tiny-random-BartForConditionalGeneration"
+  ? "/models/tiny-bart"
   : "Xenova/distilbart-cnn-6-6";
 let instance: Promise<AllTasks["summarization"]> | null = null;
 
