@@ -4,3 +4,5 @@ import { twMerge } from "tailwind-merge";
 export const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
 }
+
+export const isTestEnv = import.meta.env.VITE_APP_ENV === 'test' || import.meta.env.VITE_APP_ENV === 'TEST';

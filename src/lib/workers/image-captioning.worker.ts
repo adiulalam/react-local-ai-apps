@@ -4,12 +4,15 @@ import {
   type PipelineType,
   type AllTasks,
 } from "@huggingface/transformers";
+import { isTestEnv } from "../utils";
 
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
 const task: PipelineType = "image-to-text";
-const model = "Xenova/vit-gpt2-image-captioning";
+const model = isTestEnv
+  ? "/model/hf-internal-testing/tiny-random-VisionEncoderDecoderModel-vit-gpt2"
+  : "Xenova/vit-gpt2-image-captioning";
 let instance: Promise<AllTasks["image-to-text"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {

@@ -5,12 +5,15 @@ import {
   type PipelineType,
   type AllTasks,
 } from "@huggingface/transformers";
+import { isTestEnv } from "../utils";
 
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
 const task: PipelineType = "automatic-speech-recognition";
-const model = "onnx-community/whisper-base";
+const model = isTestEnv
+  ? "/model/hf-internal-testing/tiny-random-WhisperForConditionalGeneration"
+  : "onnx-community/whisper-base";
 let instance: Promise<AllTasks["automatic-speech-recognition"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {

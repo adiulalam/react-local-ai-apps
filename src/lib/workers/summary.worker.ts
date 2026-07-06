@@ -5,12 +5,15 @@ import {
   type PipelineType,
   type AllTasks,
 } from "@huggingface/transformers";
+import { isTestEnv } from "../utils";
 
 env.allowLocalModels = false;
 env.useBrowserCache = true;
 
 const task: PipelineType = "summarization";
-const model = "Xenova/distilbart-cnn-6-6";
+const model = isTestEnv
+  ? "/model/hf-internal-testing/tiny-random-BartForConditionalGeneration"
+  : "Xenova/distilbart-cnn-6-6";
 let instance: Promise<AllTasks["summarization"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
