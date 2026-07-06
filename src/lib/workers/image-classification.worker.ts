@@ -2,12 +2,10 @@ import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/tr
 import { isTestEnv } from "../utils";
 
 env.allowLocalModels = isTestEnv;
-env.useBrowserCache = true;
+env.useBrowserCache = !isTestEnv;
 
 const task: PipelineType = "image-classification";
-const model = isTestEnv
-  ? "/models/tiny-resnet"
-  : "Xenova/resnet-50";
+const model = isTestEnv ? "/models/tiny-resnet" : "Xenova/resnet-50";
 let instance: Promise<AllTasks["image-classification"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {

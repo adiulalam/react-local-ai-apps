@@ -1,18 +1,11 @@
-import {
-  pipeline,
-  env,
-  type PipelineType,
-  type AllTasks,
-} from "@huggingface/transformers";
+import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "../utils";
 
 env.allowLocalModels = isTestEnv;
-env.useBrowserCache = true;
+env.useBrowserCache = !isTestEnv;
 
 const task: PipelineType = "image-to-text";
-const model = isTestEnv
-  ? "/models/tiny-vit-gpt2"
-  : "Xenova/vit-gpt2-image-captioning";
+const model = isTestEnv ? "/models/tiny-vit-gpt2" : "Xenova/vit-gpt2-image-captioning";
 let instance: Promise<AllTasks["image-to-text"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
@@ -35,9 +28,10 @@ export const generateCaption = async (
 
     const results = await captioner(image);
     // results is typically an array of objects like [{ generated_text: "a cat sitting on a couch" }]
-    const caption = Array.isArray(results) && results.length > 0 
-      ? (results[0] as { generated_text: string }).generated_text 
-      : "No caption generated.";
+    const caption =
+      Array.isArray(results) && results.length > 0
+        ? (results[0] as { generated_text: string }).generated_text
+        : "No caption generated.";
 
     postMessage({ type: "complete", result: caption });
   } catch (err: unknown) {

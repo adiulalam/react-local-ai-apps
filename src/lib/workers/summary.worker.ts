@@ -8,12 +8,10 @@ import {
 import { isTestEnv } from "../utils";
 
 env.allowLocalModels = isTestEnv;
-env.useBrowserCache = true;
+env.useBrowserCache = !isTestEnv;
 
 const task: PipelineType = "summarization";
-const model = isTestEnv
-  ? "/models/tiny-bart"
-  : "Xenova/distilbart-cnn-6-6";
+const model = isTestEnv ? "/models/tiny-bart" : "Xenova/distilbart-cnn-6-6";
 let instance: Promise<AllTasks["summarization"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {

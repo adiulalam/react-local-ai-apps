@@ -8,12 +8,10 @@ import {
 import { isTestEnv } from "../utils";
 
 env.allowLocalModels = isTestEnv;
-env.useBrowserCache = true;
+env.useBrowserCache = !isTestEnv;
 
 const task: PipelineType = "automatic-speech-recognition";
-const model = isTestEnv
-  ? "/models/tiny-whisper"
-  : "onnx-community/whisper-base";
+const model = isTestEnv ? "/models/whisper-tiny" : "onnx-community/whisper-base";
 let instance: Promise<AllTasks["automatic-speech-recognition"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
@@ -21,10 +19,7 @@ const getInstance = async (progress_callback: (info: unknown) => void) => {
     instance = pipeline(task, model, {
       progress_callback,
       device: "webgpu",
-      dtype: {
-        encoder_model: "fp32",
-        decoder_model_merged: "q4",
-      },
+      dtype: "fp32",
     }) as Promise<AllTasks["automatic-speech-recognition"]>;
   }
   return instance;
@@ -64,7 +59,8 @@ self.addEventListener("message", async (event) => {
         streamer,
       });
 
-      self.postMessage({ type: "complete", result: result.text });
+      const output = Array.isArray(result) ? result[0] : result;
+      self.postMessage({ type: "complete", result: output.text });
     } catch (err: unknown) {
       const error = err instanceof Error ? err.message : "Unknown error during transcription";
       self.postMessage({ type: "error", error });
