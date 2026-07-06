@@ -31,14 +31,10 @@ export const SummaryDisplay = ({
 
   return (
     <div className="mt-4 space-y-6">
-      {status === "initializing" && (
-        <Muted>Initializing Summarization Worker...</Muted>
-      )}
+      {status === "initializing" && <Muted>Initializing Summarization Worker...</Muted>}
 
       {status === "loading" && (
-        <Muted>
-          Downloading or loading DistilBART summary model chunks...
-        </Muted>
+        <Muted>Downloading or loading DistilBART summary model chunks...</Muted>
       )}
 
       {status === "processing" && (
@@ -56,7 +52,7 @@ export const SummaryDisplay = ({
             value={summary}
             onChange={(e) => onSummaryChange(e.target.value)}
             rows={8}
-            className="max-h-52 w-full resize-y text-base"
+            className="max-h-52 w-full resize-y text-base wrap-anywhere"
             placeholder={
               status === "processing"
                 ? "Summarizing... Text will appear here."

@@ -41,7 +41,7 @@ export const ExportBlock = ({ title, content, prefix }: ExportBlockProps) => {
         <H3>{title}</H3>
         <ExportActions onCopy={handleCopy} onDownload={handleDownload} copied={copied} />
       </div>
-      <div className="bg-secondary/20 max-h-64 overflow-y-auto rounded-lg p-4 text-sm leading-relaxed whitespace-pre-wrap">
+      <div className="bg-secondary/20 max-h-64 overflow-y-auto rounded-lg p-4 text-sm leading-relaxed wrap-anywhere whitespace-pre-wrap">
         {content}
       </div>
     </div>

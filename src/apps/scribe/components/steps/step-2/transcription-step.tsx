@@ -4,7 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import { Muted } from "@/components/ui/typography";
-import { createWorkerMessageHandler, type WorkerStatus } from "@/apps/scribe/utils/worker-message-handler";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+} from "@/apps/scribe/utils/worker-message-handler";
 
 interface TranscriptionStepProps {
   audioData: Float32Array;
@@ -76,21 +79,15 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
     <div className="space-y-4">
       <DownloadProgress progressItems={progressItems} />
 
-      {status === "initializing" && (
-        <Muted>Initializing Web Worker...</Muted>
-      )}
+      {status === "initializing" && <Muted>Initializing Web Worker...</Muted>}
 
       {status === "loading" && (
-        <Muted>
-          Checking cache and downloading required model chunks...
-        </Muted>
+        <Muted>Checking cache and downloading required model chunks...</Muted>
       )}
 
       {status === "processing" && (
         <div className="flex items-center gap-3">
-          <Muted>
-            Transcribing audio locally... This may take a moment.
-          </Muted>
+          <Muted>Transcribing audio locally... This may take a moment.</Muted>
         </div>
       )}
 
@@ -103,7 +100,7 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
             value={transcription}
             onChange={(e) => setTranscription(e.target.value)}
             rows={10}
-            className="max-h-52 w-full resize-y text-base"
+            className="max-h-52 w-full resize-y text-base wrap-anywhere"
             placeholder={
               status === "processing"
                 ? "Transcribing... Text will appear here."
