@@ -51,7 +51,7 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
           <img src={image} alt="Preview" className="max-h-64 rounded-lg object-contain" />
           <div className="flex w-full justify-end">
             <Button onClick={() => onNext(image)}>
-              Continue to Classification
+              Classification
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>

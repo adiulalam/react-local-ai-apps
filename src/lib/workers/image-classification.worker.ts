@@ -5,7 +5,7 @@ env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
 
 const task: PipelineType = "image-classification";
-const model = isTestEnv ? "/models/tiny-resnet" : "Xenova/resnet-50";
+const model = isTestEnv ? "/models/mobilenet-tiny" : "Xenova/resnet-50";
 let instance: Promise<AllTasks["image-classification"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
