@@ -8,7 +8,7 @@ test.describe('Image Classifier E2E', () => {
     await page.goto('/image-classifier');
 
     // 2. Upload image file
-    const fileInput = page.locator('input[type="file"]');
+    const fileInput = page.getByTestId('image-file-input');
     await fileInput.setInputFiles(path.join(process.cwd(), 'public/test-assets/dog-image.jfif'));
 
     // The image preview should appear with a Classification button
@@ -26,6 +26,6 @@ test.describe('Image Classifier E2E', () => {
     // Wait for caption description to appear
     await expect(page.getByRole('heading', { name: 'Caption Description' })).toBeVisible({ timeout: 60000 });
     // Also expect some italic text which is the caption
-    await expect(page.locator('p.italic.text-center')).not.toBeEmpty();
+    await expect(page.getByTestId('caption-text')).not.toBeEmpty();
   });
 });

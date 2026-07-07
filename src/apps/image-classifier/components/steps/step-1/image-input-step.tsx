@@ -43,6 +43,7 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
           ref={fileInputRef}
           accept="image/*"
           onFileSelect={handleFileSelect}
+          data-testid="image-file-input"
         />
       </FileUploadRoot>
 

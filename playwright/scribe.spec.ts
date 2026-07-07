@@ -10,7 +10,7 @@ test.describe('Local Scribe E2E', () => {
     await page.goto('/scribe');
 
     // 2. Upload audio file
-    const fileInput = page.locator('input[type="file"]');
+    const fileInput = page.getByTestId('audio-file-input');
     await fileInput.setInputFiles(path.join(process.cwd(), 'public/test-assets/test-audio.wav'));
 
     // Wait for the transcription step to finish and the 'Continue to Summarization' button to become enabled

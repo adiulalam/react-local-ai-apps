@@ -25,6 +25,7 @@ export const FileUploadInput = ({ onBlobReady, disabled }: FileUploadInputProps)
         onChange={handleFileChange}
         disabled={disabled}
         className="cursor-pointer"
+        data-testid="audio-file-input"
       />
     </div>
   );

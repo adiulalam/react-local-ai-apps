@@ -93,7 +93,7 @@ export const CaptionStep = ({ imageDataUrl }: CaptionStepProps) => {
           <div className="flex flex-col gap-4">
             <H3>Caption Description</H3>
             <div className="bg-primary/5 rounded-lg border p-6 shadow-sm">
-              <p className="text-lg font-medium italic text-foreground text-center">
+              <p data-testid="caption-text" className="text-lg font-medium italic text-foreground text-center">
                 "{caption}"
               </p>
             </div>
