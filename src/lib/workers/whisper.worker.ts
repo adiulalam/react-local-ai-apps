@@ -18,7 +18,7 @@ const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (instance === null) {
     instance = pipeline(task, model, {
       progress_callback,
-      device: "webgpu",
+      device: isTestEnv ? "wasm" : "webgpu",
       dtype: "fp32",
     }) as Promise<AllTasks["automatic-speech-recognition"]>;
   }

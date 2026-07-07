@@ -18,7 +18,7 @@ const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (instance === null) {
     instance = pipeline(task, model, {
       progress_callback,
-      device: "webgpu",
+      device: isTestEnv ? "wasm" : "webgpu",
       dtype: "fp32", // fp32 is the safest full-precision fallback for webgpu ops on distilbart
     }) as Promise<AllTasks["summarization"]>;
   }
@@ -52,8 +52,9 @@ self.addEventListener("message", async (event) => {
       });
 
       const result = await summarizer(text, {
-        max_new_tokens: options?.max_length || 150,
-        min_length: options?.min_length || 30,
+        max_new_tokens: isTestEnv ? 20 : (options?.max_length || 150),
+        min_length: isTestEnv ? 5 : (options?.min_length || 30),
+        truncation: true,
         streamer,
       });
 

@@ -26,7 +26,9 @@ export const generateCaption = async (
   try {
     postMessage({ type: "processing" });
 
-    const results = await captioner(image);
+    const results = await captioner(image, {
+      max_new_tokens: isTestEnv ? 20 : undefined,
+    });
     // results is typically an array of objects like [{ generated_text: "a cat sitting on a couch" }]
     const caption =
       Array.isArray(results) && results.length > 0
