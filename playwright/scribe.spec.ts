@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 import path from 'path';
 
 test.describe('Local Scribe E2E', () => {
+  test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
+
   test('should transcribe and summarize audio using local model', async ({ page }) => {
     test.setTimeout(60000);
     // 1. Navigate to the scribe app
@@ -29,5 +31,17 @@ test.describe('Local Scribe E2E', () => {
     // 4. Export step
     await expect(page.getByText('Final Summary')).toBeVisible();
     await expect(page.getByText('Raw Transcription')).toBeVisible();
+
+    // Test Copy functionality
+    await page.getByRole('button', { name: 'Copy' }).first().click();
+    await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible();
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipboardText.length).toBeGreaterThan(0);
+
+    // Test Download functionality
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download' }).first().click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/local_scribe_.*\.txt/);
   });
 });
