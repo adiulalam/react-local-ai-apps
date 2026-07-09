@@ -1,11 +1,20 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Mic, Image as ImageIcon, Eraser } from "lucide-react";
+import {
+  Mic,
+  Image as ImageIcon,
+  Eraser,
+  MessageSquare,
+  Headphones,
+  Layers,
+  Video,
+} from "lucide-react";
 import {
   NavigationMenu,
+  NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuList,
   NavigationMenuLink,
-  navigationMenuTriggerStyle,
+  NavigationMenuList,
+  NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { Suspense } from "react";
 import { Muted } from "@/components/ui/typography";
@@ -18,38 +27,86 @@ export const Layout = () => {
     <div className="bg-background flex min-h-screen flex-col">
       <header className="flex h-14 w-full items-center justify-between border-b px-4">
         <NavigationMenu>
-          <NavigationMenuList className="gap-4">
+          <NavigationMenuList className="gap-2">
+            {/* Audio Group */}
             <NavigationMenuItem>
-              <NavigationMenuLink
-                render={<Link to="/scribe" />}
-                className={navigationMenuTriggerStyle()}
-                active={location.pathname.startsWith("/scribe")}
-              >
-                <Mic />
-                Local Scribe
-              </NavigationMenuLink>
+              <NavigationMenuTrigger className="gap-2">
+                <Headphones className="size-4" />
+                Audio
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
+                <NavigationMenuLink
+                  render={<Link to="/scribe" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/scribe")}
+                >
+                  <Mic className="size-4" />
+                  Local Scribe
+                </NavigationMenuLink>
+              </NavigationMenuContent>
             </NavigationMenuItem>
+
+            {/* Image Group */}
             <NavigationMenuItem>
-              <NavigationMenuLink
-                render={<Link to="/image-classifier" />}
-                className={navigationMenuTriggerStyle()}
-                active={location.pathname.startsWith("/image-classifier")}
-              >
-                <ImageIcon />
-                Image Classification
-              </NavigationMenuLink>
+              <NavigationMenuTrigger className="gap-2">
+                <Layers className="size-4" />
+                Image
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
+                <NavigationMenuLink
+                  render={<Link to="/image-classifier" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/image-classifier")}
+                >
+                  <ImageIcon className="size-4" />
+                  Image Classification
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/background-remover" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/background-remover")}
+                >
+                  <Eraser className="size-4" />
+                  Background Remover
+                </NavigationMenuLink>
+              </NavigationMenuContent>
             </NavigationMenuItem>
+
+            {/* Video Group */}
             <NavigationMenuItem>
-              <NavigationMenuLink
-                render={<Link to="/background-remover" />}
-                className={navigationMenuTriggerStyle()}
-                active={location.pathname.startsWith("/background-remover")}
-              >
-                <Eraser />
-                Background Remover
-              </NavigationMenuLink>
+              <NavigationMenuTrigger className="gap-2">
+                <Video className="size-4" />
+                Video
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
+                <NavigationMenuLink
+                  render={<Link to="/video" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/video")}
+                >
+                  <Video className="size-4" />
+                  Local Video
+                </NavigationMenuLink>
+              </NavigationMenuContent>
             </NavigationMenuItem>
-            {/* Future apps will be added here */}
+
+            {/* Chat Group */}
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="gap-2">
+                <MessageSquare className="size-4" />
+                Chat
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
+                <NavigationMenuLink
+                  render={<Link to="/chat" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/chat")}
+                >
+                  <MessageSquare className="size-4" />
+                  Local Chat
+                </NavigationMenuLink>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
 
