@@ -23,6 +23,7 @@ const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (modelPromise === null) {
     modelPromise = AutoModel.from_pretrained(model_id, {
       device: isTestEnv ? "wasm" : "webgpu",
+      dtype: isTestEnv ? "fp16" : "fp32",
       progress_callback,
     });
   }
