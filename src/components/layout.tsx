@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Mic, Image as ImageIcon } from "lucide-react";
+import { Mic, Image as ImageIcon, Eraser } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -37,6 +37,16 @@ export const Layout = () => {
               >
                 <ImageIcon />
                 Image Classification
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink
+                render={<Link to="/background-remover" />}
+                className={navigationMenuTriggerStyle()}
+                active={location.pathname.startsWith("/background-remover")}
+              >
+                <Eraser />
+                Background Remover
               </NavigationMenuLink>
             </NavigationMenuItem>
             {/* Future apps will be added here */}
