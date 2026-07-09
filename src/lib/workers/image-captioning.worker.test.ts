@@ -54,7 +54,7 @@ describe("image-captioning.worker", () => {
     await messageHandler({ data: { type: "process", image: "data:image/jpeg;base64,..." } });
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
-    expect(captionerMock).toHaveBeenCalledWith("data:image/jpeg;base64,...");
+    expect(captionerMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", { max_new_tokens: undefined });
     expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: "a mocked caption" });
   });
 });
