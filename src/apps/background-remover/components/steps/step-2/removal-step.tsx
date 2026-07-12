@@ -7,6 +7,7 @@ import {
   createWorkerMessageHandler,
   type WorkerStatus,
 } from "@/apps/image-classifier/utils/worker-message-handler";
+import BackgroundRemoverWorker from "@/lib/workers/background-remover.worker?worker";
 
 interface RemovalResult {
   maskData: Uint8Array;
@@ -37,12 +38,7 @@ export const RemovalStep = ({ imageDataUrl }: RemovalStepProps) => {
     }
 
     if (!worker.current) {
-      worker.current = new Worker(
-        new URL("../../../../../lib/workers/background-remover.worker.ts", import.meta.url),
-        {
-          type: "module",
-        }
-      );
+      worker.current = new BackgroundRemoverWorker();
 
       const messageHandler = createWorkerMessageHandler<RemovalResult>({
         setStatus,

@@ -8,6 +8,7 @@ import {
   createWorkerMessageHandler,
   type WorkerStatus,
 } from "@/apps/scribe/utils/worker-message-handler";
+import WhisperWorker from "@/lib/workers/whisper.worker?worker";
 
 interface TranscriptionStepProps {
   audioData: Float32Array;
@@ -41,12 +42,7 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
 
     if (!worker.current) {
       // Instantiate worker
-      worker.current = new Worker(
-        new URL("../../../../../lib/workers/whisper.worker.ts", import.meta.url),
-        {
-          type: "module",
-        }
-      );
+      worker.current = new WhisperWorker();
 
       const messageHandler = createWorkerMessageHandler({
         setStatus,

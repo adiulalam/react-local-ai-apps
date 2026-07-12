@@ -4,6 +4,7 @@ import { ModeSelector } from "./mode-selector";
 import { SummaryDisplay } from "./summary-display";
 import { type SummaryMode, SUMMARY_OPTIONS } from "@/types/summary";
 import { createWorkerMessageHandler, type WorkerStatus } from "@/apps/scribe/utils/worker-message-handler";
+import SummaryWorker from "@/lib/workers/summary.worker?worker";
 
 interface SummarizationStepProps {
   transcription: string;
@@ -37,12 +38,7 @@ export const SummarizationStep = ({ transcription, onNext }: SummarizationStepPr
       worker.current.terminate();
     }
 
-    worker.current = new Worker(
-      new URL("../../../../../lib/workers/summary.worker.ts", import.meta.url),
-      {
-        type: "module",
-      }
-    );
+    worker.current = new SummaryWorker();
 
     let summarizationStarted = false;
 

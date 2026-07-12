@@ -10,6 +10,7 @@ import {
 } from "../../../utils/worker-message-handler";
 
 import { Button } from "@/components/ui/button";
+import ImageClassificationWorker from "@/lib/workers/image-classification.worker?worker";
 
 interface ClassificationStepProps {
   imageDataUrl: string;
@@ -35,12 +36,7 @@ export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepP
     }
 
     if (!worker.current) {
-      worker.current = new Worker(
-        new URL("../../../../../lib/workers/image-classification.worker.ts", import.meta.url),
-        {
-          type: "module",
-        }
-      );
+      worker.current = new ImageClassificationWorker();
 
       const messageHandler = createWorkerMessageHandler({
         setStatus,

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import { H3, Muted } from "@/components/ui/typography";
 import { createWorkerMessageHandler, type WorkerStatus } from "../../../utils/worker-message-handler";
+import ImageCaptioningWorker from "@/lib/workers/image-captioning.worker?worker";
 
 interface CaptionStepProps {
   imageDataUrl: string;
@@ -26,12 +27,7 @@ export const CaptionStep = ({ imageDataUrl }: CaptionStepProps) => {
     }
 
     if (!worker.current) {
-      worker.current = new Worker(
-        new URL("../../../../../lib/workers/image-captioning.worker.ts", import.meta.url),
-        {
-          type: "module",
-        }
-      );
+      worker.current = new ImageCaptioningWorker();
 
       const messageHandler = createWorkerMessageHandler<string>({
         setStatus,
