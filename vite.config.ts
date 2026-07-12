@@ -15,4 +15,7 @@ export default defineConfig({
   test: {
     exclude: ["**/node_modules/**", "**/dist/**", "**/playwright/**"],
   },
+  worker: {
+    format: "es",
+  },
 });
