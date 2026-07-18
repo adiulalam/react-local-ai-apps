@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { ChatMessage, ChatInput, ChatProgress, type ProgressItem } from "@/components/chat";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Lightbulb, Play, RefreshCw } from "lucide-react";
 import { Qwen } from "@/components/icons/qwen";
 import { H1, Muted, Large, Small } from "@/components/ui/typography";
@@ -18,7 +19,7 @@ interface Message {
 
 const Qwen3Screen = () => {
   const worker = useRef<Worker | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [status, setStatus] = useState<WorkerStatus>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -89,8 +90,8 @@ const Qwen3Screen = () => {
   }, [messages, reasonEnabled, isRunning]);
 
   useEffect(() => {
-    if (scrollRef.current && isRunning) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (isRunning) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isRunning]);
 
@@ -149,19 +150,21 @@ const Qwen3Screen = () => {
 
       {(status === "ready" || status === "processing" || status === "complete") && (
         <>
-          <div
-            ref={scrollRef}
-            className="scrollbar-thin w-full flex-1 overflow-y-auto scroll-smooth pb-4"
-          >
+          <ScrollArea className="w-full flex-1 overflow-hidden">
             {messages.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center space-y-4">
+              <div className="flex h-full min-h-[50vh] flex-col items-center justify-center space-y-4">
                 <Qwen className="text-muted-foreground h-16 w-16 opacity-20" />
                 <Muted>Model loaded! Start chatting below.</Muted>
               </div>
             ) : (
-              messages.map((msg, i) => <ChatMessage key={i} {...msg} />)
+              <div className="flex flex-col pr-4">
+                {messages.map((msg, i) => (
+                  <ChatMessage key={i} {...msg} />
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
             )}
-          </div>
+          </ScrollArea>
 
           <div className="bg-background flex w-full flex-col pt-4">
             <div className="mb-2 flex items-center justify-between px-1">
