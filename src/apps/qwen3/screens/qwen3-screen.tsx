@@ -134,7 +134,6 @@ const Qwen3Screen = () => {
               setStatus("loading");
             }}
             disabled={error !== null}
-            className="mt-4"
           >
             <Play className="mr-2 h-4 w-4" />
             Start Model
@@ -166,37 +165,34 @@ const Qwen3Screen = () => {
             )}
           </ScrollArea>
 
-          <div className="bg-background flex w-full flex-col pt-4">
+          <div className="bg-background flex w-full flex-col pt-2">
             <div className="mb-2 flex items-center justify-between px-1">
-              <div className="text-muted-foreground text-xs">
-                {tps && messages.length > 0 && !isRunning && (
-                  <span className="flex items-center space-x-2">
+              {tps && messages.length > 0 && !isRunning ? (
+                <div className="flex items-center gap-0.5">
+                  <Muted className="text-xs">
                     {numTokens} tokens at {tps.toFixed(2)} tokens/sec.{" "}
-                    <Button
-                      variant="link"
-                      size="xs"
-                      onClick={() => {
-                        worker.current?.postMessage({ type: "reset" });
-                        setMessages([]);
-                      }}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                      Reset
-                    </Button>
-                  </span>
-                )}
-              </div>
+                  </Muted>
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    onClick={() => {
+                      worker.current?.postMessage({ type: "reset" });
+                      setMessages([]);
+                    }}
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Reset
+                  </Button>
+                </div>
+              ) : (
+                <div />
+              )}
               <Button
-                variant="outline"
+                variant={reasonEnabled ? "secondary" : "outline"}
                 size="sm"
                 onClick={() => setReasonEnabled(!reasonEnabled)}
-                className={cn(
-                  "h-8 gap-2 rounded-full transition-colors",
-                  reasonEnabled &&
-                    "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20"
-                )}
               >
-                <Lightbulb className={cn("h-4 w-4", reasonEnabled ? "fill-primary" : "")} />
+                <Lightbulb className={cn("h-4 w-4", reasonEnabled && "fill-primary")} />
                 Reasoning
               </Button>
             </div>
