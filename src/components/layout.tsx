@@ -19,6 +19,7 @@ import {
 import { Suspense } from "react";
 import { Muted } from "@/components/ui/typography";
 import { ModeToggle } from "@/components/mode-toggle";
+import { Qwen } from "@/components/icons/qwen";
 
 export const Layout = () => {
   const location = useLocation();
@@ -98,12 +99,12 @@ export const Layout = () => {
               </NavigationMenuTrigger>
               <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
                 <NavigationMenuLink
-                  render={<Link to="/chat" />}
+                  render={<Link to="/qwen3" />}
                   className="w-full justify-start"
-                  active={location.pathname.startsWith("/chat")}
+                  active={location.pathname.startsWith("/qwen3")}
                 >
-                  <MessageSquare className="size-4" />
-                  Local Chat
+                  <Qwen className="size-4" />
+                  Qwen 3 - 0.6B
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
