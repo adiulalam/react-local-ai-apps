@@ -31,9 +31,9 @@ export const Layout = () => {
           <NavigationMenuList className="gap-2">
             {/* Audio Group */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="gap-2">
+              <NavigationMenuTrigger className="gap-2" aria-label="Audio">
                 <Headphones className="size-4" />
-                Audio
+                <span className="hidden md:block">Audio</span>
               </NavigationMenuTrigger>
               <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
                 <NavigationMenuLink
@@ -49,9 +49,9 @@ export const Layout = () => {
 
             {/* Image Group */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="gap-2">
+              <NavigationMenuTrigger className="gap-2" aria-label="Image">
                 <Layers className="size-4" />
-                Image
+                <span className="hidden md:block">Image</span>
               </NavigationMenuTrigger>
               <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
                 <NavigationMenuLink
@@ -75,9 +75,9 @@ export const Layout = () => {
 
             {/* Video Group */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="gap-2">
+              <NavigationMenuTrigger className="gap-2" aria-label="Video">
                 <Video className="size-4" />
-                Video
+                <span className="hidden md:block">Video</span>
               </NavigationMenuTrigger>
               <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
                 <NavigationMenuLink
@@ -93,9 +93,9 @@ export const Layout = () => {
 
             {/* Chat Group */}
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="gap-2">
+              <NavigationMenuTrigger className="gap-2" aria-label="Chat">
                 <MessageSquare className="size-4" />
-                Chat
+                <span className="hidden md:block">Chat</span>
               </NavigationMenuTrigger>
               <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
                 <NavigationMenuLink
