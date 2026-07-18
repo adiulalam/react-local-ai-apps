@@ -39,7 +39,7 @@ describe("image-captioning.worker", () => {
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith("image-to-text", "Xenova/vit-gpt2-image-captioning", expect.any(Object));
+    expect(mockPipeline).toHaveBeenCalledWith("image-to-text", "/models/tiny-vit-gpt2", expect.any(Object));
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 
@@ -54,7 +54,7 @@ describe("image-captioning.worker", () => {
     await messageHandler({ data: { type: "process", image: "data:image/jpeg;base64,..." } });
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
-    expect(captionerMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", { max_new_tokens: undefined });
+    expect(captionerMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", { max_new_tokens: 20 });
     expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: "a mocked caption" });
   });
 });

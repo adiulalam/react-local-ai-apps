@@ -42,7 +42,7 @@ describe("whisper.worker", () => {
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith("automatic-speech-recognition", "onnx-community/whisper-base", expect.any(Object));
+    expect(mockPipeline).toHaveBeenCalledWith("automatic-speech-recognition", "/models/whisper-tiny", expect.any(Object));
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 

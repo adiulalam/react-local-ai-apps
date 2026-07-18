@@ -49,7 +49,7 @@ describe("summary.worker", () => {
     // Ensure it attempts to load and posts ready
     expect(mockPipeline).toHaveBeenCalledWith(
       "summarization",
-      "Xenova/distilbart-cnn-6-6",
+      "/models/tiny-bart",
       expect.any(Object)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
@@ -78,8 +78,9 @@ describe("summary.worker", () => {
     expect(summarizerMock).toHaveBeenCalledWith(
       "Long text to summarize",
       expect.objectContaining({
-        max_new_tokens: 50,
-        min_length: 10,
+        max_new_tokens: 20,
+        min_length: 5,
+        truncation: true,
         streamer: expect.any(Object),
       })
     );

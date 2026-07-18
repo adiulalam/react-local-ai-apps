@@ -72,8 +72,8 @@ describe("qwen.worker", () => {
     await messageHandler({ data: { type: "load" } });
     await new Promise((r) => setTimeout(r, 50));
 
-    expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({ status: "loading" }));
-    expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({ status: "ready" }));
+    expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({ type: "loading" }));
+    expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining({ type: "ready" }));
     expect(mockGenerate).toHaveBeenCalled();
   });
 
@@ -82,8 +82,8 @@ describe("qwen.worker", () => {
     await messageHandler({ data: { type: "generate", data: { messages: [{ role: "user", content: "Hi" }], reasonEnabled: false } } });
     await new Promise((r) => setTimeout(r, 50));
 
-    expect(postMessageMock).toHaveBeenCalledWith({ status: "start" });
+    expect(postMessageMock).toHaveBeenCalledWith({ type: "start" });
     expect(mockGenerate).toHaveBeenCalled();
-    expect(postMessageMock).toHaveBeenCalledWith({ status: "complete", output: "Hello world" });
+    expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: "Hello world" });
   });
 });

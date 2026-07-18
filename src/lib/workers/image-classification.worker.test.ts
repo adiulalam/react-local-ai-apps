@@ -39,7 +39,7 @@ describe("image-classification.worker", () => {
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith("image-classification", "Xenova/resnet-50", expect.any(Object));
+    expect(mockPipeline).toHaveBeenCalledWith("image-classification", "/models/mobilenet-tiny", expect.any(Object));
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 
