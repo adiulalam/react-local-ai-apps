@@ -34,9 +34,6 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        launchOptions: {
-          args: ["--disk-cache-size=1073741824"],
-        },
       },
     },
 
