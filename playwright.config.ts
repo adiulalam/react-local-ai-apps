@@ -4,9 +4,9 @@ import { defineConfig, devices } from "@playwright/test";
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  timeout: 120_000,
+  timeout: 60_000,
   expect: {
-    timeout: 120_000,
+    timeout: 60_000,
   },
   testDir: "./playwright",
   /* Run tests in files in parallel */
@@ -16,7 +16,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: 2,
   /* Use 100% of available CPU cores for parallel tests locally */
-  workers: 1,
+  workers: "100%",
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "github",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
