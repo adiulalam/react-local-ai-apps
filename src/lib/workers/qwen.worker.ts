@@ -6,9 +6,14 @@ import {
   PreTrainedModel,
   PreTrainedTokenizer,
   DynamicCache,
+  env,
 } from "@huggingface/transformers";
+import { isTestEnv } from "../utils";
 
-const MODEL_ID = "onnx-community/Qwen3-0.6B-ONNX";
+env.allowLocalModels = isTestEnv;
+env.useBrowserCache = !isTestEnv;
+
+const MODEL_ID = isTestEnv ? "/models/tiny-qwen" : "onnx-community/Qwen3-0.6B-ONNX";
 
 let tokenizerPromise: Promise<PreTrainedTokenizer> | null = null;
 let modelPromise: Promise<PreTrainedModel> | null = null;
@@ -19,8 +24,8 @@ const getInstance = async (progress_callback?: (info: unknown) => void) => {
   });
 
   modelPromise ??= AutoModelForCausalLM.from_pretrained(MODEL_ID, {
-    dtype: "q4f16",
-    device: "webgpu",
+    dtype: isTestEnv ? "fp32" : "q4f16",
+    device: isTestEnv ? "wasm" : "webgpu",
     progress_callback,
   });
 
@@ -132,7 +137,7 @@ const generate = async ({ messages, reasonEnabled }: GenerateData) => {
     do_sample: true,
     top_k: 20,
     temperature: reasonEnabled ? 0.6 : 0.7,
-    max_new_tokens: 16384,
+    max_new_tokens: isTestEnv ? 100 : 16384,
     streamer,
     stopping_criteria,
     return_dict_in_generate: true,

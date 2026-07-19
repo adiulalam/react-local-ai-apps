@@ -15,9 +15,15 @@ export interface ChatMessageProps {
 
 export const ChatMessage = ({ role, content, answerIndex }: ChatMessageProps) => {
   const thinkingRaw = answerIndex !== undefined ? content.slice(0, answerIndex) : content;
-  const thinking = thinkingRaw.replace(/<think>/g, "").replace(/<\/think>/g, "").trim();
+  const thinking = thinkingRaw
+    .replace(/<think>/g, "")
+    .replace(/<\/think>/g, "")
+    .trim();
   const answerRaw = answerIndex !== undefined ? content.slice(answerIndex) : "";
-  const answer = answerRaw.replace(/<think>/g, "").replace(/<\/think>/g, "").trimStart();
+  const answer = answerRaw
+    .replace(/<think>/g, "")
+    .replace(/<\/think>/g, "")
+    .trimStart();
 
   const [showThinking, setShowThinking] = useState(false);
   const doneThinking = answerIndex === 0 || answer.length > 0;
@@ -47,7 +53,7 @@ export const ChatMessage = ({ role, content, answerIndex }: ChatMessageProps) =>
         )}
       >
         {role === "assistant" ? (
-          <Card className="bg-muted/50 border-none shadow-none">
+          <Card data-testid="assistant-message" className="bg-muted/50 border-none shadow-none">
             <CardContent className="text-sm whitespace-pre-wrap">
               {answerIndex === 0 || thinking.length > 0 ? (
                 <>

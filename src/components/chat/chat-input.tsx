@@ -61,6 +61,7 @@ export const ChatInput = ({
             variant="default"
             className="h-8 w-8 rounded-full"
             onClick={onInterrupt}
+            aria-label="Stop generation"
           >
             <Square className="h-4 w-4 fill-current" />
           </Button>
@@ -71,6 +72,7 @@ export const ChatInput = ({
             className="h-8 w-8 rounded-full"
             onClick={handleSend}
             disabled={!input.trim() || disabled}
+            aria-label="Send message"
           >
             <ArrowUp className="h-4 w-4" />
           </Button>

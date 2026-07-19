@@ -46,6 +46,17 @@ vi.mock("@huggingface/transformers", () => {
       reset() {}
       interrupt() {}
     },
+    env: {
+      allowLocalModels: false,
+      useBrowserCache: true,
+      backends: {
+        onnx: {
+          wasm: {
+            proxy: true
+          }
+        }
+      }
+    }
   };
 });
 
