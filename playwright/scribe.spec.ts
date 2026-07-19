@@ -5,7 +5,6 @@ test.describe('Local Scribe E2E', () => {
   test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
   test('should transcribe and summarize audio using local model', async ({ page }) => {
-    test.setTimeout(60000);
     // 1. Navigate to the scribe app
     await page.goto('/scribe');
 
@@ -15,7 +14,7 @@ test.describe('Local Scribe E2E', () => {
 
     // Wait for the transcription step to finish and the 'Continue to Summarization' button to become enabled
     const continueToSummarizationBtn = page.getByRole('button', { name: /Continue to Summarization/i });
-    await expect(continueToSummarizationBtn).toBeEnabled({ timeout: 60000 });
+    await expect(continueToSummarizationBtn).toBeEnabled();
     await continueToSummarizationBtn.click();
 
     // 3. Summarization step
@@ -25,7 +24,7 @@ test.describe('Local Scribe E2E', () => {
 
     // Wait for summarization to complete
     const continueToExportBtn = page.getByRole('button', { name: /Continue to Export/i });
-    await expect(continueToExportBtn).toBeEnabled({ timeout: 60000 });
+    await expect(continueToExportBtn).toBeEnabled();
     await continueToExportBtn.click();
 
     // 4. Export step

@@ -3,7 +3,6 @@ import path from 'path';
 
 test.describe('Image Classifier E2E', () => {
   test('should classify image and generate caption using local model', async ({ page }) => {
-    test.setTimeout(60000);
     // 1. Navigate to the image classifier app
     await page.goto('/image-classifier');
 
@@ -19,12 +18,12 @@ test.describe('Image Classifier E2E', () => {
     // 3. Classification step
     // Wait for the classification to finish and 'Next: Generate Caption' button to appear
     const generateCaptionBtn = page.getByRole('button', { name: /Next: Generate Caption/i });
-    await expect(generateCaptionBtn).toBeVisible({ timeout: 60000 });
+    await expect(generateCaptionBtn).toBeVisible();
     await generateCaptionBtn.click();
 
     // 4. Caption step
     // Wait for caption description to appear
-    await expect(page.getByRole('heading', { name: 'Caption Description' })).toBeVisible({ timeout: 60000 });
+    await expect(page.getByRole('heading', { name: 'Caption Description' })).toBeVisible();
     // Also expect some italic text which is the caption
     await expect(page.getByTestId('caption-text')).not.toBeEmpty();
   });

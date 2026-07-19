@@ -48,6 +48,8 @@ Here are some of the design patterns that are used in the Orri application:
 - Use Lodash or vanilla JS/TS for all utility functions
 - Use arrow functions for all function definitions in TypeScript files
 - Use kebab-case for file names
+- In Playwright testing, ideally get elements by role locators. If not possible, create and use a test id.
+- Use the default waiting time for each test and locator. Ensure there is no additional extra waiting time.
 
 #### Don't:
 
@@ -55,3 +57,4 @@ Here are some of the design patterns that are used in the Orri application:
 - Try to create too many nested divs
 - Touch the ShadCN UI components folder on `components/UI`
 - Use any tailwind animation classes
+- Get elements by `className` in Playwright tests; instead try to get them by role or test id.

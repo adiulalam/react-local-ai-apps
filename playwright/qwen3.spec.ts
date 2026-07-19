@@ -2,8 +2,6 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Qwen3 Local E2E", () => {
   test("should load the tiny model and generate a dummy response", async ({ page }) => {
-    test.setTimeout(60000); // Allow time for downloading and loading the dummy model
-
     // 1. Navigate to the qwen3 app
     await page.goto("/qwen3");
 
@@ -14,7 +12,7 @@ test.describe("Qwen3 Local E2E", () => {
 
     // 3. Wait for model to load and chat input to become enabled
     const chatInput = page.getByPlaceholder("Type a message...");
-    await expect(chatInput).toBeEnabled({ timeout: 60000 });
+    await expect(chatInput).toBeEnabled();
 
     const reasonBtn = page.getByRole("button", { name: /Reasoning/i });
     await expect(reasonBtn).toBeVisible();
@@ -25,7 +23,7 @@ test.describe("Qwen3 Local E2E", () => {
 
     // 5. Verify that assistant responds
     const resetBtn = page.getByRole("button", { name: /Reset/i });
-    await expect(resetBtn).toBeVisible({ timeout: 60000 });
+    await expect(resetBtn).toBeVisible();
 
     await expect(page.getByRole("button", { name: /Stop generation/i })).toHaveCount(0);
 

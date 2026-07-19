@@ -3,9 +3,6 @@ import path from "path";
 
 test.describe("Background Remover E2E", () => {
   test("should remove background from image using local WebGPU model", async ({ page }) => {
-    // Increase timeout since downloading the model and processing takes time
-    test.setTimeout(60000);
-
     // 1. Navigate to the background remover app
     await page.goto("/background-remover");
 
@@ -23,7 +20,7 @@ test.describe("Background Remover E2E", () => {
     // 3. Removal step
     // Wait for the processing to finish and 'Download PNG' button to appear
     const downloadBtn = page.getByRole("button", { name: /Download PNG/i });
-    await expect(downloadBtn).toBeVisible({ timeout: 60000 });
+    await expect(downloadBtn).toBeVisible();
 
     // Verify the result image is displayed
     const resultImage = page.getByAltText("Background Removed");
