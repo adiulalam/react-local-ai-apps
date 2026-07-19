@@ -4,9 +4,10 @@ import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
+import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 export default defineConfig([
-  globalIgnores(["dist"]),
+  globalIgnores(["dist", "public", "playwright-report", "test-results", ".playwright-mcp"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
@@ -23,4 +24,5 @@ export default defineConfig([
       "react-refresh/only-export-components": "off",
     },
   },
+  eslintPluginPrettierRecommended,
 ]);

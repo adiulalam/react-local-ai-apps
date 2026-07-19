@@ -55,8 +55,8 @@ self.addEventListener("message", async (event) => {
       });
 
       const result = await summarizer(text, {
-        max_new_tokens: isTestEnv ? 20 : (options?.max_length || 150),
-        min_length: isTestEnv ? 5 : (options?.min_length || 30),
+        max_new_tokens: isTestEnv ? 20 : options?.max_length || 150,
+        min_length: isTestEnv ? 5 : options?.min_length || 30,
         truncation: true,
         streamer,
       });

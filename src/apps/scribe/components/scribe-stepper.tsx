@@ -58,9 +58,7 @@ export const ScribeStepper = () => {
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
       <div className="mb-4">
         <H2>Local Scribe</H2>
-        <Muted>
-          Transcribe and summarize audio completely offline.
-        </Muted>
+        <Muted>Transcribe and summarize audio completely offline.</Muted>
       </div>
 
       <Stepper.Root className="w-full space-y-4" orientation="vertical">
@@ -178,4 +176,4 @@ export const ScribeStepper = () => {
       </Stepper.Root>
     </div>
   );
-}
+};

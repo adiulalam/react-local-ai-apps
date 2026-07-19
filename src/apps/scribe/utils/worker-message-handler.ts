@@ -1,10 +1,18 @@
 import { type ProgressInfo } from "@/components/ui/download-progress";
 
-export type WorkerStatus = "idle" | "initializing" | "loading" | "processing" | "complete" | "error";
+export type WorkerStatus =
+  | "idle"
+  | "initializing"
+  | "loading"
+  | "processing"
+  | "complete"
+  | "error";
 
 export interface WorkerCallbacks {
   setStatus: (status: WorkerStatus) => void;
-  setProgressItems: (updater: (prev: Record<string, ProgressInfo>) => Record<string, ProgressInfo>) => void;
+  setProgressItems: (
+    updater: (prev: Record<string, ProgressInfo>) => Record<string, ProgressInfo>
+  ) => void;
   setResultText: (updater: (prev: string) => string) => void;
   onReady: () => void;
   onComplete: (result: string) => void;

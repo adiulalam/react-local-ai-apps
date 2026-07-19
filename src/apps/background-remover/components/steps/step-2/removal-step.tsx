@@ -51,29 +51,29 @@ export const RemovalStep = ({ imageDataUrl }: RemovalStepProps) => {
         },
         onComplete: async (result) => {
           const { maskData, width, height } = result;
-          
+
           // Create an offscreen image to get the original pixels
           const img = new Image();
           img.crossOrigin = "anonymous";
           img.src = imageDataUrl;
-          
+
           img.onload = () => {
             const canvas = document.createElement("canvas");
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext("2d");
             if (!ctx) return;
-            
+
             // Draw original image
             ctx.drawImage(img, 0, 0, width, height);
-            
+
             // Update alpha channel
             const pixelData = ctx.getImageData(0, 0, width, height);
             for (let i = 0; i < maskData.length; ++i) {
               pixelData.data[4 * i + 3] = maskData[i];
             }
             ctx.putImageData(pixelData, 0, 0);
-            
+
             setResultImage(canvas.toDataURL("image/png"));
           };
         },
@@ -107,13 +107,11 @@ export const RemovalStep = ({ imageDataUrl }: RemovalStepProps) => {
 
       {status === "initializing" && <Muted>Initializing Web Worker...</Muted>}
 
-      {status === "loading" && (
-        <Muted>Downloading WebGPU models... This only happens once.</Muted>
-      )}
+      {status === "loading" && <Muted>Downloading WebGPU models... This only happens once.</Muted>}
 
       {status === "processing" && (
         <div className="flex items-center gap-3">
-          <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
+          <RefreshCw className="text-muted-foreground h-4 w-4 animate-spin" />
           <Muted>Removing background... This may take a moment.</Muted>
         </div>
       )}
@@ -124,7 +122,7 @@ export const RemovalStep = ({ imageDataUrl }: RemovalStepProps) => {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-4">
             <H3>Original Image</H3>
-            <div className="bg-background flex items-center justify-center overflow-hidden rounded-lg border p-2 bg-[url('/checkerboard.png')] bg-repeat">
+            <div className="bg-background flex items-center justify-center overflow-hidden rounded-lg border bg-[url('/checkerboard.png')] bg-repeat p-2">
               <img
                 src={imageDataUrl}
                 alt="Original"
@@ -135,14 +133,14 @@ export const RemovalStep = ({ imageDataUrl }: RemovalStepProps) => {
 
           <div className="flex flex-col gap-4">
             <H3>Result</H3>
-            <div className="bg-background flex items-center justify-center overflow-hidden rounded-lg border p-2 bg-[url('/checkerboard.png')] bg-repeat">
+            <div className="bg-background flex items-center justify-center overflow-hidden rounded-lg border bg-[url('/checkerboard.png')] bg-repeat p-2">
               <img
                 src={resultImage}
                 alt="Background Removed"
-                className="max-h-64 rounded-md object-contain bg-transparent"
+                className="max-h-64 rounded-md bg-transparent object-contain"
                 style={{
-                  backgroundImage: 'repeating-conic-gradient(#e5e7eb 0% 25%, #f9fafb 0% 50%)',
-                  backgroundSize: '20px 20px'
+                  backgroundImage: "repeating-conic-gradient(#e5e7eb 0% 25%, #f9fafb 0% 50%)",
+                  backgroundSize: "20px 20px",
                 }}
               />
             </div>

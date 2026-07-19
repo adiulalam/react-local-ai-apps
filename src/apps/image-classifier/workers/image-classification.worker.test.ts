@@ -34,7 +34,7 @@ describe("image-classification.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
-    
+
     await import("./image-classification.worker.ts");
   });
 
@@ -49,22 +49,27 @@ describe("image-classification.worker", () => {
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith("image-classification", "/models/mobilenet-tiny", expect.any(Object));
+    expect(mockPipeline).toHaveBeenCalledWith(
+      "image-classification",
+      "/models/mobilenet-tiny",
+      expect.any(Object)
+    );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 
   it("should handle 'process' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    const classifierMock = vi.fn().mockResolvedValue([
-      { label: "cat", score: 0.99 },
-    ]);
+    const classifierMock = vi.fn().mockResolvedValue([{ label: "cat", score: 0.99 }]);
     mockPipeline.mockResolvedValueOnce(classifierMock);
 
     await messageHandler({ data: { type: "process", image: "data:image/jpeg;base64,..." } });
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
     expect(classifierMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", { top_k: 5 });
-    expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: [{ label: "cat", score: 0.99 }] });
+    expect(postMessageMock).toHaveBeenCalledWith({
+      type: "complete",
+      result: [{ label: "cat", score: 0.99 }],
+    });
   });
 });

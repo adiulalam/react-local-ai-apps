@@ -14,9 +14,11 @@ describe("image-classifier worker-message-handler", () => {
     const handler = createWorkerMessageHandler(callbacks);
 
     // Test 'progress' message
-    handler(new MessageEvent("message", {
-      data: { type: "progress", data: { file: "model.bin", progress: 50 } }
-    }));
+    handler(
+      new MessageEvent("message", {
+        data: { type: "progress", data: { file: "model.bin", progress: 50 } },
+      })
+    );
     expect(callbacks.setStatus).toHaveBeenCalledWith("loading");
     expect(callbacks.setProgressItems).toHaveBeenCalled();
 
@@ -35,7 +37,9 @@ describe("image-classifier worker-message-handler", () => {
     expect(callbacks.onComplete).toHaveBeenCalledWith("mock result");
 
     // Test 'error' message
-    handler(new MessageEvent("message", { data: { type: "error", error: "Something went wrong" } }));
+    handler(
+      new MessageEvent("message", { data: { type: "error", error: "Something went wrong" } })
+    );
     expect(callbacks.setStatus).toHaveBeenCalledWith("error");
     expect(callbacks.setErrorMsg).toHaveBeenCalledWith("Something went wrong");
   });

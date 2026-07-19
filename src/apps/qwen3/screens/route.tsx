@@ -10,14 +10,23 @@ export const qwen3Route: RouteObject = {
     <>
       <Helmet>
         <title>Qwen 3 - 0.6B</title>
-        <meta name="description" content="Chat with the Qwen 3 - 0.6B language model running entirely locally in your browser." />
+        <meta
+          name="description"
+          content="Chat with the Qwen 3 - 0.6B language model running entirely locally in your browser."
+        />
         <meta name="keywords" content="local ai, qwen, llm, chatbot, browser, offline" />
         <meta property="og:title" content="Qwen 3 - 0.6B" />
-        <meta property="og:description" content="Chat with the Qwen 3 - 0.6B language model running entirely locally in your browser." />
+        <meta
+          property="og:description"
+          content="Chat with the Qwen 3 - 0.6B language model running entirely locally in your browser."
+        />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:title" content="Qwen 3 - 0.6B" />
-        <meta name="twitter:description" content="Chat with the Qwen 3 - 0.6B language model running entirely locally in your browser." />
+        <meta
+          name="twitter:description"
+          content="Chat with the Qwen 3 - 0.6B language model running entirely locally in your browser."
+        />
       </Helmet>
       <Qwen3Screen />
     </>

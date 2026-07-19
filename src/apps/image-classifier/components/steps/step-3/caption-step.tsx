@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import { H3, Muted } from "@/components/ui/typography";
-import { createWorkerMessageHandler, type WorkerStatus } from "../../../utils/worker-message-handler";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+} from "../../../utils/worker-message-handler";
 import ImageCaptioningWorker from "@/apps/image-classifier/workers/image-captioning.worker?worker";
 
 interface CaptionStepProps {
@@ -85,11 +88,14 @@ export const CaptionStep = ({ imageDataUrl }: CaptionStepProps) => {
               />
             </div>
           </div>
-          
+
           <div className="flex flex-col gap-4">
             <H3>Caption Description</H3>
             <div className="bg-primary/5 rounded-lg border p-6 shadow-sm">
-              <p data-testid="caption-text" className="text-lg font-medium italic text-foreground text-center">
+              <p
+                data-testid="caption-text"
+                className="text-foreground text-center text-lg font-medium italic"
+              >
                 "{caption}"
               </p>
             </div>

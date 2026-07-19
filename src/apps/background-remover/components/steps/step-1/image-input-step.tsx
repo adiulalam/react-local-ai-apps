@@ -6,7 +6,7 @@ import {
   FileUploadRoot,
   FileUploadIcon,
   FileUploadText,
-  FileUploadInput
+  FileUploadInput,
 } from "@/components/ui/file-upload";
 
 interface ImageInputStepProps {

@@ -44,7 +44,11 @@ describe("qwen3 worker-message-handler", () => {
   });
 
   it("handles update message", () => {
-    handler(new MessageEvent("message", { data: { type: "update", output: "Hello", tps: 10, numTokens: 5, state: "answering" } }));
+    handler(
+      new MessageEvent("message", {
+        data: { type: "update", output: "Hello", tps: 10, numTokens: 5, state: "answering" },
+      })
+    );
     expect(callbacks.onUpdate).toHaveBeenCalledWith("Hello", 10, 5, "answering");
   });
 
@@ -55,7 +59,9 @@ describe("qwen3 worker-message-handler", () => {
   });
 
   it("handles error message", () => {
-    handler(new MessageEvent("message", { data: { type: "error", error: "Something went wrong" } }));
+    handler(
+      new MessageEvent("message", { data: { type: "error", error: "Something went wrong" } })
+    );
     expect(callbacks.setStatus).toHaveBeenCalledWith("error");
     expect(callbacks.setErrorMsg).toHaveBeenCalledWith("Something went wrong");
   });

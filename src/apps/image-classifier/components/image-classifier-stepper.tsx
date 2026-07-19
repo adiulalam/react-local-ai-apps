@@ -121,9 +121,7 @@ export const ImageClassifierStepper = () => {
                                 }}
                               />
                             ),
-                            "step-3": () => (
-                              <CaptionStep imageDataUrl={formData.imageDataUrl!} />
-                            ),
+                            "step-3": () => <CaptionStep imageDataUrl={formData.imageDataUrl!} />,
                           })}
                         </div>
                       )}

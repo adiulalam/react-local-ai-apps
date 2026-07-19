@@ -1,6 +1,12 @@
 import { type ProgressInfo } from "@/components/ui/download-progress";
 
-export type WorkerStatus = "idle" | "initializing" | "loading" | "processing" | "complete" | "error";
+export type WorkerStatus =
+  | "idle"
+  | "initializing"
+  | "loading"
+  | "processing"
+  | "complete"
+  | "error";
 
 export interface ClassificationResult {
   label: string;
@@ -9,13 +15,17 @@ export interface ClassificationResult {
 
 export interface WorkerCallbacks<T> {
   setStatus: (status: WorkerStatus) => void;
-  setProgressItems: (updater: (prev: Record<string, ProgressInfo>) => Record<string, ProgressInfo>) => void;
+  setProgressItems: (
+    updater: (prev: Record<string, ProgressInfo>) => Record<string, ProgressInfo>
+  ) => void;
   onReady: () => void;
   onComplete: (result: T) => void;
   setErrorMsg: (msg: string) => void;
 }
 
-export const createWorkerMessageHandler = <T = ClassificationResult[]>(callbacks: WorkerCallbacks<T>) => {
+export const createWorkerMessageHandler = <T = ClassificationResult[]>(
+  callbacks: WorkerCallbacks<T>
+) => {
   return (e: MessageEvent) => {
     const msg = e.data;
 

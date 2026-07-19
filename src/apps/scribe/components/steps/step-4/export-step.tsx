@@ -10,9 +10,7 @@ export const ExportStep = ({ transcription, summary }: ExportStepProps) => {
   if (!transcription && !summary) {
     return (
       <div className="p-8 text-center">
-        <Muted>
-          No transcription or summary data available to export.
-        </Muted>
+        <Muted>No transcription or summary data available to export.</Muted>
       </div>
     );
   }

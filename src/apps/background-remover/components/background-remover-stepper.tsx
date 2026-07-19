@@ -108,11 +108,7 @@ export const BackgroundRemoverStepper = () => {
                                 }}
                               />
                             ),
-                            "step-2": () => (
-                              <RemovalStep
-                                imageDataUrl={formData.imageDataUrl!}
-                              />
-                            ),
+                            "step-2": () => <RemovalStep imageDataUrl={formData.imageDataUrl!} />,
                           })}
                         </div>
                       )}

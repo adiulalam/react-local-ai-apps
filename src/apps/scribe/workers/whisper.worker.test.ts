@@ -27,7 +27,9 @@ vi.mock("@huggingface/transformers", () => {
         },
       },
     },
-    TextStreamer: class { constructor() {} },
+    TextStreamer: class {
+      constructor() {}
+    },
   };
 });
 
@@ -35,7 +37,7 @@ describe("whisper.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
-    
+
     // Dynamically import to ensure addEventListener is called in each test
     await import("./whisper.worker.ts");
   });
@@ -52,7 +54,11 @@ describe("whisper.worker", () => {
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith("automatic-speech-recognition", "/models/whisper-tiny", expect.any(Object));
+    expect(mockPipeline).toHaveBeenCalledWith(
+      "automatic-speech-recognition",
+      "/models/whisper-tiny",
+      expect.any(Object)
+    );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 
@@ -68,13 +74,19 @@ describe("whisper.worker", () => {
     await messageHandler({ data: { type: "process", audio: new Float32Array(0) } });
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
-    expect(transcriberMock).toHaveBeenCalledWith(expect.any(Float32Array), expect.objectContaining({
-      chunk_length_s: 30,
-      stride_length_s: 5,
-      language: "en",
-      task: "transcribe",
-      streamer: expect.any(Object)
-    }));
-    expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: "Mocked transcription" });
+    expect(transcriberMock).toHaveBeenCalledWith(
+      expect.any(Float32Array),
+      expect.objectContaining({
+        chunk_length_s: 30,
+        stride_length_s: 5,
+        language: "en",
+        task: "transcribe",
+        streamer: expect.any(Object),
+      })
+    );
+    expect(postMessageMock).toHaveBeenCalledWith({
+      type: "complete",
+      result: "Mocked transcription",
+    });
   });
 });

@@ -34,7 +34,7 @@ describe("image-captioning.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
-    
+
     await import("./image-captioning.worker.ts");
   });
 
@@ -49,22 +49,26 @@ describe("image-captioning.worker", () => {
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith("image-to-text", "/models/tiny-vit-gpt2", expect.any(Object));
+    expect(mockPipeline).toHaveBeenCalledWith(
+      "image-to-text",
+      "/models/tiny-vit-gpt2",
+      expect.any(Object)
+    );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 
   it("should handle 'process' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    const captionerMock = vi.fn().mockResolvedValue([
-      { generated_text: "a mocked caption" },
-    ]);
+    const captionerMock = vi.fn().mockResolvedValue([{ generated_text: "a mocked caption" }]);
     mockPipeline.mockResolvedValueOnce(captionerMock);
 
     await messageHandler({ data: { type: "process", image: "data:image/jpeg;base64,..." } });
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
-    expect(captionerMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", { max_new_tokens: 20 });
+    expect(captionerMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", {
+      max_new_tokens: 20,
+    });
     expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: "a mocked caption" });
   });
 });

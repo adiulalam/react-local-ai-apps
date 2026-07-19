@@ -3,7 +3,10 @@ import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-pr
 import { ModeSelector } from "./mode-selector";
 import { SummaryDisplay } from "./summary-display";
 import { type SummaryMode, SUMMARY_OPTIONS } from "@/types/summary";
-import { createWorkerMessageHandler, type WorkerStatus } from "@/apps/scribe/utils/worker-message-handler";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+} from "@/apps/scribe/utils/worker-message-handler";
 import SummaryWorker from "@/apps/scribe/workers/summary.worker?worker";
 
 interface SummarizationStepProps {

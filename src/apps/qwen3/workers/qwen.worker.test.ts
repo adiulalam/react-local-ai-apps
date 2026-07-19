@@ -52,11 +52,11 @@ vi.mock("@huggingface/transformers", () => {
       backends: {
         onnx: {
           wasm: {
-            proxy: false
-          }
-        }
-      }
-    }
+            proxy: false,
+          },
+        },
+      },
+    },
   };
 });
 
@@ -64,7 +64,7 @@ describe("qwen.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
-    
+
     await import("./qwen.worker.ts");
   });
 
@@ -90,7 +90,12 @@ describe("qwen.worker", () => {
 
   it("should handle 'generate' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
-    await messageHandler({ data: { type: "generate", data: { messages: [{ role: "user", content: "Hi" }], reasonEnabled: false } } });
+    await messageHandler({
+      data: {
+        type: "generate",
+        data: { messages: [{ role: "user", content: "Hi" }], reasonEnabled: false },
+      },
+    });
     await new Promise((r) => setTimeout(r, 50));
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "start" });
