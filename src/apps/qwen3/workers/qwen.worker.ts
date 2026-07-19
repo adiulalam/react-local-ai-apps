@@ -33,14 +33,16 @@ const getInstance = async (progress_callback?: (info: unknown) => void) => {
   });
 
   return Promise.all([tokenizerPromise, modelPromise]);
-}
+};
 
 const stopping_criteria = new InterruptableStoppingCriteria();
 let past_key_values_cache: DynamicCache | null | undefined = null;
 
 const check = async () => {
+  if (isTestEnv) return;
+
   try {
-    const adapter = await navigator.gpu.requestAdapter();
+    const adapter = await navigator.gpu?.requestAdapter();
     if (!adapter) {
       throw new Error("WebGPU is not supported (no adapter found)");
     }
@@ -50,7 +52,7 @@ const check = async () => {
       error: (e as Error).toString(),
     });
   }
-}
+};
 
 const load = async () => {
   self.postMessage({
@@ -70,7 +72,7 @@ const load = async () => {
   const inputs = tokenizer("a");
   await model.generate({ ...inputs, max_new_tokens: 1 });
   self.postMessage({ type: "ready" });
-}
+};
 
 export interface GenerateData {
   messages: { role: string; content: string }[];
@@ -157,7 +159,7 @@ const generate = async ({ messages, reasonEnabled }: GenerateData) => {
     type: "complete",
     result: decoded,
   });
-}
+};
 
 self.addEventListener("message", async (e: MessageEvent) => {
   const { type, data } = e.data;
