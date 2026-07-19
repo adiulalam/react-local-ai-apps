@@ -16,16 +16,28 @@ import type { PipelineType } from "@huggingface/transformers";
 vi.mock("@huggingface/transformers", () => {
   return {
     pipeline: (task: PipelineType, ...args: unknown[]) => mockPipeline(task, ...args),
-    env: { allowLocalModels: false, useBrowserCache: true },
+    env: {
+      allowLocalModels: false,
+      useBrowserCache: true,
+      backends: {
+        onnx: {
+          wasm: {
+            proxy: false,
+          },
+        },
+      },
+    },
+    TextStreamer: class { constructor() {} },
   };
 });
 
-describe("image-classification.worker", () => {
+describe("whisper.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
     
-    await import("./image-classification.worker.ts");
+    // Dynamically import to ensure addEventListener is called in each test
+    await import("./whisper.worker.ts");
   });
 
   it("should register message event listener", () => {
@@ -35,26 +47,34 @@ describe("image-classification.worker", () => {
   it("should handle 'load' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
+    // Mock pipeline resolution
     mockPipeline.mockResolvedValueOnce(vi.fn());
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith("image-classification", "/models/mobilenet-tiny", expect.any(Object));
+    expect(mockPipeline).toHaveBeenCalledWith("automatic-speech-recognition", "/models/whisper-tiny", expect.any(Object));
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 
   it("should handle 'process' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    const classifierMock = vi.fn().mockResolvedValue([
-      { label: "cat", score: 0.99 },
-    ]);
-    mockPipeline.mockResolvedValueOnce(classifierMock);
+    const transcriberMock = Object.assign(
+      vi.fn().mockResolvedValue({ text: "Mocked transcription" }),
+      { tokenizer: {} }
+    );
+    mockPipeline.mockResolvedValueOnce(transcriberMock);
 
-    await messageHandler({ data: { type: "process", image: "data:image/jpeg;base64,..." } });
+    await messageHandler({ data: { type: "process", audio: new Float32Array(0) } });
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
-    expect(classifierMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", { top_k: 5 });
-    expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: [{ label: "cat", score: 0.99 }] });
+    expect(transcriberMock).toHaveBeenCalledWith(expect.any(Float32Array), expect.objectContaining({
+      chunk_length_s: 30,
+      stride_length_s: 5,
+      language: "en",
+      task: "transcribe",
+      streamer: expect.any(Object)
+    }));
+    expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: "Mocked transcription" });
   });
 });

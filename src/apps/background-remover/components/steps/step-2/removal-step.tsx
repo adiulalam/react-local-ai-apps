@@ -7,7 +7,7 @@ import {
   createWorkerMessageHandler,
   type WorkerStatus,
 } from "@/apps/image-classifier/utils/worker-message-handler";
-import BackgroundRemoverWorker from "@/lib/workers/background-remover.worker?worker";
+import BackgroundRemoverWorker from "@/apps/background-remover/workers/background-remover.worker?worker";
 
 interface RemovalResult {
   maskData: Uint8Array;

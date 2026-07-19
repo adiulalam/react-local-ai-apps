@@ -1,43 +1,41 @@
 import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
-import { isTestEnv } from "../utils";
+import { isTestEnv } from "@/lib/utils";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
+if (env.backends.onnx.wasm) {
+  env.backends.onnx.wasm.proxy = false;
+}
 
-const task: PipelineType = "image-to-text";
-const model = isTestEnv ? "/models/tiny-vit-gpt2" : "Xenova/vit-gpt2-image-captioning";
-let instance: Promise<AllTasks["image-to-text"]> | null = null;
+const task: PipelineType = "image-classification";
+const model = isTestEnv ? "/models/mobilenet-tiny" : "Xenova/resnet-50";
+let instance: Promise<AllTasks["image-classification"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (instance === null) {
     instance = pipeline(task, model, {
       progress_callback,
       dtype: "fp32",
-    }) as Promise<AllTasks["image-to-text"]>;
+    }) as Promise<AllTasks["image-classification"]>;
   }
   return instance;
 };
 
-export const generateCaption = async (
-  captioner: AllTasks["image-to-text"],
+export const processImage = async (
+  classifier: AllTasks["image-classification"],
   image: string,
   postMessage: (msg: { type: string; result?: unknown; error?: string }) => void
 ) => {
   try {
     postMessage({ type: "processing" });
 
-    const results = await captioner(image, {
-      max_new_tokens: isTestEnv ? 20 : undefined,
+    const results = await classifier(image, {
+      top_k: 5,
     });
-    // results is typically an array of objects like [{ generated_text: "a cat sitting on a couch" }]
-    const caption =
-      Array.isArray(results) && results.length > 0
-        ? results[0].generated_text
-        : "No caption generated.";
 
-    postMessage({ type: "complete", result: caption });
+    postMessage({ type: "complete", result: results });
   } catch (err: unknown) {
-    const error = err instanceof Error ? err.message : "Unknown error during image captioning";
+    const error = err instanceof Error ? err.message : "Unknown error during image classification";
     postMessage({ type: "error", error });
   }
 };
@@ -57,10 +55,10 @@ self.addEventListener("message", async (event) => {
     }
   } else if (type === "process") {
     try {
-      const captioner = await getInstance(() => {});
-      await generateCaption(captioner, image, (msg) => self.postMessage(msg));
+      const classifier = await getInstance(() => {});
+      await processImage(classifier, image, (msg) => self.postMessage(msg));
     } catch (err: unknown) {
-      const error = err instanceof Error ? err.message : "Unknown error setting up captioning";
+      const error = err instanceof Error ? err.message : "Unknown error setting up classification";
       self.postMessage({ type: "error", error });
     }
   }

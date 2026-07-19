@@ -16,7 +16,17 @@ import type { PipelineType } from "@huggingface/transformers";
 vi.mock("@huggingface/transformers", () => {
   return {
     pipeline: (task: PipelineType, ...args: unknown[]) => mockPipeline(task, ...args),
-    env: { allowLocalModels: false, useBrowserCache: true },
+    env: {
+      allowLocalModels: false,
+      useBrowserCache: true,
+      backends: {
+        onnx: {
+          wasm: {
+            proxy: false,
+          },
+        },
+      },
+    },
     TextStreamer: class {
       constructor() {}
     },

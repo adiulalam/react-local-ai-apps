@@ -52,7 +52,7 @@ vi.mock("@huggingface/transformers", () => {
       backends: {
         onnx: {
           wasm: {
-            proxy: true
+            proxy: false
           }
         }
       }

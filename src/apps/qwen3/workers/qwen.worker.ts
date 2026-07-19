@@ -8,10 +8,13 @@ import {
   DynamicCache,
   env,
 } from "@huggingface/transformers";
-import { isTestEnv } from "../utils";
+import { isTestEnv } from "@/lib/utils";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
+if (env.backends.onnx.wasm) {
+  env.backends.onnx.wasm.proxy = false;
+}
 
 const MODEL_ID = isTestEnv ? "/models/tiny-qwen" : "onnx-community/Qwen3-0.6B-ONNX";
 

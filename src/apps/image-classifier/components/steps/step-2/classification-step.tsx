@@ -10,7 +10,7 @@ import {
 } from "../../../utils/worker-message-handler";
 
 import { Button } from "@/components/ui/button";
-import ImageClassificationWorker from "@/lib/workers/image-classification.worker?worker";
+import ImageClassificationWorker from "@/apps/image-classifier/workers/image-classification.worker?worker";
 
 interface ClassificationStepProps {
   imageDataUrl: string;

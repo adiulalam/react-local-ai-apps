@@ -8,6 +8,7 @@ import { Qwen } from "@/components/icons/qwen";
 import { H1, Muted, Large, Small } from "@/components/ui/typography";
 import { createWorkerMessageHandler, type WorkerStatus } from "../utils/worker-message-handler";
 import { cn } from "@/lib/utils";
+import QwenWorker from "@/apps/qwen3/workers/qwen.worker?worker";
 
 const IS_WEBGPU_AVAILABLE = !!navigator.gpu;
 
@@ -44,9 +45,7 @@ const Qwen3Screen = () => {
 
   useEffect(() => {
     if (!worker.current) {
-      worker.current = new Worker(new URL("../../../lib/workers/qwen.worker.ts", import.meta.url), {
-        type: "module",
-      });
+      worker.current = new QwenWorker();
       worker.current.postMessage({ type: "check" });
     }
 

@@ -8,7 +8,7 @@ import {
   createWorkerMessageHandler,
   type WorkerStatus,
 } from "@/apps/scribe/utils/worker-message-handler";
-import WhisperWorker from "@/lib/workers/whisper.worker?worker";
+import WhisperWorker from "@/apps/scribe/workers/whisper.worker?worker";
 
 interface TranscriptionStepProps {
   audioData: Float32Array;

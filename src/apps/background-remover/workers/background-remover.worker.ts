@@ -6,7 +6,7 @@ import {
   type PreTrainedModel,
   type Processor,
 } from "@huggingface/transformers";
-import { isTestEnv } from "../utils";
+import { isTestEnv } from "@/lib/utils";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;

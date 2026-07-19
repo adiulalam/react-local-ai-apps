@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import { H3, Muted } from "@/components/ui/typography";
 import { createWorkerMessageHandler, type WorkerStatus } from "../../../utils/worker-message-handler";
-import ImageCaptioningWorker from "@/lib/workers/image-captioning.worker?worker";
+import ImageCaptioningWorker from "@/apps/image-classifier/workers/image-captioning.worker?worker";
 
 interface CaptionStepProps {
   imageDataUrl: string;
