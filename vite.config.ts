@@ -18,4 +18,7 @@ export default defineConfig({
   worker: {
     format: "es",
   },
+  optimizeDeps: {
+    include: ["@huggingface/transformers"],
+  },
 });
