@@ -133,7 +133,9 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
           stream = s;
           if (videoRef.current) {
             videoRef.current.srcObject = s;
-            videoRef.current.play();
+            videoRef.current.play().catch((e) => {
+              if (e.name !== "AbortError") console.error("Webcam play error:", e);
+            });
           }
         })
         .catch(() => {
@@ -142,7 +144,9 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
         });
     } else if (videoUrl) {
       videoRef.current.src = videoUrl;
-      videoRef.current.play();
+      videoRef.current.play().catch((e) => {
+        if (e.name !== "AbortError") console.error("Video play error:", e);
+      });
     }
 
     return () => {
