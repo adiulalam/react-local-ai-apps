@@ -13,8 +13,6 @@ interface DetectionStepProps {
   useWebcam?: boolean;
 }
 
-
-
 export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
