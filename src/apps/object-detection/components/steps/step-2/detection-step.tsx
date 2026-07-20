@@ -176,10 +176,12 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
           playsInline
           muted={useWebcam}
           loop={!useWebcam}
+          data-testid="detection-video"
         />
         <canvas
           ref={canvasRef}
           className="pointer-events-none absolute top-0 left-0 h-full w-full object-contain"
+          data-testid="detection-canvas"
         />
       </div>
     </div>

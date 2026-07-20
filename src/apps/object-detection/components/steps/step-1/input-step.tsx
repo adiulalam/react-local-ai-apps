@@ -38,7 +38,12 @@ export const InputStep = ({ onNext }: InputStepProps) => {
               <VideoIcon className="mr-2 h-4 w-4" />
               Select Video
             </Button>
-            <FileUploadInput ref={fileInputRef} accept="video/*" onFileSelect={handleFileSelect} />
+            <FileUploadInput
+              ref={fileInputRef}
+              accept="video/*"
+              onFileSelect={handleFileSelect}
+              data-testid="video-file-input"
+            />
           </FileUploadRoot>
         </div>
 
