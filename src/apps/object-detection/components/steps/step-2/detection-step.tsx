@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Loader2 } from "lucide-react";
+import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import { Muted, Small } from "@/components/ui/typography";
-import { Progress } from "@/components/ui/progress";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+} from "@/apps/image-classifier/utils/worker-message-handler";
 import ObjectDetectionWorker from "@/apps/object-detection/workers/object-detection.worker?worker";
 
 interface DetectionStepProps {
@@ -27,9 +30,9 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const workerRef = useRef<Worker | null>(null);
 
-  const [status, setStatus] = useState<"loading_model" | "ready" | "error">("loading_model");
-  const [progress, setProgress] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<WorkerStatus>("initializing");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
 
   const drawBoxes = useCallback((predictions: DetectionResult[]) => {
     if (!canvasRef.current || !videoRef.current) return;
@@ -75,21 +78,26 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
         return;
       }
 
-      // Set canvas dimensions to match video exactly
+      // Set display canvas dimensions to match video exactly
       const { videoWidth, videoHeight } = video;
       if (canvasRef.current.width !== videoWidth) {
         canvasRef.current.width = videoWidth;
         canvasRef.current.height = videoHeight;
       }
 
-      // Create a temporary canvas to get ImageData
+      // Create a temporary canvas and scale down the image for faster IPC and processing
+      const MAX_DIM = 480;
+      const scale = Math.min(MAX_DIM / videoWidth, MAX_DIM / videoHeight, 1);
+      const tempWidth = videoWidth * scale;
+      const tempHeight = videoHeight * scale;
+
       const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = videoWidth;
-      tempCanvas.height = videoHeight;
+      tempCanvas.width = tempWidth;
+      tempCanvas.height = tempHeight;
       const ctx = tempCanvas.getContext("2d", { willReadFrequently: true });
       if (!ctx) return;
 
-      ctx.drawImage(video, 0, 0, videoWidth, videoHeight);
+      ctx.drawImage(video, 0, 0, tempWidth, tempHeight);
       const imageData = tempCanvas.toDataURL("image/jpeg", 0.5); // lower quality for speed
 
       workerRef.current.postMessage({ type: "process", image: imageData, threshold: 0.5 });
@@ -102,28 +110,21 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
   useEffect(() => {
     workerRef.current = new ObjectDetectionWorker();
 
-    const onMessageReceived = (e: MessageEvent) => {
-      const { type, data, result, error } = e.data;
-      switch (type) {
-        case "progress":
-          if (data?.progress) setProgress(Math.round(data.progress));
-          break;
-        case "ready":
-          setStatus("ready");
-          break;
-        case "complete":
-          drawBoxes(result);
-          // Request next frame process
-          requestAnimationFrame(processFrame);
-          break;
-        case "error":
-          setStatus("error");
-          setError(error);
-          break;
-      }
-    };
+    const messageHandler = createWorkerMessageHandler<DetectionResult[]>({
+      setStatus,
+      setProgressItems,
+      onReady: () => {
+        setStatus("idle");
+        processFrame();
+      },
+      onComplete: async (result) => {
+        drawBoxes(result);
+        requestAnimationFrame(processFrame);
+      },
+      setErrorMsg,
+    });
 
-    workerRef.current.addEventListener("message", onMessageReceived);
+    workerRef.current.addEventListener("message", messageHandler);
     workerRef.current.postMessage({ type: "load" });
 
     return () => {
@@ -149,7 +150,7 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
         })
         .catch(() => {
           setStatus("error");
-          setError("Failed to access webcam. Please check permissions.");
+          setErrorMsg("Failed to access webcam. Please check permissions.");
         });
     } else if (videoUrl) {
       videoRef.current.src = videoUrl;
@@ -161,32 +162,25 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
     };
   }, [useWebcam, videoUrl]);
 
-  // Start processing when ready
-  useEffect(() => {
-    if (status === "ready") {
-      processFrame();
-    }
-  }, [status, processFrame]);
+  // Start processing is now handled in onReady
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      {status === "loading_model" && (
-        <div className="flex w-full flex-col items-center space-y-4 py-12">
-          <Loader2 className="text-primary h-8 w-8 animate-spin" />
-          <Small>Downloading AI Model ({progress}%)</Small>
-          <Progress value={progress} className="w-[60%]" />
-        </div>
-      )}
+      <DownloadProgress progressItems={progressItems} />
+
+      {status === "initializing" && <Muted>Initializing Web Worker...</Muted>}
+
+      {status === "loading" && <Muted>Downloading WebGPU models... This only happens once.</Muted>}
 
       {status === "error" && (
         <div className="text-destructive py-12 text-center">
           <Small>Error</Small>
-          <Muted>{error}</Muted>
+          <Muted>{errorMsg}</Muted>
         </div>
       )}
 
       <div
-        className={`relative overflow-hidden rounded-lg border ${status === "ready" ? "block" : "hidden"}`}
+        className={`relative overflow-hidden rounded-lg border ${status === "idle" || status === "processing" || status === "complete" ? "block" : "hidden"}`}
       >
         <video
           ref={videoRef}

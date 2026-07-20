@@ -8,15 +8,15 @@ if (env.backends.onnx.wasm) {
 }
 
 const task: PipelineType = "object-detection";
-// We use a robust model for object detection. For testing, we mock the path.
-const model = isTestEnv ? "/models/detr-resnet-50" : "Xenova/detr-resnet-50";
+// We use a robust, but very fast tiny model for real-time video object detection.
+const model = isTestEnv ? "/models/yolos-tiny" : "Xenova/yolos-tiny";
 let instance: Promise<AllTasks["object-detection"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (instance === null) {
     instance = pipeline(task, model, {
       progress_callback,
-      dtype: "fp32", // Or "fp16" for webgpu if supported, but let's stick to fp32/wasm default
+      device: isTestEnv ? "wasm" : "webgpu",
     }) as Promise<AllTasks["object-detection"]>;
   }
   return instance;
