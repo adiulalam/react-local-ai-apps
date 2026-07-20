@@ -4,7 +4,8 @@ import { Muted, Small } from "@/components/ui/typography";
 import {
   createWorkerMessageHandler,
   type WorkerStatus,
-} from "@/apps/image-classifier/utils/worker-message-handler";
+  type DetectionResult,
+} from "@/apps/object-detection/utils/worker-message-handler";
 import ObjectDetectionWorker from "@/apps/object-detection/workers/object-detection.worker?worker";
 
 interface DetectionStepProps {
@@ -12,18 +13,7 @@ interface DetectionStepProps {
   useWebcam?: boolean;
 }
 
-interface BoundingBox {
-  xmin: number;
-  ymin: number;
-  xmax: number;
-  ymax: number;
-}
 
-interface DetectionResult {
-  score: number;
-  label: string;
-  box: BoundingBox;
-}
 
 export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
