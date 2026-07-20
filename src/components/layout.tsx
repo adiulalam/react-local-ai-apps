@@ -7,6 +7,7 @@ import {
   Headphones,
   Layers,
   Video,
+  Focus,
 } from "lucide-react";
 import {
   NavigationMenu,
@@ -85,7 +86,7 @@ export const Layout = () => {
                   className="w-full justify-start"
                   active={location.pathname.startsWith("/object-detection")}
                 >
-                  <Video className="size-4" />
+                  <Focus className="size-4" />
                   Object Detection
                 </NavigationMenuLink>
               </NavigationMenuContent>
