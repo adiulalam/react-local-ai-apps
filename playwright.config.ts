@@ -12,13 +12,13 @@ export default defineConfig({
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: false,
+  forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Use 100% of available CPU cores for parallel tests locally */
   workers: "100%",
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: "github",
+  reporter: process.env.CI ? "github" : "dot",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
