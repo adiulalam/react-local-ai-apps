@@ -81,12 +81,12 @@ export const Layout = () => {
               </NavigationMenuTrigger>
               <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
                 <NavigationMenuLink
-                  render={<Link to="/video" />}
+                  render={<Link to="/object-detection" />}
                   className="w-full justify-start"
-                  active={location.pathname.startsWith("/video")}
+                  active={location.pathname.startsWith("/object-detection")}
                 >
                   <Video className="size-4" />
-                  Local Video
+                  Object Detection
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>

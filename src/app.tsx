@@ -4,6 +4,7 @@ import { scribeRoute } from "@/apps/scribe/screens/route";
 import { imageClassifierRoute } from "@/apps/image-classifier/screens/route";
 import { backgroundRemoverRoute } from "@/apps/background-remover/screens/route";
 import { qwen3Route } from "@/apps/qwen3/screens/route";
+import { objectDetectionRoute } from "@/apps/object-detection/screens/route";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
       imageClassifierRoute,
       backgroundRemoverRoute,
       qwen3Route,
+      objectDetectionRoute,
     ],
   },
 ]);
