@@ -18,7 +18,7 @@ export default defineConfig({
   /* Use 100% of available CPU cores for parallel tests locally */
   workers: "100%",
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI ? "github" : "dot",
+  reporter: process.env.CI ? [["github"], ["html"]] : "dot",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
