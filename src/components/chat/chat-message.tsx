@@ -1,6 +1,9 @@
+import "katex/dist/katex.min.css";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { Bot, User, Brain, ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,6 +15,14 @@ export interface ChatMessageProps {
   content: string;
   answerIndex?: number;
 }
+
+const processMath = (text: string) => {
+  return text
+    .replaceAll("\\[", "$$")
+    .replaceAll("\\]", "$$")
+    .replaceAll("\\(", "$")
+    .replaceAll("\\)", "$");
+};
 
 export const ChatMessage = ({ role, content, answerIndex }: ChatMessageProps) => {
   const thinkingRaw = answerIndex !== undefined ? content.slice(0, answerIndex) : content;
@@ -77,14 +88,24 @@ export const ChatMessage = ({ role, content, answerIndex }: ChatMessageProps) =>
                       </Button>
                       {showThinking && (
                         <div className="bg-muted/20 prose prose-sm dark:prose-invert border-t p-4 pt-4">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{thinking}</ReactMarkdown>
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkMath]}
+                            rehypePlugins={[rehypeKatex]}
+                          >
+                            {processMath(thinking)}
+                          </ReactMarkdown>
                         </div>
                       )}
                     </div>
                   )}
                   {doneThinking && (
                     <div className="prose prose-sm dark:prose-invert text-foreground prose-p:leading-relaxed prose-pre:bg-muted prose-pre:border max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{answer}</ReactMarkdown>
+                      <ReactMarkdown
+                        remarkPlugins={[remarkGfm, remarkMath]}
+                        rehypePlugins={[rehypeKatex]}
+                      >
+                        {processMath(answer)}
+                      </ReactMarkdown>
                     </div>
                   )}
                 </>
