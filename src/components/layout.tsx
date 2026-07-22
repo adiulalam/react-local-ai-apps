@@ -21,6 +21,7 @@ import { Suspense } from "react";
 import { Muted } from "@/components/ui/typography";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Qwen } from "@/components/icons/qwen";
+import { Deepseek } from "@/components/icons/deepseek";
 
 export const Layout = () => {
   const location = useLocation();
@@ -106,6 +107,14 @@ export const Layout = () => {
                 >
                   <Qwen className="size-4" />
                   Qwen 3 - 0.6B
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/deepseek" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/deepseek")}
+                >
+                  <Deepseek className="size-4" />
+                  DeepSeek R1 - 1.5B
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>

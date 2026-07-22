@@ -26,7 +26,7 @@ export const ChatMessage = ({ role, content, answerIndex }: ChatMessageProps) =>
     .trimStart();
 
   const [showThinking, setShowThinking] = useState(false);
-  const doneThinking = answerIndex === 0 || answer.length > 0;
+  const doneThinking = answerIndex !== undefined && answerIndex >= 0;
 
   return (
     <div
@@ -55,7 +55,7 @@ export const ChatMessage = ({ role, content, answerIndex }: ChatMessageProps) =>
         {role === "assistant" ? (
           <Card data-testid="assistant-message" className="bg-muted/50 border-none shadow-none">
             <CardContent className="text-sm whitespace-pre-wrap">
-              {answerIndex === 0 || thinking.length > 0 ? (
+              {answerIndex !== undefined || thinking.length > 0 ? (
                 <>
                   {thinking.length > 0 && (
                     <div className="bg-background mb-2 flex flex-col overflow-hidden rounded-lg border">
