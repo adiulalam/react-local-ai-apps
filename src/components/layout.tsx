@@ -22,6 +22,7 @@ import { Muted } from "@/components/ui/typography";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Qwen } from "@/components/icons/qwen";
 import { Deepseek } from "@/components/icons/deepseek";
+import { Llama } from "@/components/icons/llama";
 
 export const Layout = () => {
   const location = useLocation();
@@ -115,6 +116,14 @@ export const Layout = () => {
                 >
                   <Deepseek className="size-4" />
                   DeepSeek R1 - 1.5B
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/llama3" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/llama3")}
+                >
+                  <Llama className="size-4" />
+                  Llama 3.2 - 1B
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
