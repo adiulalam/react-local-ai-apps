@@ -1,5 +1,5 @@
 import "katex/dist/katex.min.css";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -14,6 +14,7 @@ export interface ChatMessageProps {
   role: "user" | "assistant";
   content: string;
   answerIndex?: number;
+  isReasoning?: boolean;
 }
 
 const processMath = (text: string) => {
@@ -24,17 +25,31 @@ const processMath = (text: string) => {
     .replaceAll("\\)", "$");
 };
 
-export const ChatMessage = ({ role, content, answerIndex }: ChatMessageProps) => {
-  const thinkingRaw = answerIndex !== undefined ? content.slice(0, answerIndex) : content;
-  const thinking = thinkingRaw
-    .replace(/<think>/g, "")
-    .replace(/<\/think>/g, "")
-    .trim();
-  const answerRaw = answerIndex !== undefined ? content.slice(answerIndex) : "";
-  const answer = answerRaw
-    .replace(/<think>/g, "")
-    .replace(/<\/think>/g, "")
-    .trimStart();
+export const ChatMessage = ({
+  role,
+  content,
+  answerIndex,
+  isReasoning = true,
+}: ChatMessageProps) => {
+  const { thinking, answer } = useMemo(() => {
+    if (!isReasoning) {
+      return { thinking: "", answer: content };
+    }
+
+    const thinkingRaw = answerIndex !== undefined ? content.slice(0, answerIndex) : content;
+    const t = thinkingRaw
+      .replace(/<think>/g, "")
+      .replace(/<\/think>/g, "")
+      .trim();
+
+    const answerRaw = answerIndex !== undefined ? content.slice(answerIndex) : "";
+    const a = answerRaw
+      .replace(/<think>/g, "")
+      .replace(/<\/think>/g, "")
+      .trimStart();
+
+    return { thinking: t, answer: a };
+  }, [content, answerIndex, isReasoning]);
 
   const [showThinking, setShowThinking] = useState(false);
   const doneThinking = answerIndex !== undefined && answerIndex >= 0;
@@ -66,7 +81,7 @@ export const ChatMessage = ({ role, content, answerIndex }: ChatMessageProps) =>
         {role === "assistant" ? (
           <Card data-testid="assistant-message" className="bg-muted/50 border-none shadow-none">
             <CardContent className="text-sm whitespace-pre-wrap">
-              {answerIndex !== undefined || thinking.length > 0 ? (
+              {answerIndex !== undefined || thinking.length > 0 || !isReasoning ? (
                 <>
                   {thinking.length > 0 && (
                     <div className="bg-background mb-2 flex flex-col overflow-hidden rounded-lg border">
@@ -98,7 +113,7 @@ export const ChatMessage = ({ role, content, answerIndex }: ChatMessageProps) =>
                       )}
                     </div>
                   )}
-                  {doneThinking && (
+                  {(doneThinking || !isReasoning) && (
                     <div className="prose prose-sm dark:prose-invert text-foreground prose-p:leading-relaxed prose-pre:bg-muted prose-pre:border max-w-none">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm, remarkMath]}

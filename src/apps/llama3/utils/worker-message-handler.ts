@@ -2,13 +2,20 @@ import { type ProgressItem } from "@/components/chat";
 
 export type WorkerStatus = "idle" | "loading" | "ready" | "processing" | "complete" | "error";
 
+export interface UpdateMessageData {
+  type: "update";
+  result: string;
+  tps: number | undefined;
+  numTokens: number;
+}
+
 export interface WorkerCallbacks {
   setStatus: (status: WorkerStatus) => void;
   setLoadingMessage: (msg: string) => void;
   setProgressItems: (updater: (prev: ProgressItem[]) => ProgressItem[]) => void;
   onReady: () => void;
   onStart: () => void;
-  onUpdate: (output: string, tps: number | undefined, numTokens: number, state: string) => void;
+  onUpdate: (data: UpdateMessageData) => void;
   onComplete: () => void;
   setErrorMsg: (msg: string) => void;
 }
@@ -46,7 +53,7 @@ export const createWorkerMessageHandler = (callbacks: WorkerCallbacks) => {
         callbacks.onStart();
         break;
       case "update":
-        callbacks.onUpdate(msg.output, msg.tps, msg.numTokens, msg.state);
+        callbacks.onUpdate(msg);
         break;
       case "complete":
         callbacks.setStatus("complete");

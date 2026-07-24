@@ -3,11 +3,10 @@ import { ChatMessage, ChatInput, ChatProgress, type ProgressItem } from "@/compo
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Lightbulb, Play, RefreshCw } from "lucide-react";
+import { Play, RefreshCw } from "lucide-react";
 import { Llama } from "@/components/icons/llama";
 import { H1, Muted, Large, Small } from "@/components/ui/typography";
 import { createWorkerMessageHandler, type WorkerStatus } from "../utils/worker-message-handler";
-import { cn } from "@/lib/utils";
 import LlamaWorker from "@/apps/llama3/workers/llama.worker?worker";
 
 const IS_WEBGPU_AVAILABLE = !!navigator.gpu;
@@ -27,13 +26,9 @@ const Llama3Screen = () => {
   const [loadingMessage, setLoadingMessage] = useState("");
   const [progressItems, setProgressItems] = useState<ProgressItem[]>([]);
   const [isRunning, setIsRunning] = useState(false);
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [tps, setTps] = useState<number | null>(null);
   const [numTokens, setNumTokens] = useState<number | null>(null);
-
-  // For this specific model (MiniThinky), reasoning is always enabled
-  const reasonEnabled = true;
 
   const onSend = (message: string) => {
     setMessages((prev) => [...prev, { role: "user", content: message }]);
@@ -58,17 +53,14 @@ const Llama3Screen = () => {
       setErrorMsg: setError,
       onReady: () => {},
       onStart: () => setMessages((prev) => [...prev, { role: "assistant", content: "" }]),
-      onUpdate: (output, newTps, newNumTokens, state) => {
-        setTps(newTps ?? null);
-        setNumTokens(newNumTokens);
+      onUpdate: (data) => {
+        setTps(data.tps ?? null);
+        setNumTokens(data.numTokens);
         setMessages((prev) => {
           const cloned = [...prev];
           const last = cloned[cloned.length - 1];
-          const data: Message = { ...last, content: last.content + output };
-          if (data.answerIndex === undefined && state === "answering") {
-            data.answerIndex = last.content.length;
-          }
-          cloned[cloned.length - 1] = data;
+          const newContent = last.content + (data.result ?? "");
+          cloned[cloned.length - 1] = { ...last, content: newContent };
           return cloned;
         });
       },
@@ -86,9 +78,9 @@ const Llama3Screen = () => {
     if (messages[messages.length - 1].role === "assistant") return;
     worker.current?.postMessage({
       type: "generate",
-      data: { messages, reasonEnabled },
+      data: { messages },
     });
-  }, [messages, reasonEnabled, isRunning]);
+  }, [messages, isRunning]);
 
   useEffect(() => {
     if (isRunning) {
@@ -118,11 +110,11 @@ const Llama3Screen = () => {
           <div className="bg-primary/10 mb-4 flex h-20 w-20 items-center justify-center rounded-full">
             <Llama className="text-primary h-10 w-10" />
           </div>
-          <H1 className="text-3xl">Llama 3.2 - 1B (Reasoning)</H1>
+          <H1 className="text-3xl">Llama 3.2</H1>
           <Muted className="max-w-lg text-center text-base">
-            A reasoning model based on Llama 3.2 1B that runs locally in your browser with WebGPU
-            acceleration. Everything runs entirely on your device, meaning no data is sent to a
-            server.
+            An instruction-tuned model based on Llama 3.2 that runs locally in your browser with
+            WebGPU acceleration. Everything runs entirely on your device, meaning no data is sent to
+            a server.
           </Muted>
           {error && (
             <Small className="text-destructive bg-destructive/10 block w-full max-w-md rounded-lg p-3 text-center">
@@ -160,7 +152,7 @@ const Llama3Screen = () => {
             ) : (
               <div className="flex flex-col pr-4">
                 {messages.map((msg, i) => (
-                  <ChatMessage key={i} {...msg} />
+                  <ChatMessage key={i} {...msg} isReasoning={false} />
                 ))}
                 <div ref={messagesEndRef} />
               </div>
@@ -182,22 +174,12 @@ const Llama3Screen = () => {
                       setMessages([]);
                     }}
                   >
-                    <RefreshCw className="h-4 w-4" />
-                    Reset
+                    <RefreshCw className="h-3 w-3" />
                   </Button>
                 </div>
               ) : (
                 <div />
               )}
-              <Button
-                variant={reasonEnabled ? "secondary" : "outline"}
-                size="sm"
-                disabled={true}
-                title="Reasoning is always enabled for this model"
-              >
-                <Lightbulb className={cn("h-4 w-4", reasonEnabled && "fill-primary")} />
-                Reasoning
-              </Button>
             </div>
             <ChatInput
               onSend={onSend}

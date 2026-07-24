@@ -16,7 +16,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const MODEL_ID = isTestEnv ? "/models/tiny-qwen" : "ngxson/MiniThinky-v2-1B-Llama-3.2";
+const MODEL_ID = isTestEnv ? "/models/tiny-qwen" : "onnx-community/Llama-3.2-1B-Instruct-ONNX";
 
 let tokenizerPromise: Promise<PreTrainedTokenizer> | null = null;
 let modelPromise: Promise<PreTrainedModel> | null = null;
@@ -74,8 +74,7 @@ const load = async () => {
 };
 
 export interface GenerateData {
-  messages: { role: string; content: string; answerIndex?: number }[];
-  reasonEnabled: boolean;
+  messages: { role: string; content: string }[];
 }
 
 interface GenerateOutput {
@@ -86,59 +85,29 @@ interface GenerateOutput {
 const generate = async ({ messages }: GenerateData) => {
   const [tokenizer, model] = await getInstance();
 
-  // For MiniThinky we apply this system prompt. It's required for the reasoning model.
-  const finalMessages = [
-    {
-      role: "system",
-      content:
-        "You are MiniThinky, a helpful AI assistant. You always think before giving the answer. Use <|thinking|> before thinking and <|answer|> before giving the answer.",
-    },
-    ...messages.map((msg) => {
-      if (msg.role === "assistant" && msg.answerIndex !== undefined) {
-        const answer = msg.content.slice(msg.answerIndex).trimStart();
-        return {
-          ...msg,
-          content: answer,
-        };
-      }
-      return msg;
-    }),
-  ];
-
-  const inputs = tokenizer.apply_chat_template(finalMessages, {
+  const inputs = tokenizer.apply_chat_template(messages, {
     add_generation_prompt: true,
     return_dict: true,
   });
 
-  // MiniThinky tokens for reasoning
-  const [, ANSWER_TOKEN_ID] = tokenizer.encode("<|thinking|><|answer|>", {
-    add_special_tokens: false,
-  });
-
-  let state = "thinking";
   let startTime: number | undefined;
   let numTokens = 0;
   let tps: number | undefined;
 
-  const token_callback_function = (tokens: bigint[]) => {
+  const token_callback_function = () => {
     startTime ??= performance.now();
 
     if (numTokens++ > 0) {
       tps = (numTokens / (performance.now() - startTime)) * 1000;
-    }
-    const token = Number(tokens[0]);
-    if (token === ANSWER_TOKEN_ID) {
-      state = "answering";
     }
   };
 
   const callback_function = (output: string) => {
     self.postMessage({
       type: "update",
-      output,
+      result: output,
       tps,
       numTokens,
-      state,
     });
   };
 
