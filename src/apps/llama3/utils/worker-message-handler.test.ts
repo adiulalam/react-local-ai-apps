@@ -46,10 +46,10 @@ describe("llama3 worker-message-handler", () => {
   it("handles update message", () => {
     handler(
       new MessageEvent("message", {
-        data: { type: "update", output: "Hello", tps: 10, numTokens: 5, state: "answering" },
+        data: { type: "update", result: "Hello", tps: 10, numTokens: 5 },
       })
     );
-    expect(callbacks.onUpdate).toHaveBeenCalledWith("Hello", 10, 5, "answering");
+    expect(callbacks.onUpdate).toHaveBeenCalledWith({ type: "update", result: "Hello", tps: 10, numTokens: 5 });
   });
 
   it("handles complete message", () => {
