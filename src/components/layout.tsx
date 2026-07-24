@@ -8,6 +8,8 @@ import {
   Layers,
   Video,
   Focus,
+  PiggyBank,
+  Type,
 } from "lucide-react";
 import {
   NavigationMenu,
@@ -90,6 +92,24 @@ export const Layout = () => {
                 >
                   <Focus className="size-4" />
                   Object Detection
+                </NavigationMenuLink>
+              </NavigationMenuContent>
+            </NavigationMenuItem>
+
+            {/* Text Group */}
+            <NavigationMenuItem>
+              <NavigationMenuTrigger className="gap-2" aria-label="Text">
+                <Type className="size-4" />
+                <span className="hidden md:block">Text</span>
+              </NavigationMenuTrigger>
+              <NavigationMenuContent className="flex min-w-50 flex-col gap-1 p-2">
+                <NavigationMenuLink
+                  render={<Link to="/tokenizer-playground" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/tokenizer-playground")}
+                >
+                  <PiggyBank className="size-4" />
+                  Tokenizer Playground
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
