@@ -5,12 +5,19 @@ test.describe("Tokenizer Playground Local E2E", () => {
     // 1. Navigate to the tokenizer app
     await page.goto("/tokenizer-playground");
 
-    // 2. Click Start Model
+    // 2. Select Custom Tokenizer
+    await page.getByRole("combobox").click();
+    await page.getByRole("option", { name: "Custom" }).click();
+
+    // 3. Enter the local tiny model ID
+    await page.getByPlaceholder("e.g. Xenova/t5-small").fill("/models/tiny-llama");
+
+    // 4. Click Start Model
     const startBtn = page.getByRole("button", { name: /Start Model/i });
     await expect(startBtn).toBeVisible();
     await startBtn.click();
 
-    // 3. Wait for model to load and text input to become enabled/visible
+    // 5. Wait for model to load and text input to become enabled/visible
     const textInput = page.getByPlaceholder("Enter some text...");
     await expect(textInput).toBeVisible();
     await expect(textInput).toBeEnabled();
