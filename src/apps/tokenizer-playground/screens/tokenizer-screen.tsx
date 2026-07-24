@@ -22,6 +22,7 @@ import {
   createWorkerMessageHandler,
   type WorkerStatus,
 } from "@/apps/tokenizer-playground/utils/worker-message-handler";
+import { isTestEnv } from "@/lib/utils";
 
 const TOKENIZER_OPTIONS = {
   "Xenova/gpt-4": "gpt-4 / gpt-3.5-turbo",
@@ -43,8 +44,8 @@ const TokenizerScreen = () => {
   const [loadingMessage, setLoadingMessage] = useState("");
   const [progressItems, setProgressItems] = useState<ProgressItem[]>([]);
 
-  const [tokenizer, setTokenizer] = useState<string>("Xenova/gpt-4");
-  const [customTokenizer, setCustomTokenizer] = useState("");
+  const [tokenizer, setTokenizer] = useState<string>(isTestEnv ? "custom" : "Xenova/gpt-4");
+  const [customTokenizer, setCustomTokenizer] = useState(isTestEnv ? "/models/tiny-llama" : "");
   const [textInput, setTextInput] = useState(
     "Tokenizer Playground running locally in your browser."
   );
@@ -234,7 +235,7 @@ const TokenizerScreen = () => {
 
             <Card className="bg-muted/50 border-muted flex-1 overflow-hidden">
               <ScrollArea className="h-full w-full">
-                <CardContent className="p-4 font-mono text-base">
+                <CardContent data-testid="token-output" className="p-4 font-mono text-base">
                   {outputOption === "text" ? (
                     decodedTokens.map((token, index) => (
                       <Token
