@@ -16,7 +16,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const MODEL_ID = isTestEnv ? "/models/tiny-qwen" : "onnx-community/Llama-3.2-1B-Instruct-ONNX";
+const MODEL_ID = isTestEnv ? "/models/tiny-llama" : "onnx-community/Llama-3.2-1B-Instruct-ONNX";
 
 let tokenizerPromise: Promise<PreTrainedTokenizer> | null = null;
 let modelPromise: Promise<PreTrainedModel> | null = null;
@@ -27,7 +27,7 @@ const getInstance = async (progress_callback?: (info: unknown) => void) => {
   });
 
   modelPromise ??= AutoModelForCausalLM.from_pretrained(MODEL_ID, {
-    dtype: isTestEnv ? "fp32" : "q4f16",
+    dtype: isTestEnv ? "q4f16" : "q4f16",
     device: isTestEnv ? "wasm" : "webgpu",
     progress_callback,
   });
@@ -54,23 +54,30 @@ const check = async () => {
 };
 
 const load = async () => {
-  self.postMessage({
-    type: "loading",
-    data: "Loading model...",
-  });
+  try {
+    self.postMessage({
+      type: "loading",
+      data: "Loading model...",
+    });
 
-  const [tokenizer, model] = await getInstance((x) => {
-    self.postMessage({ type: "progress", data: x });
-  });
+    const [tokenizer, model] = await getInstance((x) => {
+      self.postMessage({ type: "progress", data: x });
+    });
 
-  self.postMessage({
-    type: "loading",
-    data: "Compiling shaders and warming up model...",
-  });
+    self.postMessage({
+      type: "loading",
+      data: "Compiling shaders and warming up model...",
+    });
 
-  const inputs = tokenizer("a");
-  await model.generate({ ...inputs, max_new_tokens: 1 });
-  self.postMessage({ type: "ready" });
+    const inputs = tokenizer("a");
+    await model.generate({ ...inputs, max_new_tokens: 1 });
+    self.postMessage({ type: "ready" });
+  } catch (e) {
+    self.postMessage({
+      type: "error",
+      error: (e as Error).toString(),
+    });
+  }
 };
 
 export interface GenerateData {
@@ -125,7 +132,7 @@ const generate = async ({ messages }: GenerateData) => {
     // past_key_values: past_key_values_cache, // Disabled per Hugging Face example TODO
     do_sample: false, // Recommended by Hugging Face for this model
     repetition_penalty: 1.1,
-    max_new_tokens: isTestEnv ? 100 : 8192,
+    max_new_tokens: isTestEnv ? 300 : 8192,
     streamer,
     stopping_criteria,
     return_dict_in_generate: true,

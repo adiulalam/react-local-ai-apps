@@ -174,7 +174,8 @@ const Llama3Screen = () => {
                       setMessages([]);
                     }}
                   >
-                    <RefreshCw className="h-3 w-3" />
+                    <RefreshCw className="h-4 w-4" />
+                    Reset
                   </Button>
                 </div>
               ) : (
