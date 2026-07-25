@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 test.describe("Tokenizer Playground Local E2E", () => {
   test("should load the tiny tokenizer and tokenize text", async ({ page }) => {
@@ -33,5 +34,16 @@ test.describe("Tokenizer Playground Local E2E", () => {
     const tokenOutput = page.getByTestId("token-output");
     await expect(tokenOutput.getByText("E2E")).toBeVisible();
     await expect(tokenOutput.getByText("test")).toBeVisible();
+  });
+});
+
+test.describe("Tokenizer Playground Local Accessibility", () => {
+  test("should not have any automatically detectable accessibility issues", async ({ page }) => {
+    await page.goto("/tokenizer-playground");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "Tokenizer Playground" })
+    ).toBeVisible();
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 });

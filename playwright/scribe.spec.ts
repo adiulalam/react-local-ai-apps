@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import path from "path";
 
 test.describe("Local Scribe E2E", () => {
@@ -44,5 +45,14 @@ test.describe("Local Scribe E2E", () => {
     await page.getByRole("button", { name: "Download" }).first().click();
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toMatch(/local_scribe_.*\.txt/);
+  });
+});
+
+test.describe("Local Scribe Accessibility", () => {
+  test("should not have any automatically detectable accessibility issues", async ({ page }) => {
+    await page.goto("/scribe");
+    await expect(page.getByRole("heading", { level: 1, name: "Local Scribe" })).toBeVisible();
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 });

@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import path from "path";
 
 test.describe("Object Detection E2E", () => {
@@ -24,5 +25,16 @@ test.describe("Object Detection E2E", () => {
 
     await expect(video).toBeVisible();
     await expect(canvas).toBeVisible();
+  });
+});
+
+test.describe("Object Detection Accessibility", () => {
+  test("should not have any automatically detectable accessibility issues", async ({ page }) => {
+    await page.goto("/object-detection");
+    await expect(
+      page.getByRole("heading", { level: 1, name: "AI Video Object Detection" })
+    ).toBeVisible();
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 });
