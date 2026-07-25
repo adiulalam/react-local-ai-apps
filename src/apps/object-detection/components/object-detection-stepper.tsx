@@ -4,7 +4,7 @@ import { ArrowLeft, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InputStep } from "./steps/step-1";
 import { DetectionStep } from "./steps/step-2";
-import { H2, Muted, Small } from "@/components/ui/typography";
+import { H1, Muted, Small } from "@/components/ui/typography";
 import {
   Stepper,
   StepperContent,
@@ -42,7 +42,7 @@ export const ObjectDetectionStepper = () => {
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
       <div className="mb-4">
-        <H2>AI Video Object Detection</H2>
+        <H1>AI Video Object Detection</H1>
         <Muted>Detect objects in real-time from your webcam or a video file.</Muted>
       </div>
 
@@ -69,6 +69,7 @@ export const ObjectDetectionStepper = () => {
                         variant={activeStep >= stepData.step ? "default" : "secondary"}
                         size="icon"
                         className="shrink-0 rounded-full"
+                        aria-label={`Step ${stepData.step}: ${stepData.title}`}
                       />
                     }
                   >

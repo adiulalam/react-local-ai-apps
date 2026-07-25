@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ImageInputStep } from "./steps/step-1";
 import { ClassificationStep } from "./steps/step-2";
 import { CaptionStep } from "./steps/step-3";
-import { H2, Muted, Small } from "@/components/ui/typography";
+import { H1, Muted, Small } from "@/components/ui/typography";
 import type { ClassificationResult } from "../utils/worker-message-handler";
 import {
   Stepper,
@@ -44,7 +44,7 @@ export const ImageClassifierStepper = () => {
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
       <div className="mb-4">
-        <H2>Image Classification</H2>
+        <H1>Image Classification</H1>
         <Muted>Classify images completely offline.</Muted>
       </div>
 
@@ -71,6 +71,7 @@ export const ImageClassifierStepper = () => {
                         variant={activeStep >= stepData.step ? "default" : "secondary"}
                         size="icon"
                         className="shrink-0 rounded-full"
+                        aria-label={`Step ${stepData.step}: ${stepData.title}`}
                       />
                     }
                   >

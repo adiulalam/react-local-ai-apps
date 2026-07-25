@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 test.describe("Llama3 Local E2E", () => {
   test("should load the tiny model and generate a dummy response", async ({ page }) => {
@@ -26,5 +27,14 @@ test.describe("Llama3 Local E2E", () => {
 
     const assistantMessages = page.getByTestId("assistant-message");
     await expect(assistantMessages.first()).toBeVisible();
+  });
+});
+
+test.describe("Llama3 Local Accessibility", () => {
+  test("should not have any automatically detectable accessibility issues", async ({ page }) => {
+    await page.goto("/llama3");
+    await expect(page.getByRole("heading", { level: 1, name: "Llama 3.2" })).toBeVisible();
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 });

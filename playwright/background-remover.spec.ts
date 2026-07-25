@@ -33,9 +33,7 @@ test.describe("Background Remover Accessibility", () => {
   test("should not have any automatically detectable accessibility issues", async ({ page }) => {
     await page.goto("/background-remover");
     await expect(page.getByRole("heading", { level: 1, name: "Background Remover" })).toBeVisible();
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["aria-required-children", "aria-required-parent", "listitem"])
-      .analyze();
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     expect(accessibilityScanResults.violations).toEqual([]);
   });
 });

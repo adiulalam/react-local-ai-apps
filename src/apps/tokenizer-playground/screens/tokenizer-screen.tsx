@@ -138,7 +138,7 @@ const TokenizerScreen = () => {
             <div className="flex flex-col gap-2">
               <Label>Select Tokenizer</Label>
               <Select value={tokenizer} onValueChange={handleTokenizerChange}>
-                <SelectTrigger className="w-auto">
+                <SelectTrigger className="w-auto" aria-label="Select Tokenizer">
                   <SelectValue placeholder="Select Tokenizer" />
                 </SelectTrigger>
                 <SelectContent>
@@ -157,6 +157,7 @@ const TokenizerScreen = () => {
                   placeholder="e.g. Xenova/t5-small"
                   value={customTokenizer}
                   onChange={(e) => setCustomTokenizer(e.target.value)}
+                  aria-label="Custom Tokenizer (Hugging Face Model ID)"
                 />
               </div>
             )}
@@ -197,6 +198,7 @@ const TokenizerScreen = () => {
               value={textInput}
               onChange={handleTextChange}
               placeholder="Enter some text..."
+              aria-label="Input Text"
             />
 
             <div className="my-4 flex items-center justify-center gap-12">

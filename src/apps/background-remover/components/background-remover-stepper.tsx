@@ -67,7 +67,7 @@ export const BackgroundRemoverStepper = () => {
                         variant={activeStep >= stepData.step ? "default" : "secondary"}
                         size="icon"
                         className="shrink-0 rounded-full"
-                        aria-label={stepData.title}
+                        aria-label={`Step ${stepData.step}: ${stepData.title}`}
                       />
                     }
                   >

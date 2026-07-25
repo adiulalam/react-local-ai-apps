@@ -6,7 +6,7 @@ import { AudioInputStep } from "./steps/step-1";
 import { TranscriptionStep } from "./steps/step-2";
 import { SummarizationStep } from "./steps/step-3";
 import { ExportStep } from "./steps/step-4";
-import { H2, Muted, Small } from "@/components/ui/typography";
+import { H1, Muted, Small } from "@/components/ui/typography";
 import {
   Stepper,
   StepperContent,
@@ -46,7 +46,7 @@ export const ScribeStepper = () => {
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
       <div className="mb-4">
-        <H2>Local Scribe</H2>
+        <H1>Local Scribe</H1>
         <Muted>Transcribe and summarize audio completely offline.</Muted>
       </div>
 
@@ -73,6 +73,7 @@ export const ScribeStepper = () => {
                         variant={activeStep >= stepData.step ? "default" : "secondary"}
                         size="icon"
                         className="shrink-0 rounded-full"
+                        aria-label={`Step ${stepData.step}: ${stepData.title}`}
                       />
                     }
                   >
