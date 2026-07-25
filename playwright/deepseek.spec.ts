@@ -12,7 +12,7 @@ test.describe("Deepseek Local E2E", () => {
     await startBtn.click();
 
     // 3. Wait for model to load and chat input to become enabled
-    const chatInput = page.getByPlaceholder("Type a message...");
+    const chatInput = page.getByRole("textbox");
     await expect(chatInput).toBeEnabled();
 
     const reasonBtn = page.getByRole("button", { name: /Reasoning/i });
@@ -39,5 +39,15 @@ test.describe("Deepseek Local Accessibility", () => {
     await expect(page.getByRole("heading", { level: 1, name: "DeepSeek R1 - 1.5B" })).toBeVisible();
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze();
     expect(accessibilityScanResults.violations).toEqual([]);
+
+    const startBtn = page.getByRole("button", { name: /Start Model/i });
+    await expect(startBtn).toBeVisible();
+    await startBtn.click();
+
+    const chatInput = page.getByRole("textbox");
+    await expect(chatInput).toBeEnabled();
+
+    const chatAccessibilityScanResults = await new AxeBuilder({ page }).analyze();
+    expect(chatAccessibilityScanResults.violations).toEqual([]);
   });
 });

@@ -151,6 +151,7 @@ const Qwen3Screen = () => {
           <ScrollArea className="w-full flex-1 overflow-hidden">
             {messages.length === 0 ? (
               <div className="flex h-full min-h-[50vh] flex-col items-center justify-center space-y-4">
+                <H1 className="sr-only">Qwen 3 - 0.6B</H1>
                 <Qwen className="text-muted-foreground h-16 w-16 opacity-20" />
                 <Muted>Model loaded! Start chatting below.</Muted>
               </div>
