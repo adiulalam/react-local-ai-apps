@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import path from "path";
+import AxeBuilder from "@axe-core/playwright";
 
 test.describe("Background Remover E2E", () => {
   test("should remove background from image using local WebGPU model", async ({ page }) => {
@@ -25,5 +26,16 @@ test.describe("Background Remover E2E", () => {
     // Verify the result image is displayed
     const resultImage = page.getByAltText("Background Removed");
     await expect(resultImage).toBeVisible();
+  });
+});
+
+test.describe("Background Remover Accessibility", () => {
+  test("should not have any automatically detectable accessibility issues", async ({ page }) => {
+    await page.goto("/background-remover");
+    await expect(page.getByRole("heading", { level: 1, name: "Background Remover" })).toBeVisible();
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["aria-required-children", "aria-required-parent", "listitem"])
+      .analyze();
+    expect(accessibilityScanResults.violations).toEqual([]);
   });
 });

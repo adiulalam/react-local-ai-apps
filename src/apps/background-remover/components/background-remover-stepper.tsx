@@ -1,12 +1,12 @@
 import { defineStepper } from "@stepperize/react";
 import { type StepStatus, useStepItemContext } from "@stepperize/react/primitives";
-import React, { useState } from "react";
+import { useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ImageInputStep } from "./steps/step-1";
 import { RemovalStep } from "./steps/step-2";
-import { H2, Muted, Small } from "@/components/ui/typography";
+import { H1, Muted, Small } from "@/components/ui/typography";
 
 // Define the steps
 const { Stepper } = defineStepper(
@@ -18,14 +18,19 @@ export type BackgroundRemoverState = {
   imageDataUrl?: string;
 };
 
-const StepperTriggerWrapper = () => {
+const StepperTriggerWrapper = ({ stepTitle }: { stepTitle: string }) => {
   const item = useStepItemContext();
   const isInactive = item.status === "inactive";
 
   return (
     <Stepper.Trigger
       render={(domProps) => (
-        <Button variant={isInactive ? "secondary" : "default"} size="icon" {...domProps}>
+        <Button
+          variant={isInactive ? "secondary" : "default"}
+          size="icon"
+          aria-label={stepTitle}
+          {...domProps}
+        >
           <Stepper.Indicator>{item.index + 1}</Stepper.Indicator>
         </Button>
       )}
@@ -51,7 +56,7 @@ export const BackgroundRemoverStepper = () => {
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
       <div className="mb-4">
-        <H2>AI Background Remover</H2>
+        <H1>AI Background Remover</H1>
         <Muted>Remove backgrounds from images locally using WebGPU.</Muted>
       </div>
 
@@ -66,12 +71,12 @@ export const BackgroundRemoverStepper = () => {
                 const isLast = index === stepper.state.all.length - 1;
 
                 return (
-                  <React.Fragment key={stepData.id}>
+                  <div key={stepData.id} role="presentation">
                     <Stepper.Item
                       step={stepData.id}
                       className="group peer relative flex shrink-0 items-center gap-4 py-2"
                     >
-                      <StepperTriggerWrapper />
+                      <StepperTriggerWrapper stepTitle={stepData.title} />
                       <div className="flex flex-col items-start gap-1">
                         <Stepper.Title
                           render={(props) => (
@@ -90,7 +95,12 @@ export const BackgroundRemoverStepper = () => {
                       </div>
                     </Stepper.Item>
 
-                    <div className="flex gap-4">
+                    <div
+                      id={`step-panel-${stepData.id}`}
+                      role="tabpanel"
+                      aria-labelledby={`step-step-${stepData.id}`}
+                      className="flex gap-4"
+                    >
                       {!isLast && (
                         <div className="flex justify-center self-stretch ps-[calc(var(--spacing)*4.5-1px)]">
                           <StepperSeparator status={status} isLast={isLast} />
@@ -117,7 +127,7 @@ export const BackgroundRemoverStepper = () => {
                         <div className="my-4 flex-1 ps-4"></div>
                       )}
                     </div>
-                  </React.Fragment>
+                  </div>
                 );
               })}
             </Stepper.List>

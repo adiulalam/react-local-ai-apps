@@ -33,7 +33,7 @@ export const Layout = () => {
     <div className="bg-background flex min-h-screen flex-col">
       <header className="flex h-14 w-full items-center justify-between border-b px-4">
         <NavigationMenu>
-          <NavigationMenuList className="gap-2">
+          <NavigationMenuList className="gap-2" aria-orientation={undefined}>
             {/* Audio Group */}
             <NavigationMenuItem>
               <NavigationMenuTrigger className="gap-2" aria-label="Audio">
