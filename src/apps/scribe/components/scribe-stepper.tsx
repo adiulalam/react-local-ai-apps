@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
