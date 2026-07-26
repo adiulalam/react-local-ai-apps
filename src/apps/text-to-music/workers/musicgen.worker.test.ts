@@ -25,6 +25,7 @@ vi.mock("@huggingface/transformers", () => {
         return new Blob([], { type: "audio/wav" });
       }
     },
+    BaseStreamer: class {},
     env: {
       allowLocalModels: false,
       useBrowserCache: true,
@@ -107,7 +108,7 @@ describe("musicgen.worker", () => {
         guidance_scale: 3.0,
         temperature: 1.0,
         max_new_tokens: 500,
-        callback_function: expect.any(Function),
+        streamer: expect.any(Object),
       })
     );
 

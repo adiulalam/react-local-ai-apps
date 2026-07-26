@@ -25,6 +25,7 @@ export const TextToMusicCard = () => {
   const [progress, setProgress] = useState<GenerationProgressState>({
     isGenerating: false,
     statusText: "",
+    progressPercent: 0,
   });
 
   const [audioResult, setAudioResult] = useState<{
@@ -46,7 +47,16 @@ export const TextToMusicCard = () => {
     });
 
     worker.onmessage = (event: MessageEvent) => {
-      const { type, data, audio, audioData, samplingRate, error } = event.data || {};
+      const {
+        type,
+        data,
+        audio,
+        audioData,
+        samplingRate,
+        error,
+        statusText,
+        progress: percent,
+      } = event.data || {};
 
       if (type === "progress") {
         if (data && typeof data === "object" && data.file) {
@@ -55,6 +65,7 @@ export const TextToMusicCard = () => {
           setProgress({
             isGenerating: true,
             statusText: `Downloading AI model (${info.file})...`,
+            progressPercent: 0,
           });
         }
       } else if (type === "ready") {
@@ -67,13 +78,11 @@ export const TextToMusicCard = () => {
           progressPercent: 0,
         });
       } else if (type === "generating_progress") {
-        const { statusText, progress: percent } = event.data || {};
-        setProgress((prev) => ({
-          ...prev,
+        setProgress({
           isGenerating: true,
           statusText: statusText || `Generating (${percent || 0}%)...`,
-          progressPercent: typeof percent === "number" ? percent : prev.progressPercent,
-        }));
+          progressPercent: typeof percent === "number" ? percent : 0,
+        });
       } else if (type === "complete") {
         setProgressItems({});
         const audioDataArray = audioData || (audio instanceof Float32Array ? audio : undefined);
@@ -93,6 +102,7 @@ export const TextToMusicCard = () => {
         setProgress({
           isGenerating: false,
           statusText: "",
+          progressPercent: 100,
         });
       } else if (type === "error") {
         setProgressItems({});
@@ -100,6 +110,7 @@ export const TextToMusicCard = () => {
         setProgress({
           isGenerating: false,
           statusText: "",
+          progressPercent: 0,
         });
       }
     };
@@ -120,6 +131,7 @@ export const TextToMusicCard = () => {
     setProgress({
       isGenerating: true,
       statusText: "Initializing model...",
+      progressPercent: 0,
     });
 
     if (workerRef.current) {

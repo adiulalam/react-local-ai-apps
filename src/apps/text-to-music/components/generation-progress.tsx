@@ -17,7 +17,8 @@ export const GenerationProgress = ({ progress }: GenerationProgressProps) => {
     return null;
   }
 
-  const hasPercentage = typeof progress.progressPercent === "number";
+  const percent = typeof progress.progressPercent === "number" ? progress.progressPercent : 0;
+  const statusText = progress.statusText || `Generating (${percent}%)...`;
 
   return (
     <div className="border-primary/20 bg-primary/5 animate-in fade-in space-y-3 rounded-lg border p-4 duration-200">
@@ -26,20 +27,15 @@ export const GenerationProgress = ({ progress }: GenerationProgressProps) => {
           <Loader2 className="text-primary size-4 animate-spin" />
           <Small className="text-primary flex items-center gap-1.5 text-xs font-medium">
             <Music2 className="size-3.5" />
-            {progress.statusText}
+            {statusText}
           </Small>
         </div>
-        {hasPercentage && (
-          <Small className="text-primary font-mono text-xs font-semibold">
-            {Math.round(progress.progressPercent as number)}%
-          </Small>
-        )}
+        <Small className="text-primary font-mono text-xs font-semibold">
+          {Math.round(percent)}%
+        </Small>
       </div>
 
-      <Progress
-        value={hasPercentage ? (progress.progressPercent as number) : null}
-        className="h-2.5 transition-all duration-300"
-      />
+      <Progress value={percent} className="h-2.5 transition-all duration-300" />
 
       <Muted className="block text-[11px]">
         Model inference runs locally using WebGPU / WebAssembly in your browser.

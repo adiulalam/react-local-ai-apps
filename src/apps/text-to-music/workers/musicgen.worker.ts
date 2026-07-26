@@ -1,6 +1,7 @@
 import {
   AutoTokenizer,
   MusicgenForConditionalGeneration,
+  BaseStreamer,
   env,
   type PreTrainedTokenizer,
 } from "@huggingface/transformers";
@@ -16,6 +17,26 @@ const modelName = isTestEnv ? "/models/musicgen-small" : "Xenova/musicgen-small"
 
 let tokenizerInstance: PreTrainedTokenizer | null = null;
 let modelInstance: MusicgenForConditionalGeneration | null = null;
+
+class MusicProgressStreamer extends BaseStreamer {
+  private stepCount = 0;
+  private maxNewTokens: number;
+  private onProgress: (step: number, percent: number) => void;
+
+  constructor(maxNewTokens: number, onProgress: (step: number, percent: number) => void) {
+    super();
+    this.maxNewTokens = maxNewTokens;
+    this.onProgress = onProgress;
+  }
+
+  override put() {
+    this.stepCount++;
+    const percent = Math.min(99, Math.round((this.stepCount / this.maxNewTokens) * 100));
+    this.onProgress(this.stepCount, percent);
+  }
+
+  end() {}
+}
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (!tokenizerInstance) {
@@ -50,7 +71,9 @@ self.addEventListener("message", async (event: MessageEvent) => {
     try {
       self.postMessage({ type: "generating", text });
 
-      const { tokenizer, model } = await getInstance(() => {});
+      const { tokenizer, model } = await getInstance((data) => {
+        self.postMessage({ type: "progress", data });
+      });
       if (!tokenizer || !model) {
         throw new Error("Failed to initialize model or tokenizer");
       }
@@ -61,30 +84,28 @@ self.addEventListener("message", async (event: MessageEvent) => {
       // MusicGen generates approx 50 tokens per second of audio
       const maxNewTokens = Math.round(duration * 50);
 
-      let stepCount = 0;
+      const streamer = new MusicProgressStreamer(maxNewTokens, (step, percent) => {
+        const statusText = `Generating (${percent}%)...`;
+        self.postMessage({
+          type: "generating_progress",
+          statusText: statusText,
+          progress: percent,
+          step: step,
+          maxSteps: maxNewTokens,
+        });
+      });
+
       const generateOptions = {
         ...inputs,
         do_sample: true,
         guidance_scale: guidanceScale,
         temperature: temperature,
         max_new_tokens: maxNewTokens,
-        callback_function: () => {
-          stepCount++;
-          const percent = Math.min(1, stepCount / maxNewTokens);
-          const progressPercent = Math.round(percent * 100);
-          const statusText = `Generating (${progressPercent}%)...`;
-          self.postMessage({
-            type: "generating_progress",
-            statusText: statusText,
-            progress: progressPercent,
-            step: stepCount,
-            maxSteps: maxNewTokens,
-          });
-        },
+        streamer: streamer,
       };
 
       const audioValues = await model.generate(
-        generateOptions as Parameters<typeof model.generate>[0]
+        generateOptions as unknown as Parameters<typeof model.generate>[0]
       );
 
       const audioData = (audioValues as { data: Float32Array }).data;
