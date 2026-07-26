@@ -89,7 +89,7 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
             >
               <img
                 src={sample.url}
-                alt={sample.name}
+                alt=""
                 className="h-20 w-full rounded object-cover transition-transform group-hover:scale-105"
               />
               <Small className="bg-background/80 absolute right-1 bottom-1 left-1 truncate rounded px-1.5 py-0.5 text-center text-[10px] backdrop-blur-sm">
