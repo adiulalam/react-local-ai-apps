@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   Mic,
+  Music,
   Image as ImageIcon,
   Eraser,
   MessageSquare,
@@ -49,6 +50,14 @@ export const Layout = () => {
                 >
                   <Mic className="size-4" />
                   Local Scribe
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/text-to-music" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/text-to-music")}
+                >
+                  <Music className="size-4" />
+                  Text to Music
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>

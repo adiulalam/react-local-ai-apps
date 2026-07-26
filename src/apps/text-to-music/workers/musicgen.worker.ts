@@ -1,0 +1,104 @@
+import {
+  AutoTokenizer,
+  MusicgenForConditionalGeneration,
+  env,
+  type PreTrainedTokenizer,
+} from "@huggingface/transformers";
+import { isTestEnv } from "@/lib/utils";
+
+env.allowLocalModels = isTestEnv;
+env.useBrowserCache = !isTestEnv;
+if (env.backends.onnx.wasm) {
+  env.backends.onnx.wasm.proxy = false;
+}
+
+const modelName = isTestEnv ? "/models/musicgen-small" : "Xenova/musicgen-small";
+
+let tokenizerInstance: PreTrainedTokenizer | null = null;
+let modelInstance: MusicgenForConditionalGeneration | null = null;
+
+const getInstance = async (progress_callback: (info: unknown) => void) => {
+  if (!tokenizerInstance) {
+    tokenizerInstance = await AutoTokenizer.from_pretrained(modelName, {
+      progress_callback,
+    });
+  }
+  if (!modelInstance) {
+    modelInstance = (await MusicgenForConditionalGeneration.from_pretrained(modelName, {
+      progress_callback,
+      device: isTestEnv ? "wasm" : "webgpu",
+      dtype: "fp32",
+    })) as unknown as MusicgenForConditionalGeneration;
+  }
+  return { tokenizer: tokenizerInstance, model: modelInstance };
+};
+
+self.addEventListener("message", async (event: MessageEvent) => {
+  const { type, text, duration = 10, guidanceScale = 3.0, temperature = 1.0 } = event.data || {};
+
+  if (type === "load") {
+    try {
+      await getInstance((data) => {
+        self.postMessage({ type: "progress", data });
+      });
+      self.postMessage({ type: "ready" });
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : "Failed to load MusicGen model";
+      self.postMessage({ type: "error", error });
+    }
+  } else if (type === "generate") {
+    try {
+      self.postMessage({ type: "generating", text });
+
+      const { tokenizer, model } = await getInstance(() => {});
+      if (!tokenizer || !model) {
+        throw new Error("Failed to initialize model or tokenizer");
+      }
+
+      // Tokenize text prompt into input_ids
+      const inputs = tokenizer(text);
+
+      // MusicGen generates approx 50 tokens per second of audio
+      const maxNewTokens = Math.round(duration * 50);
+
+      let stepCount = 0;
+      const generateOptions = {
+        ...inputs,
+        do_sample: true,
+        guidance_scale: guidanceScale,
+        temperature: temperature,
+        max_new_tokens: maxNewTokens,
+        callback_function: () => {
+          stepCount++;
+          const percent = Math.min(1, stepCount / maxNewTokens);
+          const progressPercent = Math.round(percent * 100);
+          const statusText = `Generating (${progressPercent}%)...`;
+          self.postMessage({
+            type: "generating_progress",
+            statusText: statusText,
+            progress: progressPercent,
+            step: stepCount,
+            maxSteps: maxNewTokens,
+          });
+        },
+      };
+
+      const audioValues = await model.generate(
+        generateOptions as Parameters<typeof model.generate>[0]
+      );
+
+      const audioData = (audioValues as { data: Float32Array }).data;
+      const config = model.config as { audio_encoder?: { sampling_rate?: number } };
+      const samplingRate = config?.audio_encoder?.sampling_rate || 32000;
+
+      self.postMessage({
+        type: "complete",
+        audioData: audioData,
+        samplingRate: samplingRate,
+      });
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : "Error during music generation";
+      self.postMessage({ type: "error", error });
+    }
+  }
+});
