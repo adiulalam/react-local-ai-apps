@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Download, RefreshCw, Eye, ArrowRightLeft } from "lucide-react";
+import { Download, Eye, ArrowRightLeft } from "lucide-react";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import { H3, Muted, Small } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Spinner } from "@/components/ui/spinner";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import {
   createWorkerMessageHandler,
@@ -195,12 +196,12 @@ export const DepthStep = ({ imageDataUrl }: DepthStepProps) => {
 
       {status === "processing" && (
         <div className="flex items-center gap-3">
-          <RefreshCw className="text-muted-foreground h-4 w-4 animate-spin" />
+          <Spinner className="text-muted-foreground" />
           <Muted>Estimating depth map... This may take a moment.</Muted>
         </div>
       )}
 
-      {status === "error" && <p className="text-destructive text-sm">{errorMsg}</p>}
+      {status === "error" && <Muted className="text-destructive">{errorMsg}</Muted>}
 
       {status === "complete" && resultImage && (
         <div className="space-y-6">

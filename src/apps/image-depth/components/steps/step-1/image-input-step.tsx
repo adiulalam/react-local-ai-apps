@@ -80,21 +80,22 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
         <Muted className="mb-2 text-xs">Or try one of these sample images:</Muted>
         <div className="grid grid-cols-3 gap-3">
           {SAMPLE_IMAGES.map((sample) => (
-            <button
+            <Button
               key={sample.name}
+              variant="ghost"
               type="button"
               onClick={() => handleSampleSelect(sample.url)}
-              className="border-border hover:border-primary group relative overflow-hidden rounded-lg border p-1 transition-all"
+              className="group relative h-auto border p-1"
             >
               <img
                 src={sample.url}
                 alt={sample.name}
                 className="h-20 w-full rounded object-cover transition-transform group-hover:scale-105"
               />
-              <span className="bg-background/80 absolute right-1 bottom-1 left-1 truncate rounded px-1.5 py-0.5 text-center text-[10px] font-medium backdrop-blur-sm">
+              <Small className="bg-background/80 absolute right-1 bottom-1 left-1 truncate rounded px-1.5 py-0.5 text-center text-[10px] backdrop-blur-sm">
                 {sample.name}
-              </span>
-            </button>
+              </Small>
+            </Button>
           ))}
         </div>
       </div>
