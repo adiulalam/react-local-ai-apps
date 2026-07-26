@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { Play, Pause, Download, Music, RotateCcw } from "lucide-react";
+import { Play, Pause, Download, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Muted, Small, H4 } from "@/components/ui/typography";
@@ -10,7 +10,6 @@ type AudioPlayerProps = {
   prompt: string;
   duration: number;
   samplingRate?: number;
-  onReset?: () => void;
 };
 
 export const AudioPlayer = ({
@@ -18,7 +17,6 @@ export const AudioPlayer = ({
   prompt,
   duration,
   samplingRate = 32000,
-  onReset,
 }: AudioPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -122,12 +120,6 @@ export const AudioPlayer = ({
               <Download className="size-3.5" />
               Download WAV
             </Button>
-            {onReset && (
-              <Button variant="ghost" size="sm" onClick={onReset} className="h-8 gap-1.5 text-xs">
-                <RotateCcw className="size-3.5" />
-                Reset
-              </Button>
-            )}
           </div>
         </div>
 

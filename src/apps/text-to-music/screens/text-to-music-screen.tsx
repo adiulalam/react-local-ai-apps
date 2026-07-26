@@ -1,9 +1,9 @@
-import { TextToMusicCard } from "../components/text-to-music-card";
+import { TextToMusicStepper } from "../components/text-to-music-stepper";
 
 const TextToMusicScreen = () => {
   return (
-    <div className="flex h-full w-full flex-col items-center px-4 py-10">
-      <TextToMusicCard />
+    <div className="flex h-full w-full flex-col items-center py-10">
+      <TextToMusicStepper />
     </div>
   );
 };
