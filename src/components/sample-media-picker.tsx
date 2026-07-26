@@ -154,7 +154,7 @@ export const SampleMediaPicker = ({
                 onClick={() => handleSampleClick(item)}
                 className="group relative h-auto border p-1"
               >
-                <img src={item.url} alt={item.name} className="h-20 w-full rounded object-cover" />
+                <img src={item.url} alt="" className="h-20 w-full rounded object-cover" />
                 <Small className="bg-background/80 absolute right-1 bottom-1 left-1 truncate rounded px-1.5 py-0.5 text-center text-[10px] backdrop-blur-sm">
                   {isLoading ? "Loading..." : item.name}
                 </Small>
