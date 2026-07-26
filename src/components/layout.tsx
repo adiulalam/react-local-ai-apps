@@ -10,6 +10,7 @@ import {
   Focus,
   PiggyBank,
   Type,
+  Box,
 } from "lucide-react";
 import {
   NavigationMenu,
@@ -74,6 +75,14 @@ export const Layout = () => {
                 >
                   <Eraser className="size-4" />
                   Background Remover
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/image-depth" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/image-depth")}
+                >
+                  <Box className="size-4" />
+                  Image Depth
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
