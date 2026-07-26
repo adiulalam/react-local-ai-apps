@@ -130,13 +130,16 @@ export const SampleMediaPicker = ({
     }
   };
 
-  const isAudio = items.some((item) => item.type === "audio");
+  const isFullWidth = items.some((item) => item.type === "audio" || item.type === "video");
 
   return (
     <div className={cn("w-full space-y-2", className)}>
       <Muted className="text-xs">{label}</Muted>
       <div
-        className={cn("grid w-full gap-3", isAudio ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-3")}
+        className={cn(
+          "grid w-full gap-3",
+          isFullWidth ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-3"
+        )}
       >
         {items.map((item) => {
           const isLoading = loadingUrl === item.url;
@@ -215,30 +218,38 @@ export const SampleMediaPicker = ({
 
           // Video type
           return (
-            <Button
+            <div
               key={item.name}
-              variant="outline"
-              type="button"
-              disabled={loadingUrl !== null}
-              onClick={() => handleSampleClick(item)}
-              className="flex h-auto flex-col items-start gap-1 p-3 text-left"
+              className="bg-card text-card-foreground flex w-full items-center justify-between gap-4 rounded-xl border p-4 shadow-xs"
             >
-              <div className="flex w-full items-center justify-between gap-2">
-                <div className="bg-primary/10 text-primary rounded-md p-1.5">
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                  ) : (
-                    <Film className="h-4 w-4" aria-hidden="true" />
+              <div className="flex min-w-0 flex-1 items-center gap-3.5">
+                <div className="bg-primary/10 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+                  <Film className="h-4 w-4" aria-hidden="true" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <Small className="block truncate text-sm font-semibold">{item.name}</Small>
+                  {item.description && (
+                    <Muted className="block truncate text-xs">{item.description}</Muted>
                   )}
                 </div>
-                {item.description && (
-                  <Small className="text-muted-foreground text-[10px]">{item.description}</Small>
-                )}
               </div>
-              <Small className="w-full truncate font-medium">
-                {isLoading ? "Loading..." : item.name}
-              </Small>
-            </Button>
+
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                disabled={loadingUrl !== null}
+                onClick={() => handleSampleClick(item)}
+                aria-label={`Select video sample ${item.name} for detection`}
+                className="shrink-0 px-4 text-xs"
+              >
+                {isLoading ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                ) : (
+                  "Select"
+                )}
+              </Button>
+            </div>
           );
         })}
       </div>

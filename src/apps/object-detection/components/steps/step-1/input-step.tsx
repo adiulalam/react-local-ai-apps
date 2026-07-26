@@ -8,10 +8,20 @@ import {
   FileUploadText,
   FileUploadInput,
 } from "@/components/ui/file-upload";
+import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
 
 interface InputStepProps {
   onNext: (data: { videoUrl?: string; useWebcam?: boolean }) => void;
 }
+
+const OBJECT_DETECTION_SAMPLES: SampleMediaItem[] = [
+  {
+    name: "People Walking",
+    url: "/sample/people-walking.mp4",
+    type: "video",
+    description: "Pedestrian street video",
+  },
+];
 
 export const InputStep = ({ onNext }: InputStepProps) => {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -59,6 +69,12 @@ export const InputStep = ({ onNext }: InputStepProps) => {
           </Button>
         </div>
       </div>
+
+      <SampleMediaPicker
+        items={OBJECT_DETECTION_SAMPLES}
+        onSelectUrl={setVideoUrl}
+        label="Or try this sample video:"
+      />
 
       {videoUrl && (
         <div className="flex flex-col items-center space-y-4">

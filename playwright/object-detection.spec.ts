@@ -9,9 +9,7 @@ test.describe("Object Detection E2E", () => {
 
     // 2. Upload video file
     const fileInput = page.getByTestId("video-file-input");
-    await fileInput.setInputFiles(
-      path.join(process.cwd(), "public/test-assets/people-walking.mp4")
-    );
+    await fileInput.setInputFiles(path.join(process.cwd(), "public/sample/people-walking.mp4"));
 
     // 3. Start detection
     const startDetectionBtn = page.getByRole("button", { name: /Start Detection/i });
