@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 type AudioPlayerProps = {
   audioBlob: Blob;
-  audioData?: Float32Array;
   prompt: string;
   duration: number;
   samplingRate?: number;
@@ -16,7 +15,6 @@ type AudioPlayerProps = {
 
 export const AudioPlayer = ({
   audioBlob,
-  audioData,
   prompt,
   duration,
   samplingRate = 32000,
@@ -26,125 +24,36 @@ export const AudioPlayer = ({
   const [currentTime, setCurrentTime] = useState(0);
   const [totalDuration, setTotalDuration] = useState(duration);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
-  const startTimeRef = useRef<number>(0);
-  const animationFrameRef = useRef<number | null>(null);
 
   const audioUrl = useMemo(() => {
+    if (!audioBlob) return "";
     return URL.createObjectURL(audioBlob);
   }, [audioBlob]);
 
   useEffect(() => {
+    if (!audioUrl) return;
     if (audioRef.current) {
       audioRef.current.load();
     }
     return () => {
-      URL.revokeObjectURL(audioUrl);
-      if (sourceNodeRef.current) {
-        try {
-          sourceNodeRef.current.stop();
-        } catch {
-          // Ignore if source is already stopped
-        }
-      }
-      if (audioCtxRef.current) {
-        audioCtxRef.current.close();
-      }
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
+      setTimeout(() => {
+        URL.revokeObjectURL(audioUrl);
+      }, 10000);
     };
   }, [audioUrl]);
 
-  const playWebAudio = () => {
-    if (!audioData) return false;
-    try {
-      if (!audioCtxRef.current) {
-        const AudioCtxClass =
-          window.AudioContext ||
-          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        audioCtxRef.current = new AudioCtxClass({ sampleRate: samplingRate });
-      }
-
-      if (audioCtxRef.current.state === "suspended") {
-        audioCtxRef.current.resume();
-      }
-
-      if (sourceNodeRef.current) {
-        try {
-          sourceNodeRef.current.stop();
-        } catch {
-          // Ignore if source is already stopped
-        }
-      }
-
-      const buffer = audioCtxRef.current.createBuffer(1, audioData.length, samplingRate);
-      buffer.getChannelData(0).set(audioData);
-
-      const source = audioCtxRef.current.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audioCtxRef.current.destination);
-
-      const offset = currentTime < totalDuration ? currentTime : 0;
-      source.start(0, offset);
-      startTimeRef.current = audioCtxRef.current.currentTime - offset;
-      sourceNodeRef.current = source;
-      setIsPlaying(true);
-
-      const updateProgress = () => {
-        if (!audioCtxRef.current) return;
-        const elapsed = audioCtxRef.current.currentTime - startTimeRef.current;
-        if (elapsed >= buffer.duration) {
-          setIsPlaying(false);
-          setCurrentTime(0);
-          if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-        } else {
-          setCurrentTime(elapsed);
-          animationFrameRef.current = requestAnimationFrame(updateProgress);
-        }
-      };
-
-      animationFrameRef.current = requestAnimationFrame(updateProgress);
-
-      source.onended = () => {
-        setIsPlaying(false);
-      };
-      return true;
-    } catch (e) {
-      console.error("WebAudio playback failed:", e);
-      return false;
-    }
-  };
-
   const togglePlayPause = async () => {
-    if (isPlaying) {
-      if (audioRef.current && !audioRef.current.paused) {
+    if (!audioRef.current) return;
+    try {
+      if (isPlaying) {
         audioRef.current.pause();
-      }
-      if (sourceNodeRef.current) {
-        try {
-          sourceNodeRef.current.stop();
-        } catch {
-          // Ignore if source is already stopped
-        }
-      }
-      setIsPlaying(false);
-      if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
-      return;
-    }
-
-    if (audioRef.current) {
-      try {
+      } else {
         await audioRef.current.play();
-        setIsPlaying(true);
-        return;
-      } catch (err) {
-        console.warn("HTML5 audio play failed, falling back to Web Audio API:", err);
       }
+    } catch (err: unknown) {
+      console.error("Audio playback error:", err);
+      setIsPlaying(false);
     }
-
-    playWebAudio();
   };
 
   const handleDownload = () => {
@@ -257,7 +166,7 @@ export const AudioPlayer = ({
           </div>
 
           <div className="text-muted-foreground flex items-center gap-4 border-t pt-1 text-xs">
-            <Small className="text-[11px]">Format: 32-bit Float WAV</Small>
+            <Small className="text-[11px]">Format: 16-bit PCM WAV</Small>
             <Small className="text-[11px]">Sample Rate: {samplingRate} Hz</Small>
             <Small className="text-[11px]">Channels: Mono</Small>
           </div>

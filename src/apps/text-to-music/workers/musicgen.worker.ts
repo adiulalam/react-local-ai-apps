@@ -35,7 +35,7 @@ class MusicProgressStreamer extends BaseStreamer {
     this.onProgress(this.stepCount, percent);
   }
 
-  end() {}
+  override end() {}
 }
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
@@ -78,17 +78,13 @@ self.addEventListener("message", async (event: MessageEvent) => {
         throw new Error("Failed to initialize model or tokenizer");
       }
 
-      // Tokenize text prompt into input_ids
       const inputs = tokenizer(text);
-
-      // MusicGen generates approx 50 tokens per second of audio
       const maxNewTokens = Math.round(duration * 50);
 
       const streamer = new MusicProgressStreamer(maxNewTokens, (step, percent) => {
-        const statusText = `Generating (${percent}%)...`;
         self.postMessage({
           type: "generating_progress",
-          statusText: statusText,
+          statusText: `Generating (${percent}%)...`,
           progress: percent,
           step: step,
           maxSteps: maxNewTokens,

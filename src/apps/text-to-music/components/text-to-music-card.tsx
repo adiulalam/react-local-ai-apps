@@ -8,9 +8,10 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import { SamplePrompts } from "./sample-prompts";
 import { MusicControls, type MusicControlsState } from "./music-controls";
-import { GenerationProgress, type GenerationProgressState } from "./generation-progress";
+import { GenerationProgress } from "./generation-progress";
 import { AudioPlayer } from "./audio-player";
 import { encodeWav } from "../utils/wav-encoder";
+import { createWorkerMessageHandler, type WorkerStatus } from "../utils/worker-message-handler";
 
 export const TextToMusicCard = () => {
   const [prompt, setPrompt] = useState("");
@@ -20,17 +21,13 @@ export const TextToMusicCard = () => {
     temperature: 1.0,
   });
 
+  const [status, setStatus] = useState<WorkerStatus>("idle");
   const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
-
-  const [progress, setProgress] = useState<GenerationProgressState>({
-    isGenerating: false,
-    statusText: "",
-    progressPercent: 0,
-  });
+  const [statusText, setStatusText] = useState("");
+  const [progressPercent, setProgressPercent] = useState(0);
 
   const [audioResult, setAudioResult] = useState<{
     blob: Blob;
-    audioData?: Float32Array;
     prompt: string;
     duration: number;
     samplingRate: number;
@@ -39,100 +36,58 @@ export const TextToMusicCard = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const workerRef = useRef<Worker | null>(null);
+  const currentPromptRef = useRef(prompt);
+  const currentDurationRef = useRef(controls.duration);
 
   useEffect(() => {
-    // Initialize Web Worker
+    currentPromptRef.current = prompt;
+    currentDurationRef.current = controls.duration;
+  }, [prompt, controls.duration]);
+
+  useEffect(() => {
     const worker = new Worker(new URL("../workers/musicgen.worker.ts", import.meta.url), {
       type: "module",
     });
 
-    worker.onmessage = (event: MessageEvent) => {
-      const {
-        type,
-        data,
-        audio,
-        audioData,
-        samplingRate,
-        error,
-        statusText,
-        progress: percent,
-      } = event.data || {};
+    const handler = createWorkerMessageHandler({
+      setStatus,
+      setProgressItems,
+      setStatusText,
+      setProgressPercent,
+      onReady: () => {
+        setStatus("idle");
+      },
+      onComplete: (audioData, samplingRate) => {
+        const wavBlob = encodeWav(audioData, samplingRate);
+        setAudioResult({
+          blob: wavBlob,
+          prompt: currentPromptRef.current,
+          duration: currentDurationRef.current,
+          samplingRate: samplingRate,
+        });
+      },
+      setErrorMsg: setErrorMessage,
+    });
 
-      if (type === "progress") {
-        if (data && typeof data === "object" && data.file) {
-          const info = data as ProgressInfo;
-          setProgressItems((prev) => ({ ...prev, [info.file]: info }));
-          setProgress({
-            isGenerating: true,
-            statusText: `Downloading AI model (${info.file})...`,
-            progressPercent: 0,
-          });
-        }
-      } else if (type === "ready") {
-        setProgressItems({});
-      } else if (type === "generating") {
-        setProgressItems({});
-        setProgress({
-          isGenerating: true,
-          statusText: "Generating (0%)...",
-          progressPercent: 0,
-        });
-      } else if (type === "generating_progress") {
-        setProgress({
-          isGenerating: true,
-          statusText: statusText || `Generating (${percent || 0}%)...`,
-          progressPercent: typeof percent === "number" ? percent : 0,
-        });
-      } else if (type === "complete") {
-        setProgressItems({});
-        const audioDataArray = audioData || (audio instanceof Float32Array ? audio : undefined);
-        const wavBlob =
-          event.data.audioBlob ||
-          (audioDataArray ? encodeWav(audioDataArray, samplingRate || 32000) : null);
-
-        if (wavBlob) {
-          setAudioResult({
-            blob: wavBlob,
-            audioData: audioDataArray,
-            prompt: prompt,
-            duration: controls.duration,
-            samplingRate: samplingRate || 32000,
-          });
-        }
-        setProgress({
-          isGenerating: false,
-          statusText: "",
-          progressPercent: 100,
-        });
-      } else if (type === "error") {
-        setProgressItems({});
-        setErrorMessage(error || "An error occurred during music generation");
-        setProgress({
-          isGenerating: false,
-          statusText: "",
-          progressPercent: 0,
-        });
-      }
-    };
-
+    worker.onmessage = handler;
     workerRef.current = worker;
 
     return () => {
       worker.terminate();
     };
-  }, [prompt, controls.duration]);
+  }, []);
+
+  const isGenerating = status === "loading" || status === "generating" || status === "initializing";
 
   const handleGenerate = () => {
-    if (!prompt.trim() || progress.isGenerating) return;
+    if (!prompt.trim() || isGenerating) return;
 
     setErrorMessage(null);
     setAudioResult(null);
     setProgressItems({});
-    setProgress({
-      isGenerating: true,
-      statusText: "Initializing model...",
-      progressPercent: 0,
-    });
+    setStatus("initializing");
+    setStatusText("Initializing model...");
+    setProgressPercent(0);
 
     if (workerRef.current) {
       workerRef.current.postMessage({
@@ -150,6 +105,9 @@ export const TextToMusicCard = () => {
     setAudioResult(null);
     setErrorMessage(null);
     setProgressItems({});
+    setStatus("idle");
+    setStatusText("");
+    setProgressPercent(0);
     setControls({
       duration: 10,
       guidanceScale: 3.0,
@@ -183,7 +141,7 @@ export const TextToMusicCard = () => {
               variant="ghost"
               size="sm"
               onClick={() => setPrompt("")}
-              disabled={progress.isGenerating}
+              disabled={isGenerating}
               className="text-muted-foreground h-6 px-2 text-xs"
             >
               <X className="mr-1 size-3" />
@@ -196,23 +154,20 @@ export const TextToMusicCard = () => {
           placeholder="Describe the music you want to generate (e.g. '80s synthwave pop track with energetic drums and retro synths')..."
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          disabled={progress.isGenerating}
+          disabled={isGenerating}
           rows={3}
           className="resize-none text-sm"
         />
 
         {/* Sample Presets */}
-        <SamplePrompts
-          onSelectPrompt={(selected) => setPrompt(selected)}
-          disabled={progress.isGenerating}
-        />
+        <SamplePrompts onSelectPrompt={(selected) => setPrompt(selected)} disabled={isGenerating} />
       </div>
 
       {/* Music Controls */}
       <MusicControls
         values={controls}
         onChange={(updates) => setControls((prev) => ({ ...prev, ...updates }))}
-        disabled={progress.isGenerating}
+        disabled={isGenerating}
       />
 
       {/* Error Alert */}
@@ -225,7 +180,11 @@ export const TextToMusicCard = () => {
       )}
 
       {/* Progress Indicator */}
-      <GenerationProgress progress={progress} />
+      <GenerationProgress
+        isGenerating={isGenerating}
+        statusText={statusText}
+        progressPercent={progressPercent}
+      />
 
       {/* Action Button */}
       {!audioResult && (
@@ -234,11 +193,11 @@ export const TextToMusicCard = () => {
             variant="default"
             size="lg"
             onClick={handleGenerate}
-            disabled={!prompt.trim() || progress.isGenerating}
+            disabled={!prompt.trim() || isGenerating}
             className="gap-2 px-6 font-medium"
           >
             <Sparkles className="size-4" />
-            {progress.isGenerating ? "Generating Music..." : "Generate Music"}
+            {isGenerating ? "Generating Music..." : "Generate Music"}
           </Button>
         </div>
       )}
@@ -247,7 +206,6 @@ export const TextToMusicCard = () => {
       {audioResult && (
         <AudioPlayer
           audioBlob={audioResult.blob}
-          audioData={audioResult.audioData}
           prompt={audioResult.prompt}
           duration={audioResult.duration}
           samplingRate={audioResult.samplingRate}

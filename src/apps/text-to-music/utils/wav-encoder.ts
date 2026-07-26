@@ -1,6 +1,6 @@
 export const encodeWav = (audioData: Float32Array, sampleRate: number): Blob => {
   const numChannels = 1;
-  const bitsPerSample = 32; // 32-bit IEEE Float PCM
+  const bitsPerSample = 16; // 16-bit Signed Integer PCM WAV
   const bytesPerSample = bitsPerSample / 8;
   const blockAlign = numChannels * bytesPerSample;
   const byteRate = sampleRate * blockAlign;
@@ -23,10 +23,10 @@ export const encodeWav = (audioData: Float32Array, sampleRate: number): Blob => 
 
   /* Format chunk identifier */
   writeString(12, "fmt ");
-  /* Format chunk length (16 for PCM/Float) */
+  /* Format chunk length (16 for PCM) */
   view.setUint32(16, 16, true);
-  /* Audio format (3 = IEEE Float PCM) */
-  view.setUint16(20, 3, true);
+  /* Audio format (1 = PCM) */
+  view.setUint16(20, 1, true);
   /* Channel count */
   view.setUint16(22, numChannels, true);
   /* Sample rate */
@@ -43,11 +43,12 @@ export const encodeWav = (audioData: Float32Array, sampleRate: number): Blob => 
   /* Data chunk length */
   view.setUint32(40, dataSize, true);
 
-  /* Write 32-bit IEEE Float PCM samples */
+  /* Write 16-bit signed PCM samples */
   let offset = 44;
   for (let i = 0; i < audioData.length; i++) {
-    view.setFloat32(offset, audioData[i], true);
-    offset += 4;
+    const s = Math.max(-1, Math.min(1, audioData[i]));
+    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+    offset += 2;
   }
 
   return new Blob([buffer], { type: "audio/wav" });
