@@ -8,24 +8,27 @@ import {
   FileUploadText,
   FileUploadInput,
 } from "@/components/ui/file-upload";
-import { SampleImagePicker, type SampleImage } from "@/components/sample-image-picker";
+import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
 
 interface ImageInputStepProps {
   onNext: (imageDataUrl: string) => void;
 }
 
-const CLASSIFICATION_SAMPLE_IMAGES: SampleImage[] = [
+const CLASSIFICATION_SAMPLE_IMAGES: SampleMediaItem[] = [
   {
     name: "Cute Cat",
     url: "/sample/cat.jpg",
+    type: "image",
   },
   {
     name: "Sports Car",
     url: "/sample/car.jpg",
+    type: "image",
   },
   {
     name: "Burger",
     url: "/sample/food.jpg",
+    type: "image",
   },
 ];
 
@@ -63,7 +66,11 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
         />
       </FileUploadRoot>
 
-      <SampleImagePicker images={CLASSIFICATION_SAMPLE_IMAGES} onSelect={setImage} />
+      <SampleMediaPicker
+        items={CLASSIFICATION_SAMPLE_IMAGES}
+        onSelectDataUrl={setImage}
+        label="Or try one of these sample images:"
+      />
 
       {image && (
         <div className="flex flex-col items-center space-y-4">

@@ -4,6 +4,16 @@ import { Label } from "@/components/ui/label";
 import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
 import { FileUploadInput, MicrophoneInput } from ".";
 import { Muted } from "@/components/ui/typography";
+import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
+
+const SCRIBE_SAMPLE_AUDIO: SampleMediaItem[] = [
+  {
+    name: "10-Minute Speech Recording",
+    url: "/sample/speech-10min.mp3",
+    type: "audio",
+    description: "~10 minutes • Spoken English",
+  },
+];
 
 export const AudioInputStep = ({ onNext }: { onNext: (audioData: Float32Array) => void }) => {
   const [source, setSource] = useState<"file" | "mic">("file");
@@ -58,7 +68,14 @@ export const AudioInputStep = ({ onNext }: { onNext: (audioData: Float32Array) =
       </FieldGroup>
 
       {source === "file" && (
-        <FileUploadInput onBlobReady={handleProcessBlob} disabled={isProcessing} />
+        <div className="space-y-6">
+          <FileUploadInput onBlobReady={handleProcessBlob} disabled={isProcessing} />
+          <SampleMediaPicker
+            items={SCRIBE_SAMPLE_AUDIO}
+            onSelectBlob={(blob) => handleProcessBlob(blob)}
+            label="Or try one of these sample audio recordings:"
+          />
+        </div>
       )}
 
       {source === "mic" && (
