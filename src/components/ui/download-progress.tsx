@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
 export interface ProgressInfo {
@@ -22,13 +23,15 @@ export const DownloadProgress = ({ progressItems }: DownloadProgressProps) => {
   const activeDownloads = files;
 
   return (
-    <div className="bg-background fixed top-4 right-4 z-50 w-80 space-y-4 rounded-lg border p-4 shadow-lg">
-      <h4 className="text-sm font-semibold">Downloading AI Model</h4>
-      <div className="max-h-[30vh] space-y-3 overflow-y-auto">
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Downloading AI Model</CardTitle>
+      </CardHeader>
+      <CardContent className="max-h-[30vh] space-y-3 overflow-y-auto">
         {activeDownloads.map((data, idx) => (
           <div key={`${data.file}-${idx}`} className="space-y-1">
             <div className="text-muted-foreground flex justify-between text-xs">
-              <span className="w-48 truncate" title={data.file}>
+              <span className="max-w-3/4 truncate" title={data.file}>
                 {data.file}
               </span>
               <span>{data.status === "done" ? 100 : Math.round(data.progress || 0)}%</span>
@@ -36,7 +39,7 @@ export const DownloadProgress = ({ progressItems }: DownloadProgressProps) => {
             <Progress value={data.status === "done" ? 100 : data.progress || 0} className="h-1.5" />
           </div>
         ))}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
