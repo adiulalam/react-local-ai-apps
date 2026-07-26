@@ -16,15 +16,15 @@ interface ImageInputStepProps {
 const SAMPLE_IMAGES = [
   {
     name: "Room Interior",
-    url: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=600&q=80",
+    url: "/sample/room.jpg",
   },
   {
     name: "Street View",
-    url: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=600&q=80",
+    url: "/sample/street.jpg",
   },
   {
     name: "Nature Landscape",
-    url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80",
+    url: "/sample/nature.jpg",
   },
 ];
 
