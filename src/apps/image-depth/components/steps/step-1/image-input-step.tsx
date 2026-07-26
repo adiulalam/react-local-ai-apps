@@ -8,12 +8,13 @@ import {
   FileUploadText,
   FileUploadInput,
 } from "@/components/ui/file-upload";
+import { SampleImagePicker, type SampleImage } from "@/components/sample-image-picker";
 
 interface ImageInputStepProps {
   onNext: (imageDataUrl: string) => void;
 }
 
-const SAMPLE_IMAGES = [
+const SAMPLE_IMAGES: SampleImage[] = [
   {
     name: "Room Interior",
     url: "/sample/room.jpg",
@@ -40,20 +41,6 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
     reader.readAsDataURL(file);
   };
 
-  const handleSampleSelect = async (url: string) => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result as string);
-      };
-      reader.readAsDataURL(blob);
-    } catch {
-      setImage(url);
-    }
-  };
-
   return (
     <div className="space-y-6">
       <FileUploadRoot>
@@ -76,29 +63,7 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
         />
       </FileUploadRoot>
 
-      <div>
-        <Muted className="mb-2 text-xs">Or try one of these sample images:</Muted>
-        <div className="grid grid-cols-3 gap-3">
-          {SAMPLE_IMAGES.map((sample) => (
-            <Button
-              key={sample.name}
-              variant="ghost"
-              type="button"
-              onClick={() => handleSampleSelect(sample.url)}
-              className="group relative h-auto border p-1"
-            >
-              <img
-                src={sample.url}
-                alt=""
-                className="h-20 w-full rounded object-cover transition-transform group-hover:scale-105"
-              />
-              <Small className="bg-background/80 absolute right-1 bottom-1 left-1 truncate rounded px-1.5 py-0.5 text-center text-[10px] backdrop-blur-sm">
-                {sample.name}
-              </Small>
-            </Button>
-          ))}
-        </div>
-      </div>
+      <SampleImagePicker images={SAMPLE_IMAGES} onSelect={setImage} />
 
       {image && (
         <div className="flex flex-col items-center space-y-4 pt-2">

@@ -8,10 +8,26 @@ import {
   FileUploadText,
   FileUploadInput,
 } from "@/components/ui/file-upload";
+import { SampleImagePicker, type SampleImage } from "@/components/sample-image-picker";
 
 interface ImageInputStepProps {
   onNext: (imageDataUrl: string) => void;
 }
+
+const BG_REMOVER_SAMPLE_IMAGES: SampleImage[] = [
+  {
+    name: "Portrait",
+    url: "/sample/portrait.jpg",
+  },
+  {
+    name: "Sneakers",
+    url: "/sample/shoes.jpg",
+  },
+  {
+    name: "Dog",
+    url: "/sample/dog.jpg",
+  },
+];
 
 export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
   const [image, setImage] = useState<string | null>(null);
@@ -46,6 +62,8 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
           data-testid="image-file-input"
         />
       </FileUploadRoot>
+
+      <SampleImagePicker images={BG_REMOVER_SAMPLE_IMAGES} onSelect={setImage} />
 
       {image && (
         <div className="flex flex-col items-center space-y-4">
