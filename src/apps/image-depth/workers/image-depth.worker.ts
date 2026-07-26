@@ -16,7 +16,7 @@ const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (instance === null) {
     instance = pipeline(task, model, {
       progress_callback,
-      dtype: "fp32",
+      dtype: isTestEnv ? "q8" : "fp32",
       device: isTestEnv ? "wasm" : "webgpu",
     }) as Promise<AllTasks["depth-estimation"]>;
   }

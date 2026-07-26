@@ -54,6 +54,7 @@ describe("image-depth.worker", () => {
       "/models/depth-anything-small",
       expect.objectContaining({
         device: "wasm",
+        dtype: "q8",
         progress_callback: expect.any(Function),
       })
     );
