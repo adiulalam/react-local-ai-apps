@@ -935,6 +935,6 @@
   "model_max_length": 512,
   "pad_token": "<pad>",
   "processor_class": "MusicgenProcessor",
-  "tokenizer_class": "T5Tokenizer",
+  "tokenizer_class": "T5TokenizerFast",
   "unk_token": "<unk>"
 }
