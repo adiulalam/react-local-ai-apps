@@ -13,7 +13,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const modelName = isTestEnv ? "/models/musicgen-small" : "Xenova/musicgen-small";
+const modelName = isTestEnv ? "/models/text-to-audio-tiny" : "Xenova/musicgen-small";
 
 let tokenizerInstance: PreTrainedTokenizer | null = null;
 let modelInstance: MusicgenForConditionalGeneration | null = null;
@@ -48,7 +48,7 @@ const getInstance = async (progress_callback: (info: unknown) => void) => {
     modelInstance = (await MusicgenForConditionalGeneration.from_pretrained(modelName, {
       progress_callback,
       device: isTestEnv ? "wasm" : "webgpu",
-      dtype: "fp32",
+      dtype: isTestEnv ? "fp32" : "fp32",
     })) as unknown as MusicgenForConditionalGeneration;
   }
   return { tokenizer: tokenizerInstance, model: modelInstance };

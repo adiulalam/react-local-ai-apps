@@ -1,0 +1,6 @@
+{
+  "_from_model_config": true,
+  "bos_token_id": 2048,
+  "pad_token_id": 2048,
+  "transformers_version": "4.57.6"
+}

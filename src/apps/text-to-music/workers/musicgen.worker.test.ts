@@ -60,11 +60,11 @@ describe("musicgen.worker", () => {
     await messageHandler({ data: { type: "load" } });
 
     expect(mockTokenizerFromPretrained).toHaveBeenCalledWith(
-      "/models/musicgen-small",
+      "/models/text-to-audio-tiny",
       expect.any(Object)
     );
     expect(mockModelFromPretrained).toHaveBeenCalledWith(
-      "/models/musicgen-small",
+      "/models/text-to-audio-tiny",
       expect.any(Object)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
