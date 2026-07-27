@@ -142,6 +142,7 @@ export const AudioPlayer = ({
                 min={0}
                 max={totalDuration || 1}
                 step={0.1}
+                aria-label="Playback progress"
                 onValueChange={(val) => {
                   const targetTime = Array.isArray(val) ? val[0] : val;
                   setCurrentTime(targetTime);

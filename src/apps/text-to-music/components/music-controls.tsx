@@ -27,7 +27,7 @@ export const MusicControls = ({ values, onChange, disabled = false }: MusicContr
         {/* Duration Control */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <Label className="flex items-center gap-1.5 text-xs font-medium">
+            <Label id="duration-label" className="flex items-center gap-1.5 text-xs font-medium">
               <Clock className="text-muted-foreground size-3.5" />
               Duration: <span className="text-primary font-bold">{values.duration}s</span>
             </Label>
@@ -38,6 +38,8 @@ export const MusicControls = ({ values, onChange, disabled = false }: MusicContr
             max={30}
             step={1}
             disabled={disabled}
+            aria-label="Duration"
+            aria-labelledby="duration-label"
             onValueChange={(val) => {
               const num = Array.isArray(val) ? val[0] : val;
               onChange({ duration: num });
@@ -51,7 +53,10 @@ export const MusicControls = ({ values, onChange, disabled = false }: MusicContr
         {/* Guidance Scale Control */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <Label className="flex items-center gap-1.5 text-xs font-medium">
+            <Label
+              id="guidance-scale-label"
+              className="flex items-center gap-1.5 text-xs font-medium"
+            >
               <Compass className="text-muted-foreground size-3.5" />
               Guidance Scale:{" "}
               <span className="text-primary font-bold">{values.guidanceScale.toFixed(1)}</span>
@@ -63,6 +68,8 @@ export const MusicControls = ({ values, onChange, disabled = false }: MusicContr
             max={10.0}
             step={0.5}
             disabled={disabled}
+            aria-label="Guidance Scale"
+            aria-labelledby="guidance-scale-label"
             onValueChange={(val) => {
               const num = Array.isArray(val) ? val[0] : val;
               onChange({ guidanceScale: num });
@@ -76,7 +83,7 @@ export const MusicControls = ({ values, onChange, disabled = false }: MusicContr
         {/* Temperature Control */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <Label className="flex items-center gap-1.5 text-xs font-medium">
+            <Label id="temperature-label" className="flex items-center gap-1.5 text-xs font-medium">
               <Sparkles className="text-muted-foreground size-3.5" />
               Temperature:{" "}
               <span className="text-primary font-bold">{values.temperature.toFixed(1)}</span>
@@ -88,6 +95,8 @@ export const MusicControls = ({ values, onChange, disabled = false }: MusicContr
             max={2.0}
             step={0.1}
             disabled={disabled}
+            aria-label="Temperature"
+            aria-labelledby="temperature-label"
             onValueChange={(val) => {
               const num = Array.isArray(val) ? val[0] : val;
               onChange({ temperature: num });
