@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-import { Film, Loader2, Play, Pause, FileText, Sparkles } from "lucide-react";
+import {
+  Film,
+  Loader2,
+  Play,
+  Pause,
+  FileText,
+  Sparkles,
+  Music,
+  Video,
+  Image as ImageIcon,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Muted, Small } from "@/components/ui/typography";
 import { cn } from "@/lib/utils";
@@ -193,6 +203,12 @@ export const SampleMediaPicker = ({
               >
                 {isLoading ? (
                   <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                ) : item.type === "audio" ? (
+                  <Music className="text-muted-foreground mr-1 h-3 w-3" />
+                ) : item.type === "video" ? (
+                  <Video className="text-muted-foreground mr-1 h-3 w-3" />
+                ) : item.type === "image" ? (
+                  <ImageIcon className="text-muted-foreground mr-1 h-3 w-3" />
                 ) : (
                   <FileText className="text-muted-foreground mr-1 h-3 w-3" />
                 )}
@@ -250,7 +266,10 @@ export const SampleMediaPicker = ({
                   {isLoading ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
                   ) : (
-                    "Select"
+                    <>
+                      <FileText className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                      Select
+                    </>
                   )}
                 </Button>
               </div>
@@ -322,7 +341,10 @@ export const SampleMediaPicker = ({
                   {isLoading ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
                   ) : (
-                    "Select"
+                    <>
+                      <Music className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                      Select
+                    </>
                   )}
                 </Button>
               </div>
@@ -359,7 +381,10 @@ export const SampleMediaPicker = ({
                 {isLoading ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
                 ) : (
-                  "Select"
+                  <>
+                    <Video className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
+                    Select
+                  </>
                 )}
               </Button>
             </div>
