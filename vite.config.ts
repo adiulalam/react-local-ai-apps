@@ -18,11 +18,6 @@ export default defineConfig({
   worker: {
     format: "es",
   },
-  preview: {
-    headers: {
-      "Cache-Control": "no-store",
-    },
-  },
   optimizeDeps: {
     include: ["@huggingface/transformers"],
   },
