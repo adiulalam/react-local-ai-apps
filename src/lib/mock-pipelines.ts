@@ -1,7 +1,6 @@
 import {
   Tensor,
   type AllTasks,
-  type PipelineType,
   type PreTrainedModel,
   type Processor,
   type PreTrainedTokenizer,
@@ -96,9 +95,7 @@ export const getMockObjectDetection = async (
   progress_callback({ status: "ready", name: model, file: "mock" });
 
   return (async () => {
-    return [
-      { score: 0.99, label: "person", box: { xmin: 0.1, ymin: 0.1, xmax: 0.9, ymax: 0.9 } },
-    ];
+    return [{ score: 0.99, label: "person", box: { xmin: 0.1, ymin: 0.1, xmax: 0.9, ymax: 0.9 } }];
   }) as unknown as AllTasks["object-detection"];
 };
 
