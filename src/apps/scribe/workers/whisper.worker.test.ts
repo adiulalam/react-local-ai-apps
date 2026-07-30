@@ -3,19 +3,26 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 const addEventListenerMock = vi.fn();
 const postMessageMock = vi.fn();
 
-// Mock global self for the worker environment
+// Mock global self for worker environment
 vi.stubGlobal("self", {
   addEventListener: addEventListenerMock,
   postMessage: postMessageMock,
 });
 
-const mockPipeline = vi.fn();
+vi.mock("@/lib/utils", () => ({
+  isTestEnv: true,
+}));
 
-import type { PipelineType } from "@huggingface/transformers";
+const mockGetMockPipeline = vi.fn();
+vi.mock("@/lib/mock-pipelines", () => ({
+  getMockPipeline: (...args: unknown[]) => mockGetMockPipeline(...args),
+}));
 
 vi.mock("@huggingface/transformers", () => {
   return {
-    pipeline: (task: PipelineType, ...args: unknown[]) => mockPipeline(task, ...args),
+    TextStreamer: class {
+      constructor() {}
+    },
     env: {
       allowLocalModels: false,
       useBrowserCache: true,
@@ -27,9 +34,6 @@ vi.mock("@huggingface/transformers", () => {
         },
       },
     },
-    TextStreamer: class {
-      constructor() {}
-    },
   };
 });
 
@@ -37,9 +41,7 @@ describe("whisper.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
-
-    // Dynamically import to ensure addEventListener is called in each test
-    await import("./whisper.worker.ts");
+    await import("./whisper.worker");
   });
 
   it("should register message event listener", () => {
@@ -49,15 +51,16 @@ describe("whisper.worker", () => {
   it("should handle 'load' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    // Mock pipeline resolution
-    mockPipeline.mockResolvedValueOnce(vi.fn());
+    mockGetMockPipeline.mockResolvedValueOnce(vi.fn());
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith(
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(mockGetMockPipeline).toHaveBeenCalledWith(
       "automatic-speech-recognition",
       "/models/whisper-tiny",
-      expect.any(Object)
+      expect.any(Function)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
@@ -65,13 +68,16 @@ describe("whisper.worker", () => {
   it("should handle 'process' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    const transcriberMock = Object.assign(
-      vi.fn().mockResolvedValue({ text: "Mocked transcription" }),
-      { tokenizer: {} }
-    );
-    mockPipeline.mockResolvedValueOnce(transcriberMock);
+    const transcriberMock = Object.assign(vi.fn().mockResolvedValue({ text: "Hello, world!" }), {
+      tokenizer: {},
+    });
+    mockGetMockPipeline.mockResolvedValueOnce(transcriberMock);
 
-    await messageHandler({ data: { type: "process", audio: new Float32Array(0) } });
+    await messageHandler({
+      data: { type: "process", audio: new Float32Array([0.1, 0.2, 0.3]) },
+    });
+
+    await new Promise((r) => setTimeout(r, 0));
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
     expect(transcriberMock).toHaveBeenCalledWith(
@@ -86,7 +92,7 @@ describe("whisper.worker", () => {
     );
     expect(postMessageMock).toHaveBeenCalledWith({
       type: "complete",
-      result: "Mocked transcription",
+      result: "Hello, world!",
     });
   });
 });

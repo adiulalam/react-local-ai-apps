@@ -7,6 +7,40 @@ import {
   type PreTrainedTokenizer,
 } from "@huggingface/transformers";
 
+export interface MockStreamer {
+  token_callback_function?: (tokens: bigint[]) => void;
+  put?: (tokens: bigint[]) => void;
+  end?: () => void;
+}
+
+const getSharedMockTokenizer = () => {
+  return Object.assign(() => ({ input_ids: [1] }), {
+    apply_chat_template: () => ({ input_ids: [1, 2, 3] }),
+    encode: () => [1, 2],
+    decode: () => " mock ",
+    batch_decode: () => ["This is a mock response."],
+    all_special_ids: [1, 2],
+  });
+};
+
+const simulateStream = async (streamer?: MockStreamer) => {
+  const mockTokens = [10, 11, 12, 13];
+  if (streamer) {
+    for (let i = 0; i < mockTokens.length; i++) {
+      if (typeof streamer.token_callback_function === "function") {
+        streamer.token_callback_function([BigInt(mockTokens[i])]);
+      }
+      if (typeof streamer.put === "function") {
+        streamer.put([BigInt(mockTokens[i])]);
+      }
+      await new Promise((r) => setTimeout(r, 10));
+    }
+    if (typeof streamer.end === "function") {
+      streamer.end();
+    }
+  }
+};
+
 export const getMockPipeline = async <T extends PipelineType>(
   task: T,
   model: string,
@@ -53,6 +87,26 @@ export const getMockPipeline = async <T extends PipelineType>(
     }) as unknown as AllTasks[T];
   }
 
+  if (task === "automatic-speech-recognition") {
+    const mockTranscriber = async (_audio: unknown, options: unknown) => {
+      const { streamer } = options as { streamer?: MockStreamer };
+      await simulateStream(streamer);
+      return { text: "mock transcribed text" };
+    };
+    mockTranscriber.tokenizer = getSharedMockTokenizer();
+    return mockTranscriber as unknown as AllTasks[T];
+  }
+
+  if (task === "summarization") {
+    const mockSummarizer = async (_text: unknown, options: unknown) => {
+      const { streamer } = options as { streamer?: MockStreamer };
+      await simulateStream(streamer);
+      return [{ summary_text: "mock summary text" }];
+    };
+    mockSummarizer.tokenizer = getSharedMockTokenizer();
+    return mockSummarizer as unknown as AllTasks[T];
+  }
+
   throw new Error(`Mock pipeline not implemented for task: ${task}`);
 };
 
@@ -91,39 +145,12 @@ export const getMockLLM = async (
     progress_callback({ status: "ready", name: model, file: "mock" });
   }
 
-  const mockTokenizer = Object.assign(() => ({ input_ids: [1] }), {
-    apply_chat_template: () => ({ input_ids: [1, 2, 3] }),
-    encode: () => [1, 2],
-    decode: () => " mock ",
-    batch_decode: () => ["This is a mock LLM response."],
-    all_special_ids: [1, 2],
-  });
-
-  interface MockStreamer {
-    token_callback_function?: (tokens: bigint[]) => void;
-    put?: (tokens: bigint[]) => void;
-    end?: () => void;
-  }
+  const mockTokenizer = getSharedMockTokenizer();
 
   const mockModel = {
     generate: async (options: unknown) => {
       const { streamer } = options as { streamer?: MockStreamer };
-      const mockTokens = [10, 11, 12, 13];
-
-      if (streamer) {
-        for (let i = 0; i < mockTokens.length; i++) {
-          if (typeof streamer.token_callback_function === "function") {
-            streamer.token_callback_function([BigInt(mockTokens[i])]);
-          }
-          if (typeof streamer.put === "function") {
-            streamer.put([BigInt(mockTokens[i])]);
-          }
-          await new Promise((r) => setTimeout(r, 10));
-        }
-        if (typeof streamer.end === "function") {
-          streamer.end();
-        }
-      }
+      await simulateStream(streamer);
       return {
         sequences: [[10, 11, 12, 13]],
       };

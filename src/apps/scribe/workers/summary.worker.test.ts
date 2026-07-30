@@ -3,19 +3,26 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 const addEventListenerMock = vi.fn();
 const postMessageMock = vi.fn();
 
-// Mock global self for the worker environment
+// Mock global self for worker environment
 vi.stubGlobal("self", {
   addEventListener: addEventListenerMock,
   postMessage: postMessageMock,
 });
 
-const mockPipeline = vi.fn();
+vi.mock("@/lib/utils", () => ({
+  isTestEnv: true,
+}));
 
-import type { PipelineType } from "@huggingface/transformers";
+const mockGetMockPipeline = vi.fn();
+vi.mock("@/lib/mock-pipelines", () => ({
+  getMockPipeline: (...args: unknown[]) => mockGetMockPipeline(...args),
+}));
 
 vi.mock("@huggingface/transformers", () => {
   return {
-    pipeline: (task: PipelineType, ...args: unknown[]) => mockPipeline(task, ...args),
+    TextStreamer: class {
+      constructor() {}
+    },
     env: {
       allowLocalModels: false,
       useBrowserCache: true,
@@ -27,9 +34,6 @@ vi.mock("@huggingface/transformers", () => {
         },
       },
     },
-    TextStreamer: class {
-      constructor() {}
-    },
   };
 });
 
@@ -37,9 +41,7 @@ describe("summary.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
-
-    // Dynamically import to ensure addEventListener is called in each test
-    await import("./summary.worker.ts");
+    await import("./summary.worker");
   });
 
   it("should register message event listener", () => {
@@ -47,20 +49,18 @@ describe("summary.worker", () => {
   });
 
   it("should handle 'load' message", async () => {
-    // Get the registered message handler
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    // Mock pipeline resolution
-    mockPipeline.mockResolvedValueOnce(vi.fn());
+    mockGetMockPipeline.mockResolvedValueOnce(vi.fn());
 
-    // Trigger the load event
     await messageHandler({ data: { type: "load" } });
 
-    // Ensure it attempts to load and posts ready
-    expect(mockPipeline).toHaveBeenCalledWith(
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(mockGetMockPipeline).toHaveBeenCalledWith(
       "summarization",
       "/models/tiny-bart",
-      expect.any(Object)
+      expect.any(Function)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
@@ -68,25 +68,25 @@ describe("summary.worker", () => {
   it("should handle 'process' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    // Mock summarizer function and attach a tokenizer
     const summarizerMock = Object.assign(
-      vi.fn().mockResolvedValue([{ summary_text: "Mocked summary" }]),
+      vi.fn().mockResolvedValue([{ summary_text: "This is a summary." }]),
       { tokenizer: {} }
     );
-    summarizerMock.tokenizer = {};
-    mockPipeline.mockResolvedValueOnce(summarizerMock);
+    mockGetMockPipeline.mockResolvedValueOnce(summarizerMock);
 
     await messageHandler({
       data: {
         type: "process",
-        text: "Long text to summarize",
+        text: "This is a long text that needs to be summarized.",
         options: { max_length: 50, min_length: 10 },
       },
     });
 
+    await new Promise((r) => setTimeout(r, 0));
+
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
     expect(summarizerMock).toHaveBeenCalledWith(
-      "Long text to summarize",
+      "This is a long text that needs to be summarized.",
       expect.objectContaining({
         max_new_tokens: 20,
         min_length: 5,
@@ -94,6 +94,9 @@ describe("summary.worker", () => {
         streamer: expect.any(Object),
       })
     );
-    expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: "Mocked summary" });
+    expect(postMessageMock).toHaveBeenCalledWith({
+      type: "complete",
+      result: "This is a summary.",
+    });
   });
 });
