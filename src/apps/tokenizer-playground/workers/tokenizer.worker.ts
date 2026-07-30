@@ -1,5 +1,6 @@
 import { AutoTokenizer, PreTrainedTokenizer, env } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
+import { getMockLLM } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -12,27 +13,44 @@ const TOKENIZER_MAPPINGS = new Map<string, Promise<PreTrainedTokenizer>>();
 const load = async (model_id: string, progress_callback?: (info: unknown) => void) => {
   let tokenizerPromise = TOKENIZER_MAPPINGS.get(model_id);
   if (!tokenizerPromise) {
-    tokenizerPromise = AutoTokenizer.from_pretrained(model_id, {
-      progress_callback,
-    }).then((tokenizer: PreTrainedTokenizer) => {
-      // @ts-expect-error accessing internal config
-      const tokenizer_class = (tokenizer._tokenizer_config?.tokenizer_class ?? "").replace(
-        /Fast$/,
-        ""
-      );
-      switch (tokenizer_class) {
-        case "LlamaTokenizer":
-        case "Grok1Tokenizer":
-          // @ts-expect-error accessing internal decoder
-          tokenizer.decoder.decoders.pop();
-          break;
-        case "T5Tokenizer":
-          // @ts-expect-error accessing internal decoder
-          tokenizer.decoder.addPrefixSpace = false;
-          break;
-      }
-      return tokenizer;
-    });
+    if (isTestEnv) {
+      tokenizerPromise = getMockLLM(model_id, progress_callback).then((res) => {
+        const tokenizer = res[0] as PreTrainedTokenizer;
+        // @ts-expect-error accessing internal config
+        tokenizer._tokenizer_config = { tokenizer_class: "LlamaTokenizer" };
+        // @ts-expect-error accessing internal decoder
+        tokenizer.decoder = { decoders: [{}] };
+        tokenizer.encode = () => [1, 2];
+        tokenizer.decode = (ids: number[]) => {
+          if (ids[0] === 1) return "E2E";
+          if (ids[0] === 2) return "test";
+          return "mock";
+        };
+        return tokenizer;
+      });
+    } else {
+      tokenizerPromise = AutoTokenizer.from_pretrained(model_id, {
+        progress_callback,
+      }).then((tokenizer: PreTrainedTokenizer) => {
+        // @ts-expect-error accessing internal config
+        const tokenizer_class = (tokenizer._tokenizer_config?.tokenizer_class ?? "").replace(
+          /Fast$/,
+          ""
+        );
+        switch (tokenizer_class) {
+          case "LlamaTokenizer":
+          case "Grok1Tokenizer":
+            // @ts-expect-error accessing internal decoder
+            tokenizer.decoder.decoders.pop();
+            break;
+          case "T5Tokenizer":
+            // @ts-expect-error accessing internal decoder
+            tokenizer.decoder.addPrefixSpace = false;
+            break;
+        }
+        return tokenizer;
+      });
+    }
 
     TOKENIZER_MAPPINGS.set(model_id, tokenizerPromise);
   }
