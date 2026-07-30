@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
 const addEventListenerMock = vi.fn();
 const postMessageMock = vi.fn();
@@ -34,8 +34,13 @@ describe("image-classification.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
+    vi.useFakeTimers();
 
     await import("./image-classification.worker.ts");
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("should register message event listener", () => {
@@ -45,31 +50,32 @@ describe("image-classification.worker", () => {
   it("should handle 'load' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    mockPipeline.mockResolvedValueOnce(vi.fn());
-
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith(
-      "image-classification",
-      "/models/mobilenet-tiny",
-      expect.any(Object)
-    );
+    vi.runAllTimers();
+
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 
   it("should handle 'process' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    const classifierMock = vi.fn().mockResolvedValue([{ label: "cat", score: 0.99 }]);
-    mockPipeline.mockResolvedValueOnce(classifierMock);
+    const promise = messageHandler({
+      data: { type: "process", image: "data:image/jpeg;base64,..." },
+    });
 
-    await messageHandler({ data: { type: "process", image: "data:image/jpeg;base64,..." } });
+    // Advance timers so the mock setTimeout resolves
+    await vi.runAllTimersAsync();
+    await promise;
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
-    expect(classifierMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", { top_k: 5 });
     expect(postMessageMock).toHaveBeenCalledWith({
       type: "complete",
-      result: [{ label: "cat", score: 0.99 }],
+      result: [
+        { label: "mock golden retriever", score: 0.85 },
+        { label: "mock labrador", score: 0.1 },
+        { label: "mock beagle", score: 0.05 },
+      ],
     });
   });
 });

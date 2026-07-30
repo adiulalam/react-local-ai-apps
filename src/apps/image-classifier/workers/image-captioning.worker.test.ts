@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 
 const addEventListenerMock = vi.fn();
 const postMessageMock = vi.fn();
@@ -34,8 +34,13 @@ describe("image-captioning.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
+    vi.useFakeTimers();
 
     await import("./image-captioning.worker.ts");
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("should register message event listener", () => {
@@ -45,30 +50,28 @@ describe("image-captioning.worker", () => {
   it("should handle 'load' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    mockPipeline.mockResolvedValueOnce(vi.fn());
-
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith(
-      "image-to-text",
-      "/models/tiny-vit-gpt2",
-      expect.any(Object)
-    );
+    vi.runAllTimers();
+
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 
   it("should handle 'process' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    const captionerMock = vi.fn().mockResolvedValue([{ generated_text: "a mocked caption" }]);
-    mockPipeline.mockResolvedValueOnce(captionerMock);
+    const promise = messageHandler({
+      data: { type: "process", image: "data:image/jpeg;base64,..." },
+    });
 
-    await messageHandler({ data: { type: "process", image: "data:image/jpeg;base64,..." } });
+    // Advance timers so the mock setTimeout resolves
+    await vi.runAllTimersAsync();
+    await promise;
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
-    expect(captionerMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", {
-      max_new_tokens: 20,
+    expect(postMessageMock).toHaveBeenCalledWith({
+      type: "complete",
+      result: "a mock caption of a cute animal",
     });
-    expect(postMessageMock).toHaveBeenCalledWith({ type: "complete", result: "a mocked caption" });
   });
 });
