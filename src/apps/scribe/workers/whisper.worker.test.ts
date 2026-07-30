@@ -95,5 +95,3 @@ describe("whisper.worker", () => {
     });
   });
 });
-
-

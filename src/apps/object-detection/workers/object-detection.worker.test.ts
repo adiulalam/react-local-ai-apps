@@ -55,10 +55,7 @@ describe("object-detection.worker", () => {
 
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(mockGetMockPipeline).toHaveBeenCalledWith(
-      "Xenova/yolos-tiny",
-      expect.any(Function)
-    );
+    expect(mockGetMockPipeline).toHaveBeenCalledWith("Xenova/yolos-tiny", expect.any(Function));
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 

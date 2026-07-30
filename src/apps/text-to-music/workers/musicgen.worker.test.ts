@@ -70,10 +70,7 @@ describe("musicgen.worker", () => {
 
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(mockGetMockMusicgen).toHaveBeenCalledWith(
-      "Xenova/musicgen-small",
-      expect.any(Function)
-    );
+    expect(mockGetMockMusicgen).toHaveBeenCalledWith("Xenova/musicgen-small", expect.any(Function));
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 

@@ -1,4 +1,10 @@
-import { pipeline, env, TextStreamer, type PipelineType, type AllTasks } from "@huggingface/transformers";
+import {
+  pipeline,
+  env,
+  TextStreamer,
+  type PipelineType,
+  type AllTasks,
+} from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
 import { getMockSpeechRecognition } from "@/lib/mock-pipelines";
 

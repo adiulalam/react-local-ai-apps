@@ -13,8 +13,6 @@ const mockPipeline = vi.fn();
 
 import type { PipelineType } from "@huggingface/transformers";
 
-
-
 vi.mock("@huggingface/transformers", () => {
   return {
     pipeline: (task: PipelineType, ...args: unknown[]) => mockPipeline(task, ...args),
@@ -70,10 +68,10 @@ describe("image-captioning.worker", () => {
     await vi.runAllTimersAsync();
     await promise;
 
-    expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });expect(postMessageMock).toHaveBeenCalledWith({
+    expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
+    expect(postMessageMock).toHaveBeenCalledWith({
       type: "complete",
       result: "a mock caption of a cute animal",
     });
   });
 });
-
