@@ -1,12 +1,6 @@
-import {
-  pipeline,
-  env,
-  TextStreamer,
-  type PipelineType,
-  type AllTasks,
-} from "@huggingface/transformers";
+import { pipeline, env, TextStreamer, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
-import { getMockPipeline } from "@/lib/mock-pipelines";
+import { getMockSummarization } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -19,16 +13,19 @@ const model = "Xenova/distilbart-cnn-6-6";
 let instance: Promise<AllTasks["summarization"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
-  if (instance === null) {
-    if (isTestEnv) {
-      instance = Promise.resolve(getMockPipeline(task, model, progress_callback));
-    } else {
-      instance = pipeline(task, model, {
-        progress_callback,
-        device: "webgpu",
-        dtype: "fp32", // fp32 is the safest full-precision fallback for webgpu ops on distilbart
-      }) as Promise<AllTasks["summarization"]>;
+  if (isTestEnv) {
+    if (instance === null) {
+      instance = getMockSummarization(model, progress_callback);
     }
+    return instance;
+  }
+
+  if (instance === null) {
+    instance = pipeline(task, model, {
+      progress_callback,
+      device: "webgpu",
+      dtype: "fp32", // fp32 is the safest full-precision fallback for webgpu ops on distilbart
+    }) as Promise<AllTasks["summarization"]>;
   }
   return instance;
 };

@@ -15,7 +15,7 @@ vi.mock("@/lib/utils", () => ({
 
 const mockGetMockPipeline = vi.fn();
 vi.mock("@/lib/mock-pipelines", () => ({
-  getMockPipeline: (...args: unknown[]) => mockGetMockPipeline(...args),
+  getMockSpeechRecognition: (...args: unknown[]) => mockGetMockPipeline(...args),
 }));
 
 vi.mock("@huggingface/transformers", () => {
@@ -58,7 +58,6 @@ describe("whisper.worker", () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(mockGetMockPipeline).toHaveBeenCalledWith(
-      "automatic-speech-recognition",
       "onnx-community/whisper-base",
       expect.any(Function)
     );
@@ -96,3 +95,5 @@ describe("whisper.worker", () => {
     });
   });
 });
+
+

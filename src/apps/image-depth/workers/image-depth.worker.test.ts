@@ -15,7 +15,7 @@ vi.mock("@/lib/utils", () => ({
 
 const mockGetMockPipeline = vi.fn();
 vi.mock("@/lib/mock-pipelines", () => ({
-  getMockPipeline: (...args: unknown[]) => mockGetMockPipeline(...args),
+  getMockDepthEstimation: (...args: unknown[]) => mockGetMockPipeline(...args),
 }));
 
 vi.mock("@huggingface/transformers", () => {
@@ -57,7 +57,6 @@ describe("image-depth.worker", () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(mockGetMockPipeline).toHaveBeenCalledWith(
-      "depth-estimation",
       "Xenova/depth-anything-small-hf",
       expect.any(Function)
     );

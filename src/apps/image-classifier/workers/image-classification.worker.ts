@@ -1,6 +1,6 @@
 import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
-import { getMockPipeline } from "@/lib/mock-pipelines";
+import { getMockImageClassification } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -9,15 +9,13 @@ if (env.backends.onnx.wasm) {
 }
 
 const task: PipelineType = "image-classification";
-const model = "Xenova/resnet-50";
+const model = "Xenova/mobilenet_v2";
 let instance: Promise<AllTasks["image-classification"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (instance === null) {
     if (isTestEnv) {
-      instance = getMockPipeline(task, model, progress_callback) as Promise<
-        AllTasks["image-classification"]
-      >;
+      instance = getMockImageClassification(model, progress_callback);
     } else {
       instance = pipeline(task, model, {
         progress_callback,

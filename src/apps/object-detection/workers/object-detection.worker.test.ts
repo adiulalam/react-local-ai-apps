@@ -15,7 +15,7 @@ vi.mock("@/lib/utils", () => ({
 
 const mockGetMockPipeline = vi.fn();
 vi.mock("@/lib/mock-pipelines", () => ({
-  getMockPipeline: (...args: unknown[]) => mockGetMockPipeline(...args),
+  getMockObjectDetection: (...args: unknown[]) => mockGetMockPipeline(...args),
 }));
 
 vi.mock("@huggingface/transformers", () => {
@@ -56,7 +56,6 @@ describe("object-detection.worker", () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(mockGetMockPipeline).toHaveBeenCalledWith(
-      "object-detection",
       "Xenova/yolos-tiny",
       expect.any(Function)
     );

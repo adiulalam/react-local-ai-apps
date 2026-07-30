@@ -41,73 +41,97 @@ const simulateStream = async (streamer?: MockStreamer) => {
   }
 };
 
-export const getMockPipeline = async <T extends PipelineType>(
-  task: T,
+export const getMockImageClassification = async (
   model: string,
   progress_callback: (info: unknown) => void
-): Promise<AllTasks[T]> => {
-  // Simulate the loading events for the UI
+): Promise<AllTasks["image-classification"]> => {
   progress_callback({ status: "initiate", name: model, file: "mock" });
   progress_callback({ status: "ready", name: model, file: "mock" });
 
-  if (task === "image-classification") {
-    return (async () => {
-      return [
-        { label: "mock golden retriever", score: 0.85 },
-        { label: "mock labrador", score: 0.1 },
-        { label: "mock beagle", score: 0.05 },
-      ];
-    }) as unknown as AllTasks[T];
-  }
+  return (async () => {
+    return [
+      { label: "mock golden retriever", score: 0.85 },
+      { label: "mock labrador", score: 0.1 },
+      { label: "mock beagle", score: 0.05 },
+    ];
+  }) as unknown as AllTasks["image-classification"];
+};
 
-  if (task === "image-to-text") {
-    return (async () => {
-      return [{ generated_text: "a mock caption of a cute animal" }];
-    }) as unknown as AllTasks[T];
-  }
+export const getMockImageToText = async (
+  model: string,
+  progress_callback: (info: unknown) => void
+): Promise<AllTasks["image-to-text"]> => {
+  progress_callback({ status: "initiate", name: model, file: "mock" });
+  progress_callback({ status: "ready", name: model, file: "mock" });
 
-  if (task === "depth-estimation") {
-    return (async () => {
-      return {
-        depth: {
-          width: 10,
-          height: 10,
-          channels: 1,
-          data: new Uint8Array(100),
-        },
-      };
-    }) as unknown as AllTasks[T];
-  }
+  return (async () => {
+    return [{ generated_text: "a mock caption of a cute animal" }];
+  }) as unknown as AllTasks["image-to-text"];
+};
 
-  if (task === "object-detection") {
-    return (async () => {
-      return [
-        { score: 0.99, label: "person", box: { xmin: 0.1, ymin: 0.1, xmax: 0.9, ymax: 0.9 } },
-      ];
-    }) as unknown as AllTasks[T];
-  }
+export const getMockDepthEstimation = async (
+  model: string,
+  progress_callback: (info: unknown) => void
+): Promise<AllTasks["depth-estimation"]> => {
+  progress_callback({ status: "initiate", name: model, file: "mock" });
+  progress_callback({ status: "ready", name: model, file: "mock" });
 
-  if (task === "automatic-speech-recognition") {
-    const mockTranscriber = async (_audio: unknown, options: unknown) => {
-      const { streamer } = options as { streamer?: MockStreamer };
-      await simulateStream(streamer);
-      return { text: "mock transcribed text" };
+  return (async () => {
+    return {
+      depth: {
+        width: 10,
+        height: 10,
+        channels: 1,
+        data: new Uint8Array(100),
+      },
     };
-    mockTranscriber.tokenizer = getSharedMockTokenizer();
-    return mockTranscriber as unknown as AllTasks[T];
-  }
+  }) as unknown as AllTasks["depth-estimation"];
+};
 
-  if (task === "summarization") {
-    const mockSummarizer = async (_text: unknown, options: unknown) => {
-      const { streamer } = options as { streamer?: MockStreamer };
-      await simulateStream(streamer);
-      return [{ summary_text: "mock summary text" }];
-    };
-    mockSummarizer.tokenizer = getSharedMockTokenizer();
-    return mockSummarizer as unknown as AllTasks[T];
-  }
+export const getMockObjectDetection = async (
+  model: string,
+  progress_callback: (info: unknown) => void
+): Promise<AllTasks["object-detection"]> => {
+  progress_callback({ status: "initiate", name: model, file: "mock" });
+  progress_callback({ status: "ready", name: model, file: "mock" });
 
-  throw new Error(`Mock pipeline not implemented for task: ${task}`);
+  return (async () => {
+    return [
+      { score: 0.99, label: "person", box: { xmin: 0.1, ymin: 0.1, xmax: 0.9, ymax: 0.9 } },
+    ];
+  }) as unknown as AllTasks["object-detection"];
+};
+
+export const getMockSpeechRecognition = async (
+  model: string,
+  progress_callback: (info: unknown) => void
+): Promise<AllTasks["automatic-speech-recognition"]> => {
+  progress_callback({ status: "initiate", name: model, file: "mock" });
+  progress_callback({ status: "ready", name: model, file: "mock" });
+
+  const mockTranscriber = async (_audio: unknown, options: unknown) => {
+    const { streamer } = options as { streamer?: MockStreamer };
+    await simulateStream(streamer);
+    return { text: "mock transcribed text" };
+  };
+  mockTranscriber.tokenizer = getSharedMockTokenizer();
+  return mockTranscriber as unknown as AllTasks["automatic-speech-recognition"];
+};
+
+export const getMockSummarization = async (
+  model: string,
+  progress_callback: (info: unknown) => void
+): Promise<AllTasks["summarization"]> => {
+  progress_callback({ status: "initiate", name: model, file: "mock" });
+  progress_callback({ status: "ready", name: model, file: "mock" });
+
+  const mockSummarizer = async (_text: unknown, options: unknown) => {
+    const { streamer } = options as { streamer?: MockStreamer };
+    await simulateStream(streamer);
+    return [{ summary_text: "mock summary text" }];
+  };
+  mockSummarizer.tokenizer = getSharedMockTokenizer();
+  return mockSummarizer as unknown as AllTasks["summarization"];
 };
 
 export const getMockBackgroundRemover = async (

@@ -1,12 +1,6 @@
-import {
-  pipeline,
-  env,
-  TextStreamer,
-  type PipelineType,
-  type AllTasks,
-} from "@huggingface/transformers";
+import { pipeline, env, TextStreamer, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
-import { getMockPipeline } from "@/lib/mock-pipelines";
+import { getMockSpeechRecognition } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -19,16 +13,18 @@ const model = "onnx-community/whisper-base";
 let instance: Promise<AllTasks["automatic-speech-recognition"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
-  if (instance === null) {
-    if (isTestEnv) {
-      instance = Promise.resolve(getMockPipeline(task, model, progress_callback));
-    } else {
-      instance = pipeline(task, model, {
-        progress_callback,
-        device: "webgpu",
-        dtype: "fp32",
-      }) as Promise<AllTasks["automatic-speech-recognition"]>;
+  if (isTestEnv) {
+    if (instance === null) {
+      instance = getMockSpeechRecognition(model, progress_callback);
     }
+    return instance;
+  }
+  if (instance === null) {
+    instance = pipeline(task, model, {
+      progress_callback,
+      device: "webgpu",
+      dtype: "fp32",
+    }) as Promise<AllTasks["automatic-speech-recognition"]>;
   }
   return instance;
 };

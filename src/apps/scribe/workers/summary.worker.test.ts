@@ -15,7 +15,7 @@ vi.mock("@/lib/utils", () => ({
 
 const mockGetMockPipeline = vi.fn();
 vi.mock("@/lib/mock-pipelines", () => ({
-  getMockPipeline: (...args: unknown[]) => mockGetMockPipeline(...args),
+  getMockSummarization: (...args: unknown[]) => mockGetMockPipeline(...args),
 }));
 
 vi.mock("@huggingface/transformers", () => {
@@ -58,7 +58,6 @@ describe("summary.worker", () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(mockGetMockPipeline).toHaveBeenCalledWith(
-      "summarization",
       "Xenova/distilbart-cnn-6-6",
       expect.any(Function)
     );

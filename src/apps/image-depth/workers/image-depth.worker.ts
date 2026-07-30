@@ -1,6 +1,6 @@
 import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
-import { getMockPipeline } from "@/lib/mock-pipelines";
+import { getMockDepthEstimation } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -14,16 +14,18 @@ const model = "Xenova/depth-anything-small-hf";
 let instance: Promise<AllTasks["depth-estimation"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
-  if (instance === null) {
-    if (isTestEnv) {
-      instance = Promise.resolve(getMockPipeline(task, model, progress_callback));
-    } else {
-      instance = pipeline(task, model, {
-        progress_callback,
-        dtype: "fp32",
-        device: "webgpu",
-      }) as Promise<AllTasks["depth-estimation"]>;
+  if (isTestEnv) {
+    if (instance === null) {
+      instance = getMockDepthEstimation(model, progress_callback);
     }
+    return instance;
+  }
+  if (instance === null) {
+    instance = pipeline(task, model, {
+      progress_callback,
+      dtype: "fp32",
+      device: "webgpu",
+    }) as Promise<AllTasks["depth-estimation"]>;
   }
   return instance;
 };

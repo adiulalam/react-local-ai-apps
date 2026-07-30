@@ -1,6 +1,6 @@
 import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
-import { getMockPipeline } from "@/lib/mock-pipelines";
+import { getMockImageToText } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -15,9 +15,7 @@ let instance: Promise<AllTasks["image-to-text"]> | null = null;
 const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (instance === null) {
     if (isTestEnv) {
-      instance = getMockPipeline(task, model, progress_callback) as Promise<
-        AllTasks["image-to-text"]
-      >;
+      instance = getMockImageToText(model, progress_callback);
     } else {
       instance = pipeline(task, model, {
         progress_callback,
