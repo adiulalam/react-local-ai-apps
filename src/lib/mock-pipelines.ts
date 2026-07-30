@@ -32,6 +32,19 @@ export const getMockPipeline = async <T extends PipelineType>(
     }) as unknown as AllTasks[T];
   }
 
+  if (task === "depth-estimation") {
+    return (async () => {
+      return {
+        depth: {
+          width: 10,
+          height: 10,
+          channels: 1,
+          data: new Uint8Array(100),
+        },
+      };
+    }) as unknown as AllTasks[T];
+  }
+
   throw new Error(`Mock pipeline not implemented for task: ${task}`);
 };
 
