@@ -9,6 +9,7 @@ import {
   env,
 } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
+import { getMockLLM } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -24,13 +25,22 @@ let tokenizerPromise: Promise<PreTrainedTokenizer> | null = null;
 let modelPromise: Promise<PreTrainedModel> | null = null;
 
 const getInstance = async (progress_callback?: (info: unknown) => void) => {
+  if (isTestEnv) {
+    if (!tokenizerPromise || !modelPromise) {
+      const [mockTokenizer, mockModel] = await getMockLLM(MODEL_ID, progress_callback);
+      tokenizerPromise = Promise.resolve(mockTokenizer);
+      modelPromise = Promise.resolve(mockModel);
+    }
+    return Promise.all([tokenizerPromise, modelPromise]);
+  }
+
   tokenizerPromise ??= AutoTokenizer.from_pretrained(MODEL_ID, {
     progress_callback,
   });
 
   modelPromise ??= AutoModelForCausalLM.from_pretrained(MODEL_ID, {
-    dtype: isTestEnv ? "fp32" : "q4f16",
-    device: isTestEnv ? "wasm" : "webgpu",
+    dtype: "q4f16",
+    device: "webgpu",
     progress_callback,
   });
 
@@ -87,73 +97,77 @@ interface GenerateOutput {
 }
 
 const generate = async ({ messages, reasonEnabled }: GenerateData) => {
-  const [tokenizer, model] = await getInstance();
+  try {
+    const [tokenizer, model] = await getInstance();
 
-  const inputs = tokenizer.apply_chat_template(messages, {
-    add_generation_prompt: true,
-    return_dict: true,
-  });
-
-  const [START_THINKING_TOKEN_ID, END_THINKING_TOKEN_ID] = tokenizer.encode("<think></think>", {
-    add_special_tokens: false,
-  });
-
-  let state = reasonEnabled ? "thinking" : "answering";
-  let startTime: number | undefined;
-  let numTokens = 0;
-  let tps: number | undefined;
-
-  const token_callback_function = (tokens: bigint[]) => {
-    startTime ??= performance.now();
-
-    if (numTokens++ > 0) {
-      tps = (numTokens / (performance.now() - startTime)) * 1000;
-    }
-    const token = Number(tokens[0]);
-    if (token === END_THINKING_TOKEN_ID) {
-      state = "answering";
-    }
-  };
-
-  const callback_function = (output: string) => {
-    self.postMessage({
-      type: "update",
-      output,
-      tps,
-      numTokens,
-      state,
+    const inputs = tokenizer.apply_chat_template(messages, {
+      add_generation_prompt: true,
+      return_dict: true,
     });
-  };
 
-  const streamer = new TextStreamer(tokenizer, {
-    skip_prompt: true,
-    skip_special_tokens: true,
-    callback_function,
-    token_callback_function,
-  });
+    const [START_THINKING_TOKEN_ID, END_THINKING_TOKEN_ID] = tokenizer.encode("<think></think>", {
+      add_special_tokens: false,
+    });
 
-  self.postMessage({ type: "start" });
+    let state = reasonEnabled ? "thinking" : "answering";
+    let startTime: number | undefined;
+    let numTokens = 0;
+    let tps: number | undefined;
 
-  const output = (await model.generate({
-    ...inputs,
-    do_sample: false,
-    max_new_tokens: isTestEnv ? 100 : 2048,
-    ...(reasonEnabled ? {} : { bad_words_ids: [[START_THINKING_TOKEN_ID]] }),
-    streamer,
-    stopping_criteria,
-    return_dict_in_generate: true,
-  })) as unknown as GenerateOutput;
+    const token_callback_function = (tokens: bigint[]) => {
+      startTime ??= performance.now();
 
-  const { sequences } = output;
+      if (numTokens++ > 0) {
+        tps = (numTokens / (performance.now() - startTime)) * 1000;
+      }
+      const token = Number(tokens[0]);
+      if (token === END_THINKING_TOKEN_ID) {
+        state = "answering";
+      }
+    };
 
-  const decoded = tokenizer.batch_decode(sequences, {
-    skip_special_tokens: true,
-  });
+    const callback_function = (output: string) => {
+      self.postMessage({
+        type: "update",
+        output,
+        tps,
+        numTokens,
+        state,
+      });
+    };
 
-  self.postMessage({
-    type: "complete",
-    result: decoded,
-  });
+    const streamer = new TextStreamer(tokenizer, {
+      skip_prompt: true,
+      skip_special_tokens: true,
+      callback_function,
+      token_callback_function,
+    });
+
+    self.postMessage({ type: "start" });
+
+    const output = (await model.generate({
+      ...inputs,
+      do_sample: false,
+      max_new_tokens: isTestEnv ? 100 : 2048,
+      ...(reasonEnabled ? {} : { bad_words_ids: [[START_THINKING_TOKEN_ID]] }),
+      streamer,
+      stopping_criteria,
+      return_dict_in_generate: true,
+    })) as unknown as GenerateOutput;
+
+    const { sequences } = output;
+
+    const decoded = tokenizer.batch_decode(sequences, {
+      skip_special_tokens: true,
+    });
+
+    self.postMessage({
+      type: "complete",
+      result: decoded,
+    });
+  } catch (e) {
+    self.postMessage({ type: "error", error: String(e) });
+  }
 };
 
 self.addEventListener("message", async (e: MessageEvent) => {

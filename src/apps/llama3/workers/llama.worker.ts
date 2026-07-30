@@ -9,6 +9,7 @@ import {
   env,
 } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
+import { getMockLLM } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -22,13 +23,22 @@ let tokenizerPromise: Promise<PreTrainedTokenizer> | null = null;
 let modelPromise: Promise<PreTrainedModel> | null = null;
 
 const getInstance = async (progress_callback?: (info: unknown) => void) => {
+  if (isTestEnv) {
+    if (!tokenizerPromise || !modelPromise) {
+      const [mockTokenizer, mockModel] = await getMockLLM(MODEL_ID, progress_callback);
+      tokenizerPromise = Promise.resolve(mockTokenizer);
+      modelPromise = Promise.resolve(mockModel);
+    }
+    return Promise.all([tokenizerPromise, modelPromise]);
+  }
+
   tokenizerPromise ??= AutoTokenizer.from_pretrained(MODEL_ID, {
     progress_callback,
   });
 
   modelPromise ??= AutoModelForCausalLM.from_pretrained(MODEL_ID, {
-    dtype: isTestEnv ? "q4f16" : "q4f16",
-    device: isTestEnv ? "wasm" : "webgpu",
+    dtype: "q4f16",
+    device: "webgpu",
     progress_callback,
   });
 
@@ -90,64 +100,68 @@ interface GenerateOutput {
 }
 
 const generate = async ({ messages }: GenerateData) => {
-  const [tokenizer, model] = await getInstance();
+  try {
+    const [tokenizer, model] = await getInstance();
 
-  const inputs = tokenizer.apply_chat_template(messages, {
-    add_generation_prompt: true,
-    return_dict: true,
-  });
-
-  let startTime: number | undefined;
-  let numTokens = 0;
-  let tps: number | undefined;
-
-  const token_callback_function = () => {
-    startTime ??= performance.now();
-
-    if (numTokens++ > 0) {
-      tps = (numTokens / (performance.now() - startTime)) * 1000;
-    }
-  };
-
-  const callback_function = (output: string) => {
-    self.postMessage({
-      type: "update",
-      result: output,
-      tps,
-      numTokens,
+    const inputs = tokenizer.apply_chat_template(messages, {
+      add_generation_prompt: true,
+      return_dict: true,
     });
-  };
 
-  const streamer = new TextStreamer(tokenizer, {
-    skip_prompt: true,
-    skip_special_tokens: true,
-    callback_function,
-    token_callback_function,
-  });
+    let startTime: number | undefined;
+    let numTokens = 0;
+    let tps: number | undefined;
 
-  self.postMessage({ type: "start" });
+    const token_callback_function = () => {
+      startTime ??= performance.now();
 
-  const output = (await model.generate({
-    ...inputs,
-    // past_key_values: past_key_values_cache, // Disabled per Hugging Face example TODO
-    do_sample: false, // Recommended by Hugging Face for this model
-    repetition_penalty: 1.1,
-    max_new_tokens: isTestEnv ? 300 : 8192,
-    streamer,
-    stopping_criteria,
-    return_dict_in_generate: true,
-  })) as unknown as GenerateOutput;
+      if (numTokens++ > 0) {
+        tps = (numTokens / (performance.now() - startTime)) * 1000;
+      }
+    };
 
-  const { sequences } = output;
+    const callback_function = (output: string) => {
+      self.postMessage({
+        type: "update",
+        result: output,
+        tps,
+        numTokens,
+      });
+    };
 
-  const decoded = tokenizer.batch_decode(sequences, {
-    skip_special_tokens: true,
-  });
+    const streamer = new TextStreamer(tokenizer, {
+      skip_prompt: true,
+      skip_special_tokens: true,
+      callback_function,
+      token_callback_function,
+    });
 
-  self.postMessage({
-    type: "complete",
-    result: decoded,
-  });
+    self.postMessage({ type: "start" });
+
+    const output = (await model.generate({
+      ...inputs,
+      // past_key_values: past_key_values_cache, // Disabled per Hugging Face example TODO
+      do_sample: false, // Recommended by Hugging Face for this model
+      repetition_penalty: 1.1,
+      max_new_tokens: isTestEnv ? 300 : 8192,
+      streamer,
+      stopping_criteria,
+      return_dict_in_generate: true,
+    })) as unknown as GenerateOutput;
+
+    const { sequences } = output;
+
+    const decoded = tokenizer.batch_decode(sequences, {
+      skip_special_tokens: true,
+    });
+
+    self.postMessage({
+      type: "complete",
+      result: decoded,
+    });
+  } catch (e) {
+    self.postMessage({ type: "error", error: String(e) });
+  }
 };
 
 self.addEventListener("message", async (e: MessageEvent) => {

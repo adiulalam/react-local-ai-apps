@@ -21,7 +21,7 @@ describe("Background Remover Worker", () => {
       addEventListener: addEventListenerMock,
       postMessage: postMessageMock,
     });
-    
+
     // Dynamically import the worker so mocks apply
     await import("./background-remover.worker");
 
