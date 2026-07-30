@@ -1,5 +1,6 @@
 import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
+import { getMockPipeline } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -14,10 +15,14 @@ let instance: Promise<AllTasks["object-detection"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (instance === null) {
-    instance = pipeline(task, model, {
-      progress_callback,
-      device: isTestEnv ? "wasm" : "webgpu",
-    }) as Promise<AllTasks["object-detection"]>;
+    if (isTestEnv) {
+      instance = Promise.resolve(getMockPipeline(task, model, progress_callback));
+    } else {
+      instance = pipeline(task, model, {
+        progress_callback,
+        device: "webgpu",
+      }) as Promise<AllTasks["object-detection"]>;
+    }
   }
   return instance;
 };

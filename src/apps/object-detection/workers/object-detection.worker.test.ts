@@ -9,13 +9,17 @@ vi.stubGlobal("self", {
   postMessage: postMessageMock,
 });
 
-const mockPipeline = vi.fn();
+vi.mock("@/lib/utils", () => ({
+  isTestEnv: true,
+}));
 
-import type { PipelineType } from "@huggingface/transformers";
+const mockGetMockPipeline = vi.fn();
+vi.mock("@/lib/mock-pipelines", () => ({
+  getMockPipeline: (...args: unknown[]) => mockGetMockPipeline(...args),
+}));
 
 vi.mock("@huggingface/transformers", () => {
   return {
-    pipeline: (task: PipelineType, ...args: unknown[]) => mockPipeline(task, ...args),
     env: {
       allowLocalModels: false,
       useBrowserCache: true,
@@ -45,17 +49,16 @@ describe("object-detection.worker", () => {
   it("should handle 'load' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    mockPipeline.mockResolvedValueOnce(vi.fn());
+    mockGetMockPipeline.mockResolvedValueOnce(vi.fn());
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith(
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(mockGetMockPipeline).toHaveBeenCalledWith(
       "object-detection",
       "/models/yolos-tiny",
-      expect.objectContaining({
-        device: "wasm",
-        progress_callback: expect.any(Function),
-      })
+      expect.any(Function)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
@@ -68,11 +71,13 @@ describe("object-detection.worker", () => {
       .mockResolvedValue([
         { score: 0.99, label: "person", box: { xmin: 0.1, ymin: 0.1, xmax: 0.9, ymax: 0.9 } },
       ]);
-    mockPipeline.mockResolvedValueOnce(detectorMock);
+    mockGetMockPipeline.mockResolvedValueOnce(detectorMock);
 
     await messageHandler({
       data: { type: "process", image: "data:image/jpeg;base64,...", threshold: 0.5 },
     });
+
+    await new Promise((r) => setTimeout(r, 0));
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
     expect(detectorMock).toHaveBeenCalledWith("data:image/jpeg;base64,...", {

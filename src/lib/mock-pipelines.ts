@@ -45,6 +45,14 @@ export const getMockPipeline = async <T extends PipelineType>(
     }) as unknown as AllTasks[T];
   }
 
+  if (task === "object-detection") {
+    return (async () => {
+      return [
+        { score: 0.99, label: "person", box: { xmin: 0.1, ymin: 0.1, xmax: 0.9, ymax: 0.9 } },
+      ];
+    }) as unknown as AllTasks[T];
+  }
+
   throw new Error(`Mock pipeline not implemented for task: ${task}`);
 };
 
