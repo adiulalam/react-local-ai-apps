@@ -1,5 +1,6 @@
 import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
+import { getMockImageToText } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -8,15 +9,19 @@ if (env.backends.onnx.wasm) {
 }
 
 const task: PipelineType = "image-to-text";
-const model = isTestEnv ? "/models/tiny-vit-gpt2" : "Xenova/vit-gpt2-image-captioning";
+const model = "Xenova/vit-gpt2-image-captioning";
 let instance: Promise<AllTasks["image-to-text"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (instance === null) {
-    instance = pipeline(task, model, {
-      progress_callback,
-      dtype: "fp32",
-    }) as Promise<AllTasks["image-to-text"]>;
+    if (isTestEnv) {
+      instance = getMockImageToText(model, progress_callback);
+    } else {
+      instance = pipeline(task, model, {
+        progress_callback,
+        dtype: "fp32",
+      }) as Promise<AllTasks["image-to-text"]>;
+    }
   }
   return instance;
 };

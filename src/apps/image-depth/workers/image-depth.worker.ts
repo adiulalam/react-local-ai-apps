@@ -1,5 +1,6 @@
 import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
+import { getMockDepthEstimation } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -8,16 +9,22 @@ if (env.backends.onnx.wasm) {
 }
 
 const task: PipelineType = "depth-estimation";
-const model = isTestEnv ? "/models/depth-anything-small" : "Xenova/depth-anything-small-hf";
+const model = "Xenova/depth-anything-small-hf";
 
 let instance: Promise<AllTasks["depth-estimation"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
+  if (isTestEnv) {
+    if (instance === null) {
+      instance = getMockDepthEstimation(model, progress_callback);
+    }
+    return instance;
+  }
   if (instance === null) {
     instance = pipeline(task, model, {
       progress_callback,
-      dtype: isTestEnv ? "q8" : "fp32",
-      device: isTestEnv ? "wasm" : "webgpu",
+      dtype: "fp32",
+      device: "webgpu",
     }) as Promise<AllTasks["depth-estimation"]>;
   }
   return instance;

@@ -9,13 +9,17 @@ vi.stubGlobal("self", {
   postMessage: postMessageMock,
 });
 
-const mockPipeline = vi.fn();
+vi.mock("@/lib/utils", () => ({
+  isTestEnv: true,
+}));
 
-import type { PipelineType } from "@huggingface/transformers";
+const mockGetMockPipeline = vi.fn();
+vi.mock("@/lib/mock-pipelines", () => ({
+  getMockDepthEstimation: (...args: unknown[]) => mockGetMockPipeline(...args),
+}));
 
 vi.mock("@huggingface/transformers", () => {
   return {
-    pipeline: (task: PipelineType, ...args: unknown[]) => mockPipeline(task, ...args),
     env: {
       allowLocalModels: false,
       useBrowserCache: true,
@@ -45,18 +49,16 @@ describe("image-depth.worker", () => {
   it("should handle 'load' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    mockPipeline.mockResolvedValueOnce(vi.fn());
+    mockGetMockPipeline.mockResolvedValueOnce(vi.fn());
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockPipeline).toHaveBeenCalledWith(
-      "depth-estimation",
-      "/models/depth-anything-small",
-      expect.objectContaining({
-        device: "wasm",
-        dtype: "q8",
-        progress_callback: expect.any(Function),
-      })
+    // Allow promise resolution
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(mockGetMockPipeline).toHaveBeenCalledWith(
+      "Xenova/depth-anything-small-hf",
+      expect.any(Function)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
@@ -73,11 +75,13 @@ describe("image-depth.worker", () => {
       },
     });
 
-    mockPipeline.mockResolvedValueOnce(depthEstimatorMock);
+    mockGetMockPipeline.mockResolvedValueOnce(depthEstimatorMock);
 
     await messageHandler({
       data: { type: "process", image: "data:image/jpeg;base64,..." },
     });
+
+    await new Promise((r) => setTimeout(r, 10));
 
     expect(postMessageMock).toHaveBeenCalledWith({ type: "processing" });
     expect(depthEstimatorMock).toHaveBeenCalledWith("data:image/jpeg;base64,...");

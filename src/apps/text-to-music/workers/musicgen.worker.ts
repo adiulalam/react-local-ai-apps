@@ -6,6 +6,7 @@ import {
   type PreTrainedTokenizer,
 } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
+import { getMockMusicgen } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -13,7 +14,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const modelName = isTestEnv ? "/models/text-to-audio-tiny" : "Xenova/musicgen-small";
+const modelName = "Xenova/musicgen-small";
 
 let tokenizerInstance: PreTrainedTokenizer | null = null;
 let modelInstance: MusicgenForConditionalGeneration | null = null;
@@ -39,6 +40,15 @@ class MusicProgressStreamer extends BaseStreamer {
 }
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
+  if (isTestEnv) {
+    if (!tokenizerInstance || !modelInstance) {
+      const [mockTokenizer, mockModel] = await getMockMusicgen(modelName, progress_callback);
+      tokenizerInstance = mockTokenizer;
+      modelInstance = mockModel as unknown as MusicgenForConditionalGeneration;
+    }
+    return { tokenizer: tokenizerInstance, model: modelInstance };
+  }
+
   if (!tokenizerInstance) {
     tokenizerInstance = await AutoTokenizer.from_pretrained(modelName, {
       progress_callback,
@@ -47,8 +57,8 @@ const getInstance = async (progress_callback: (info: unknown) => void) => {
   if (!modelInstance) {
     modelInstance = (await MusicgenForConditionalGeneration.from_pretrained(modelName, {
       progress_callback,
-      device: isTestEnv ? "wasm" : "webgpu",
-      dtype: isTestEnv ? "fp32" : "fp32",
+      device: "webgpu",
+      dtype: "fp32",
     })) as unknown as MusicgenForConditionalGeneration;
   }
   return { tokenizer: tokenizerInstance, model: modelInstance };

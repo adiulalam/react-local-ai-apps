@@ -8,16 +8,22 @@ vi.stubGlobal("self", {
   postMessage: postMessageMock,
 });
 
-const mockTokenizerFromPretrained = vi.fn();
-const mockModelFromPretrained = vi.fn();
+vi.mock("@/lib/utils", () => ({
+  isTestEnv: true,
+}));
+
+const mockGetMockMusicgen = vi.fn();
+vi.mock("@/lib/mock-pipelines", () => ({
+  getMockMusicgen: (...args: unknown[]) => mockGetMockMusicgen(...args),
+}));
 
 vi.mock("@huggingface/transformers", () => {
   return {
     AutoTokenizer: {
-      from_pretrained: (...args: unknown[]) => mockTokenizerFromPretrained(...args),
+      from_pretrained: vi.fn(),
     },
     MusicgenForConditionalGeneration: {
-      from_pretrained: (...args: unknown[]) => mockModelFromPretrained(...args),
+      from_pretrained: vi.fn(),
     },
     RawAudio: class {
       constructor() {}
@@ -25,7 +31,11 @@ vi.mock("@huggingface/transformers", () => {
         return new Blob([], { type: "audio/wav" });
       }
     },
-    BaseStreamer: class {},
+    BaseStreamer: class {
+      constructor() {}
+      put() {}
+      end() {}
+    },
     env: {
       allowLocalModels: false,
       useBrowserCache: true,
@@ -44,7 +54,7 @@ describe("musicgen.worker", () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     vi.resetModules();
-    await import("./musicgen.worker.ts");
+    await import("./musicgen.worker");
   });
 
   it("should register message event listener", () => {
@@ -54,19 +64,13 @@ describe("musicgen.worker", () => {
   it("should handle 'load' message", async () => {
     const messageHandler = addEventListenerMock.mock.calls[0][1];
 
-    mockTokenizerFromPretrained.mockResolvedValueOnce(vi.fn());
-    mockModelFromPretrained.mockResolvedValueOnce(vi.fn());
+    mockGetMockMusicgen.mockResolvedValueOnce([{}, {}]);
 
     await messageHandler({ data: { type: "load" } });
 
-    expect(mockTokenizerFromPretrained).toHaveBeenCalledWith(
-      "/models/text-to-audio-tiny",
-      expect.any(Object)
-    );
-    expect(mockModelFromPretrained).toHaveBeenCalledWith(
-      "/models/text-to-audio-tiny",
-      expect.any(Object)
-    );
+    await new Promise((r) => setTimeout(r, 0));
+
+    expect(mockGetMockMusicgen).toHaveBeenCalledWith("Xenova/musicgen-small", expect.any(Function));
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });
   });
 
@@ -83,8 +87,7 @@ describe("musicgen.worker", () => {
       config: { audio_encoder: { sampling_rate: 32000 } },
     };
 
-    mockTokenizerFromPretrained.mockResolvedValueOnce(tokenizerMock);
-    mockModelFromPretrained.mockResolvedValueOnce(modelMock);
+    mockGetMockMusicgen.mockResolvedValueOnce([tokenizerMock, modelMock]);
 
     await messageHandler({
       data: {
@@ -95,6 +98,8 @@ describe("musicgen.worker", () => {
         temperature: 1.0,
       },
     });
+
+    await new Promise((r) => setTimeout(r, 0));
 
     expect(postMessageMock).toHaveBeenCalledWith({
       type: "generating",

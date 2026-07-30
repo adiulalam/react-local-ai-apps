@@ -1,5 +1,6 @@
 import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
+import { getMockObjectDetection } from "@/lib/mock-pipelines";
 
 env.allowLocalModels = isTestEnv;
 env.useBrowserCache = !isTestEnv;
@@ -9,14 +10,21 @@ if (env.backends.onnx.wasm) {
 
 const task: PipelineType = "object-detection";
 // We use a robust, but very fast tiny model for real-time video object detection.
-const model = isTestEnv ? "/models/yolos-tiny" : "Xenova/yolos-tiny";
+const model = "Xenova/yolos-tiny";
 let instance: Promise<AllTasks["object-detection"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
+  if (isTestEnv) {
+    if (instance === null) {
+      instance = getMockObjectDetection(model, progress_callback);
+    }
+    return instance;
+  }
+
   if (instance === null) {
     instance = pipeline(task, model, {
       progress_callback,
-      device: isTestEnv ? "wasm" : "webgpu",
+      device: "webgpu",
     }) as Promise<AllTasks["object-detection"]>;
   }
   return instance;
