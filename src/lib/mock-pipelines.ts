@@ -1,4 +1,4 @@
-import type { AllTasks, PipelineType } from "@huggingface/transformers";
+import { Tensor, type AllTasks, type PipelineType, type PreTrainedModel, type Processor } from "@huggingface/transformers";
 
 export const getMockPipeline = async <T extends PipelineType>(
   task: T,
@@ -26,4 +26,30 @@ export const getMockPipeline = async <T extends PipelineType>(
   }
 
   throw new Error(`Mock pipeline not implemented for task: ${task}`);
+};
+
+export const getMockBackgroundRemover = async (
+  model: string,
+  progress_callback: (info: unknown) => void
+): Promise<[PreTrainedModel, Processor]> => {
+  progress_callback({ status: "initiate", name: model, file: "mock" });
+  progress_callback({ status: "ready", name: model, file: "mock" });
+
+  const mockModel = async () => {
+    return {
+      output: [
+        {
+          mul: () => ({
+            to: () => new Tensor("uint8", new Uint8Array(100 * 100), [1, 100, 100]),
+          }),
+        },
+      ],
+    };
+  };
+
+  const mockProcessor = async () => {
+    return { pixel_values: [] };
+  };
+
+  return [mockModel as unknown as PreTrainedModel, mockProcessor as unknown as Processor];
 };
