@@ -59,7 +59,7 @@ describe("summary.worker", () => {
 
     expect(mockGetMockPipeline).toHaveBeenCalledWith(
       "summarization",
-      "/models/tiny-bart",
+      "Xenova/distilbart-cnn-6-6",
       expect.any(Function)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });

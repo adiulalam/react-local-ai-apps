@@ -9,7 +9,7 @@ if (env.backends.onnx.wasm) {
 }
 
 const task: PipelineType = "depth-estimation";
-const model = isTestEnv ? "/models/depth-anything-small" : "Xenova/depth-anything-small-hf";
+const model = "Xenova/depth-anything-small-hf";
 
 let instance: Promise<AllTasks["depth-estimation"]> | null = null;
 

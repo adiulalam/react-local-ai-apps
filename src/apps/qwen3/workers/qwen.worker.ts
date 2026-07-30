@@ -17,7 +17,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const MODEL_ID = isTestEnv ? "/models/tiny-qwen" : "onnx-community/Qwen3-0.6B-ONNX";
+const MODEL_ID = "onnx-community/Qwen3-0.6B-ONNX";
 
 let tokenizerPromise: Promise<PreTrainedTokenizer> | null = null;
 let modelPromise: Promise<PreTrainedModel> | null = null;

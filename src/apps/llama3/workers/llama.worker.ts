@@ -17,7 +17,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const MODEL_ID = isTestEnv ? "/models/tiny-llama" : "onnx-community/Llama-3.2-1B-Instruct-ONNX";
+const MODEL_ID = "onnx-community/Llama-3.2-1B-Instruct-ONNX";
 
 let tokenizerPromise: Promise<PreTrainedTokenizer> | null = null;
 let modelPromise: Promise<PreTrainedModel> | null = null;

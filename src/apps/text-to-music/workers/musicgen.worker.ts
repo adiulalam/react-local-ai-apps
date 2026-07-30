@@ -14,7 +14,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const modelName = isTestEnv ? "/models/text-to-audio-tiny" : "Xenova/musicgen-small";
+const modelName = "Xenova/musicgen-small";
 
 let tokenizerInstance: PreTrainedTokenizer | null = null;
 let modelInstance: MusicgenForConditionalGeneration | null = null;

@@ -59,7 +59,7 @@ describe("whisper.worker", () => {
 
     expect(mockGetMockPipeline).toHaveBeenCalledWith(
       "automatic-speech-recognition",
-      "/models/whisper-tiny",
+      "onnx-community/whisper-base",
       expect.any(Function)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });

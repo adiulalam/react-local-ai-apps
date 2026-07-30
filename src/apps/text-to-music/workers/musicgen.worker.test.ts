@@ -71,7 +71,7 @@ describe("musicgen.worker", () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(mockGetMockMusicgen).toHaveBeenCalledWith(
-      "/models/text-to-audio-tiny",
+      "Xenova/musicgen-small",
       expect.any(Function)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });

@@ -15,7 +15,7 @@ if (env.backends.onnx.wasm) {
 }
 
 const task: PipelineType = "automatic-speech-recognition";
-const model = isTestEnv ? "/models/whisper-tiny" : "onnx-community/whisper-base";
+const model = "onnx-community/whisper-base";
 let instance: Promise<AllTasks["automatic-speech-recognition"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {

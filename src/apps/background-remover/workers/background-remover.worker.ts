@@ -15,7 +15,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const model_id = isTestEnv ? "/models/modnet" : "Xenova/modnet";
+const model_id = "Xenova/modnet";
 
 let modelPromise: Promise<PreTrainedModel> | null = null;
 let processorPromise: Promise<Processor> | null = null;

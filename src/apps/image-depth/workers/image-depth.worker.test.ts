@@ -58,7 +58,7 @@ describe("image-depth.worker", () => {
 
     expect(mockGetMockPipeline).toHaveBeenCalledWith(
       "depth-estimation",
-      "/models/depth-anything-small",
+      "Xenova/depth-anything-small-hf",
       expect.any(Function)
     );
     expect(postMessageMock).toHaveBeenCalledWith({ type: "ready" });

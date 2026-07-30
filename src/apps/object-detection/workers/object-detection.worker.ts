@@ -10,7 +10,7 @@ if (env.backends.onnx.wasm) {
 
 const task: PipelineType = "object-detection";
 // We use a robust, but very fast tiny model for real-time video object detection.
-const model = isTestEnv ? "/models/yolos-tiny" : "Xenova/yolos-tiny";
+const model = "Xenova/yolos-tiny";
 let instance: Promise<AllTasks["object-detection"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
