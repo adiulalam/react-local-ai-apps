@@ -109,7 +109,10 @@ export const getMockSpeechRecognition = async (
   const mockTranscriber = async (_audio: unknown, options: unknown) => {
     const { streamer } = options as { streamer?: MockStreamer };
     await simulateStream(streamer);
-    return { text: "mock transcribed text" };
+    return {
+      text: "mock transcribed text",
+      chunks: [{ timestamp: [0, 999999], text: "mock transcribed text" }],
+    };
   };
   mockTranscriber.tokenizer = getSharedMockTokenizer();
   return mockTranscriber as unknown as AllTasks["automatic-speech-recognition"];

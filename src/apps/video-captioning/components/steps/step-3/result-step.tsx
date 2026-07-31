@@ -31,15 +31,19 @@ export const ResultStep = ({ videoUrl, chunks }: ResultStepProps) => {
     <div className="space-y-6">
       <div className="relative flex flex-col items-center overflow-hidden rounded-lg border bg-black">
         <video
+          data-testid="result-video"
           ref={videoRef}
           src={videoUrl}
           controls
-          className="max-h-[600px] w-full object-contain"
+          className="max-h-150 w-full object-contain"
           onTimeUpdate={handleTimeUpdate}
         />
         {currentCaption && (
           <div className="pointer-events-none absolute right-0 bottom-16 left-0 px-4 text-center">
-            <span className="inline-block rounded bg-black/75 px-3 py-1 text-lg font-medium text-white">
+            <span
+              data-testid="caption-text"
+              className="inline-block rounded bg-black/75 px-3 py-1 text-lg font-medium text-white"
+            >
               {currentCaption}
             </span>
           </div>

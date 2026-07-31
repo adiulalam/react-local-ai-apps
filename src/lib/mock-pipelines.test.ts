@@ -79,7 +79,10 @@ describe("mock-pipelines", () => {
     expect(mockPipeline).toHaveProperty("tokenizer");
 
     const result = await mockPipeline("test-audio-data", {});
-    expect(result).toEqual({ text: "mock transcribed text" });
+    expect(result).toEqual({
+      text: "mock transcribed text",
+      chunks: [{ timestamp: [0, 999999], text: "mock transcribed text" }],
+    });
   });
 
   it("should return a working summarization mock", async () => {

@@ -31,6 +31,9 @@ vi.mock("@huggingface/transformers", () => {
         },
       },
     },
+    TextStreamer: class {
+      constructor() {}
+    },
   };
 });
 
@@ -83,6 +86,7 @@ describe("video-captioning.worker", () => {
       language: "en",
       task: "transcribe",
       return_timestamps: true,
+      streamer: expect.any(Object),
     });
     expect(postMessageMock).toHaveBeenCalledWith({
       type: "complete",
