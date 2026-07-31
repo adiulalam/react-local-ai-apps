@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { type CaptionChunk } from "@/apps/video-captioning/utils/worker-message-handler";
+import { Large } from "@/components/ui/typography";
 
 interface ResultStepProps {
   videoUrl?: string;
@@ -40,12 +41,12 @@ export const ResultStep = ({ videoUrl, chunks }: ResultStepProps) => {
         />
         {currentCaption && (
           <div className="pointer-events-none absolute right-0 bottom-16 left-0 px-4 text-center">
-            <span
+            <Large
               data-testid="caption-text"
-              className="inline-block rounded bg-black/75 px-3 py-1 text-lg font-medium text-white"
+              className="inline-block rounded bg-black/75 px-3 py-1 text-white"
             >
               {currentCaption}
-            </span>
+            </Large>
           </div>
         )}
       </div>
