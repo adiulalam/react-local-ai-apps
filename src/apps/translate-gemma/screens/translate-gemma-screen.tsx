@@ -236,7 +236,7 @@ const TranslateGemmaScreen = () => {
 
               <div className="relative p-3">
                 <Textarea
-                  className="min-h-36 w-full resize-none border-none p-0 font-sans text-base leading-relaxed focus-visible:ring-0"
+                  className="min-h-36 w-full resize-none border-none font-sans text-base leading-relaxed focus-visible:ring-0"
                   value={sourceText}
                   onChange={(e) => setSourceText(e.target.value)}
                   placeholder="Type or paste text to translate..."
