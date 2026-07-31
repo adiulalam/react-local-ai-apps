@@ -9,6 +9,7 @@ import { qwen3Route } from "@/apps/qwen3/screens/route";
 import { deepseekRoute } from "@/apps/deepseek/screens/route";
 import { llama3Route } from "@/apps/llama3/screens/route";
 import { objectDetectionRoute } from "@/apps/object-detection/screens/route";
+import { videoCaptioningRoute } from "@/apps/video-captioning/screens/route";
 import { tokenizerRoute } from "@/apps/tokenizer-playground/screens/route";
 
 const router = createBrowserRouter([
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
       deepseekRoute,
       llama3Route,
       objectDetectionRoute,
+      videoCaptioningRoute,
       tokenizerRoute,
     ],
   },

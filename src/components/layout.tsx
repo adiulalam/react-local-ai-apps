@@ -9,6 +9,7 @@ import {
   Layers,
   Video,
   Focus,
+  Captions,
   PiggyBank,
   Type,
   Box,
@@ -110,6 +111,14 @@ export const Layout = () => {
                 >
                   <Focus className="size-4" />
                   Object Detection
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/video-captioning" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/video-captioning")}
+                >
+                  <Captions className="size-4" />
+                  Video Captioning
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
