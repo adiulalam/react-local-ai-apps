@@ -221,7 +221,7 @@ const TranslateGemmaScreen = () => {
                   <Label className="text-xs font-semibold tracking-wider uppercase">From</Label>
                 </div>
                 <Select value={sourceLang} onValueChange={handleSourceChange}>
-                  <SelectTrigger className="h-8 w-45 text-xs">
+                  <SelectTrigger className="h-8 w-45 text-xs" aria-label="Source Language">
                     <SelectValue>{getLanguageName(sourceLang)}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
@@ -308,7 +308,7 @@ const TranslateGemmaScreen = () => {
                 </div>
 
                 <Select value={targetLang} onValueChange={handleTargetChange}>
-                  <SelectTrigger className="h-8 w-45 text-xs">
+                  <SelectTrigger className="h-8 w-45 text-xs" aria-label="Target Language">
                     <SelectValue>{getLanguageName(targetLang)}</SelectValue>
                   </SelectTrigger>
                   <SelectContent>
@@ -323,7 +323,10 @@ const TranslateGemmaScreen = () => {
 
               <div className="relative p-3">
                 {translatedText ? (
-                  <div className="min-h-36 w-full font-sans text-base leading-relaxed whitespace-pre-wrap">
+                  <div
+                    data-testid="target-translation-output"
+                    className="min-h-36 w-full font-sans text-base leading-relaxed whitespace-pre-wrap"
+                  >
                     {translatedText}
                   </div>
                 ) : (
