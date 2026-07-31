@@ -11,6 +11,7 @@ import { llama3Route } from "@/apps/llama3/screens/route";
 import { objectDetectionRoute } from "@/apps/object-detection/screens/route";
 import { videoCaptioningRoute } from "@/apps/video-captioning/screens/route";
 import { tokenizerRoute } from "@/apps/tokenizer-playground/screens/route";
+import { translateGemmaRoute } from "@/apps/translate-gemma/screens/route";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
       objectDetectionRoute,
       videoCaptioningRoute,
       tokenizerRoute,
+      translateGemmaRoute,
     ],
   },
 ]);

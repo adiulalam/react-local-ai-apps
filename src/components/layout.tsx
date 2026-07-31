@@ -13,6 +13,7 @@ import {
   PiggyBank,
   Type,
   Box,
+  Languages,
 } from "lucide-react";
 import {
   NavigationMenu,
@@ -137,6 +138,14 @@ export const Layout = () => {
                 >
                   <PiggyBank className="size-4" />
                   Tokenizer Playground
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/translate-gemma" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/translate-gemma")}
+                >
+                  <Languages className="size-4" />
+                  TranslateGemma
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
