@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import {
   Mic,
   Music,
+  AudioWaveform,
   Image as ImageIcon,
   Eraser,
   MessageSquare,
@@ -60,6 +61,14 @@ export const Layout = () => {
                 >
                   <Music className="size-4" />
                   Text to Music
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/voice-cloning" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/voice-cloning")}
+                >
+                  <AudioWaveform className="size-4" />
+                  Voice Cloning
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
