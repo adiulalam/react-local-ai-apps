@@ -133,7 +133,10 @@ const generate = async (data: { text: string; speakerId: string; exaggeration?: 
     waveformData.byteOffset + waveformData.byteLength
   );
 
-  self.postMessage({ type: "generate:complete", data: { waveform: buffer } }, [buffer]);
+  self.postMessage(
+    { type: "generate:complete", data: { waveform: buffer } },
+    { transfer: [buffer] }
+  );
 };
 
 self.addEventListener("message", async (event: MessageEvent) => {

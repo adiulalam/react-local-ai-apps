@@ -57,9 +57,7 @@ export const createWorkerMessageHandler = (callbacks: WorkerCallbacks) => {
       case "error":
         callbacks.setStatus("error");
         callbacks.setProgressItems(() => ({}));
-        callbacks.setErrorMsg(
-          msg.data?.message || "An error occurred during voice cloning"
-        );
+        callbacks.setErrorMsg(msg.data?.message || "An error occurred during voice cloning");
         break;
     }
   };

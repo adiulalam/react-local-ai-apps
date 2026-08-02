@@ -110,7 +110,7 @@ export const AudioInputStep = ({ onNext }: AudioInputStepProps) => {
         <div className="bg-card space-y-3 rounded-lg border p-4 shadow-xs">
           <div className="flex items-center gap-2">
             <Volume2 className="text-primary size-4" />
-            <P className="text-sm font-medium">Reference Voice Audio Selected</P>
+            <P className="text-sm font-medium not-first:mt-0">Reference Voice Audio Selected</P>
           </div>
           {audioPreviewUrl && (
             <audio controls src={audioPreviewUrl} className="h-10 w-full rounded-md" />

@@ -77,7 +77,7 @@ describe("voice-cloning.worker", () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(mockGetMockVoiceCloning).toHaveBeenCalledWith(
-      "onnx-community/chatterbox-ONNX",
+      "ResembleAI/chatterbox-turbo-ONNX",
       expect.any(Function)
     );
     expect(postMessageMock).toHaveBeenCalledWith({
@@ -156,9 +156,7 @@ describe("voice-cloning.worker", () => {
     });
     await new Promise((r) => setTimeout(r, 0));
 
-    expect(mockProcessor._call).toHaveBeenCalledWith(
-      "Hello from local AI voice cloning!"
-    );
+    expect(mockProcessor._call).toHaveBeenCalledWith("Hello from local AI voice cloning!");
 
     expect(mockModel.generate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -173,9 +171,11 @@ describe("voice-cloning.worker", () => {
     expect(postMessageMock).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "generate:complete",
-        data: { waveform: expect.any(ArrayBuffer) },
+        data: {
+          waveform: expect.any(ArrayBuffer),
+        },
       }),
-      [expect.any(ArrayBuffer)]
+      { transfer: [expect.any(ArrayBuffer)] }
     );
   });
 

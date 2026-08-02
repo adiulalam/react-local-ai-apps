@@ -92,8 +92,6 @@ describe("createWorkerMessageHandler", () => {
       data: { type: "error", data: {} },
     } as MessageEvent);
 
-    expect(callbacks.setErrorMsg).toHaveBeenCalledWith(
-      "An error occurred during voice cloning"
-    );
+    expect(callbacks.setErrorMsg).toHaveBeenCalledWith("An error occurred during voice cloning");
   });
 });
