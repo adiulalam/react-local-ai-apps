@@ -208,3 +208,32 @@ export const getMockMusicgen = async (
 
   return [mockTokenizer as unknown as PreTrainedTokenizer, mockModel as unknown as PreTrainedModel];
 };
+
+export const getMockVoiceCloning = async (
+  model: string,
+  progress_callback?: (info: unknown) => void
+): Promise<[unknown, unknown]> => {
+  if (progress_callback) {
+    progress_callback({ status: "initiate", name: model, file: "mock" });
+    progress_callback({ status: "ready", name: model, file: "mock" });
+  }
+
+  const mockProcessor = {
+    _call: async () => ({
+      input_ids: [1, 2, 3],
+      attention_mask: [1, 1, 1],
+    }),
+  };
+
+  const mockModel = {
+    encode_speech: async () => ({
+      speaker_embeddings: new Float32Array([0.1, 0.2, 0.3]),
+    }),
+    generate: async () => ({
+      data: new Float32Array([0.05, -0.1, 0.15, -0.2, 0.25, 0.1, -0.05]),
+    }),
+    config: { audio_encoder: { sampling_rate: 24000 } },
+  };
+
+  return [mockProcessor, mockModel];
+};
