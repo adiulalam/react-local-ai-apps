@@ -8,7 +8,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const MODEL_ID = "onnx-community/chatterbox-ONNX";
+const MODEL_ID = "ResembleAI/chatterbox-turbo-ONNX";
 
 type ChatterboxModelInstance = {
   encode_speech: (audioTensor: unknown) => Promise<Record<string, unknown>>;
