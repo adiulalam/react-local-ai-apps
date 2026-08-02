@@ -26,7 +26,7 @@ const speakerCache = new Map<string, Record<string, unknown>>();
 
 // Only language_model has quantized variants in the repo.
 // Other sessions (embed_tokens, speech_encoder, conditional_decoder) are fp32 only.
-const DTYPE_CONFIGS: Record<string, Record<string, string>> = {
+const DTYPE_CONFIGS = {
   wasm: {
     embed_tokens: "fp32",
     speech_encoder: "fp32",
@@ -39,7 +39,7 @@ const DTYPE_CONFIGS: Record<string, Record<string, string>> = {
     language_model: "q4f16",
     conditional_decoder: "fp32",
   },
-};
+} as const;
 
 const checkWebGPU = async (): Promise<{ available: boolean; reason?: string }> => {
   if (!navigator.gpu) {
