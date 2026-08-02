@@ -25,6 +25,7 @@ vi.mock("@huggingface/transformers", () => {
     AutoProcessor: {
       from_pretrained: vi.fn(),
     },
+    BaseStreamer: class {},
     Tensor: class {
       type: string;
       data: Float32Array;

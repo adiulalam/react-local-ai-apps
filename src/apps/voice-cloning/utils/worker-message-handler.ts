@@ -45,6 +45,12 @@ export const createWorkerMessageHandler = (callbacks: WorkerCallbacks) => {
         callbacks.setProgressPercent(0);
         callbacks.onSpeakerEncoded();
         break;
+      case "generate:progress":
+        if (msg.data && msg.data.percent !== undefined) {
+          callbacks.setProgressPercent(msg.data.percent);
+          callbacks.setStatusText(`Generating (${msg.data.percent}%)...`);
+        }
+        break;
       case "generate:complete": {
         callbacks.setStatus("complete");
         callbacks.setProgressItems(() => ({}));

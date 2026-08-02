@@ -1,4 +1,10 @@
-import { ChatterboxModel, AutoProcessor, Tensor, env } from "@huggingface/transformers";
+import {
+  ChatterboxModel,
+  AutoProcessor,
+  Tensor,
+  env,
+  BaseStreamer,
+} from "@huggingface/transformers";
 import { isTestEnv } from "@/lib/utils";
 import { getMockVoiceCloning } from "@/lib/mock-pipelines";
 
@@ -23,6 +29,26 @@ type ProcessorInstance = {
 let model: ChatterboxModelInstance | null = null;
 let processor: ProcessorInstance | null = null;
 const speakerCache = new Map<string, Record<string, unknown>>();
+
+class VoiceProgressStreamer extends BaseStreamer {
+  private stepCount = 0;
+  private maxNewTokens: number;
+  private onProgress: (step: number, percent: number) => void;
+
+  constructor(maxNewTokens: number, onProgress: (step: number, percent: number) => void) {
+    super();
+    this.maxNewTokens = maxNewTokens;
+    this.onProgress = onProgress;
+  }
+
+  override put() {
+    this.stepCount++;
+    const percent = Math.min(99, Math.round((this.stepCount / this.maxNewTokens) * 100));
+    this.onProgress(this.stepCount, percent);
+  }
+
+  override end() {}
+}
 
 // Only language_model has quantized variants in the repo.
 // Other sessions (embed_tokens, speech_encoder, conditional_decoder) are fp32 only.
@@ -118,13 +144,22 @@ const generate = async (data: { text: string; speakerId: string; exaggeration?: 
   // Processor returns { input_ids, attention_mask } for text-only call
   const inputs = await processor._call(text);
 
+  const max_new_tokens = 256;
+  const streamer = new VoiceProgressStreamer(max_new_tokens, (step, percent) => {
+    self.postMessage({
+      type: "generate:progress",
+      data: { percent, step, maxSteps: max_new_tokens },
+    });
+  });
+
   // generate() takes input_ids, attention_mask, speaker embeddings, and exaggeration
   // max_new_tokens=256 matches the reference implementation
   const waveform = await model.generate({
     ...inputs,
     ...speakerEmbeddings,
     exaggeration,
-    max_new_tokens: 256,
+    max_new_tokens,
+    streamer,
   });
 
   const waveformData = waveform.data;
