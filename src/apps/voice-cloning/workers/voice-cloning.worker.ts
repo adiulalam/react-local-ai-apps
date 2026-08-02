@@ -88,6 +88,16 @@ const load = async () => {
     self.postMessage({ type: "load:progress", data: progress });
   };
 
+  if (model && processor) {
+    const webgpu = await checkWebGPU();
+    const useDevice = webgpu.available ? "webgpu" : "wasm";
+    self.postMessage({
+      type: "load:complete",
+      data: { device: useDevice, webgpu: webgpu.available },
+    });
+    return;
+  }
+
   if (isTestEnv) {
     const [mockProcessor, mockModel] = await getMockVoiceCloning(MODEL_ID, progressCallback);
     processor = mockProcessor as ProcessorInstance;

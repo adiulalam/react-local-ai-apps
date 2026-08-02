@@ -11,6 +11,8 @@ import {
 import VoiceCloningWorker from "@/apps/voice-cloning/workers/voice-cloning.worker?worker";
 import type { VoiceCloningParams } from "../step-2";
 
+let globalWorker: Worker | null = null;
+
 type GenerationStepProps = {
   params: VoiceCloningParams;
   audioData?: Float32Array;
@@ -24,7 +26,6 @@ export const GenerationStep = ({ params, audioData, onNext }: GenerationStepProp
   const [progressPercent, setProgressPercent] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const workerRef = useRef<Worker | null>(null);
   const onNextRef = useRef(onNext);
 
   useEffect(() => {
@@ -32,49 +33,48 @@ export const GenerationStep = ({ params, audioData, onNext }: GenerationStepProp
   }, [onNext]);
 
   useEffect(() => {
-    if (!workerRef.current) {
-      const worker = new VoiceCloningWorker();
-
-      const handler = createWorkerMessageHandler({
-        setStatus,
-        setProgressItems,
-        setStatusText,
-        setProgressPercent,
-        onReady: () => {
-          // Model loaded — encode the reference speaker voice
-          worker.postMessage({
-            type: "encode_speaker",
-            data: { id: "user", audioData: audioData },
-          });
-        },
-        onSpeakerEncoded: () => {
-          // Speaker encoded — start generating speech
-          worker.postMessage({
-            type: "generate",
-            data: {
-              text: params.text,
-              speakerId: "user",
-              exaggeration: params.exaggeration,
-            },
-          });
-        },
-        onComplete: (generatedAudioData, samplingRate) => {
-          const wavBlob = encodeWav(generatedAudioData, samplingRate);
-          onNextRef.current({ audioBlob: wavBlob, samplingRate });
-        },
-        setErrorMsg: setErrorMessage,
-      });
-
-      worker.addEventListener("message", handler);
-      workerRef.current = worker;
-
-      // Phase 1: Load the model
-      worker.postMessage({ type: "load", data: {} });
+    if (!globalWorker) {
+      globalWorker = new VoiceCloningWorker();
     }
+    const worker = globalWorker;
+
+    const handler = createWorkerMessageHandler({
+      setStatus,
+      setProgressItems,
+      setStatusText,
+      setProgressPercent,
+      onReady: () => {
+        // Model loaded — encode the reference speaker voice
+        worker.postMessage({
+          type: "encode_speaker",
+          data: { id: "user", audioData: audioData },
+        });
+      },
+      onSpeakerEncoded: () => {
+        // Speaker encoded — start generating speech
+        worker.postMessage({
+          type: "generate",
+          data: {
+            text: params.text,
+            speakerId: "user",
+            exaggeration: params.exaggeration,
+          },
+        });
+      },
+      onComplete: (generatedAudioData, samplingRate) => {
+        const wavBlob = encodeWav(generatedAudioData, samplingRate);
+        onNextRef.current({ audioBlob: wavBlob, samplingRate });
+      },
+      setErrorMsg: setErrorMessage,
+    });
+
+    worker.addEventListener("message", handler);
+
+    // Phase 1: Load the model
+    worker.postMessage({ type: "load", data: {} });
 
     return () => {
-      workerRef.current?.terminate();
-      workerRef.current = null;
+      worker.removeEventListener("message", handler);
     };
   }, [params.text, params.exaggeration, audioData]);
 
