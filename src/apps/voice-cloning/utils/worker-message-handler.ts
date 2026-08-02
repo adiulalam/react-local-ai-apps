@@ -4,6 +4,7 @@ export type WorkerStatus =
   | "idle"
   | "initializing"
   | "loading"
+  | "encoding"
   | "generating"
   | "complete"
   | "error";
@@ -16,6 +17,7 @@ export interface WorkerCallbacks {
   setStatusText: (text: string) => void;
   setProgressPercent: (percent: number) => void;
   onReady: () => void;
+  onSpeakerEncoded: () => void;
   onComplete: (audioData: Float32Array, samplingRate: number) => void;
   setErrorMsg: (msg: string) => void;
 }
@@ -25,39 +27,39 @@ export const createWorkerMessageHandler = (callbacks: WorkerCallbacks) => {
     const msg = e.data || {};
 
     switch (msg.type) {
-      case "progress":
+      case "load:progress":
         if (msg.data?.file) {
           callbacks.setStatus("loading");
           callbacks.setProgressItems((prev) => ({ ...prev, [msg.data.file]: msg.data }));
         }
         break;
-      case "ready":
+      case "load:complete":
         callbacks.setProgressItems(() => ({}));
+        callbacks.setStatus("encoding");
+        callbacks.setStatusText("Encoding reference voice...");
         callbacks.onReady();
         break;
-      case "generating":
+      case "encode_speaker:complete":
         callbacks.setStatus("generating");
-        callbacks.setProgressItems(() => ({}));
-        callbacks.setStatusText(`Cloning voice and generating speech...`);
+        callbacks.setStatusText("Generating speech...");
         callbacks.setProgressPercent(0);
+        callbacks.onSpeakerEncoded();
         break;
-      case "generating_progress":
-        callbacks.setStatus("generating");
-        callbacks.setStatusText(msg.statusText || `Generating (${msg.progress || 0}%)...`);
-        if (typeof msg.progress === "number") {
-          callbacks.setProgressPercent(msg.progress);
-        }
-        break;
-      case "complete":
+      case "generate:complete": {
         callbacks.setStatus("complete");
         callbacks.setProgressItems(() => ({}));
         callbacks.setProgressPercent(100);
-        callbacks.onComplete(msg.audioData, msg.samplingRate || 24000);
+        const waveformBuffer = msg.data?.waveform as ArrayBuffer;
+        const audioData = new Float32Array(waveformBuffer);
+        callbacks.onComplete(audioData, 24000);
         break;
+      }
       case "error":
         callbacks.setStatus("error");
         callbacks.setProgressItems(() => ({}));
-        callbacks.setErrorMsg(msg.error || "An error occurred during voice cloning");
+        callbacks.setErrorMsg(
+          msg.data?.message || "An error occurred during voice cloning"
+        );
         break;
     }
   };

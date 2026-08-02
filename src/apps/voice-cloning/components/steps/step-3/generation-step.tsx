@@ -20,7 +20,7 @@ type GenerationStepProps = {
 export const GenerationStep = ({ params, audioData, onNext }: GenerationStepProps) => {
   const [status, setStatus] = useState<WorkerStatus>("initializing");
   const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
-  const [statusText, setStatusText] = useState("Initializing Chatterbox model...");
+  const [statusText, setStatusText] = useState("Downloading Chatterbox model...");
   const [progressPercent, setProgressPercent] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -41,7 +41,22 @@ export const GenerationStep = ({ params, audioData, onNext }: GenerationStepProp
         setStatusText,
         setProgressPercent,
         onReady: () => {
-          // Model ready
+          // Model loaded — encode the reference speaker voice
+          worker.postMessage({
+            type: "encode_speaker",
+            data: { id: "user", audioData: audioData },
+          });
+        },
+        onSpeakerEncoded: () => {
+          // Speaker encoded — start generating speech
+          worker.postMessage({
+            type: "generate",
+            data: {
+              text: params.text,
+              speakerId: "user",
+              exaggeration: params.exaggeration,
+            },
+          });
         },
         onComplete: (generatedAudioData, samplingRate) => {
           const wavBlob = encodeWav(generatedAudioData, samplingRate);
@@ -53,21 +68,15 @@ export const GenerationStep = ({ params, audioData, onNext }: GenerationStepProp
       worker.addEventListener("message", handler);
       workerRef.current = worker;
 
-      worker.postMessage({
-        type: "generate",
-        text: params.text,
-        audioData: audioData,
-        exaggeration: params.exaggeration,
-        temperature: params.temperature,
-        repetitionPenalty: params.repetitionPenalty,
-      });
+      // Phase 1: Load the model
+      worker.postMessage({ type: "load", data: {} });
     }
 
     return () => {
       workerRef.current?.terminate();
       workerRef.current = null;
     };
-  }, [params.text, params.exaggeration, params.temperature, params.repetitionPenalty, audioData]);
+  }, [params.text, params.exaggeration, audioData]);
 
   const hasDownloadItems = Object.keys(progressItems).length > 0;
 
