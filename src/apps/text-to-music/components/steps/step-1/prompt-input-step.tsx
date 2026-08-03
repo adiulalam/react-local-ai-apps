@@ -9,6 +9,8 @@ import {
   type MusicControlsState,
 } from "@/apps/text-to-music/components/music-controls";
 
+import { useTextToMusic } from "../../../context/text-to-music-context";
+
 export type GenerationParams = {
   prompt: string;
   duration: number;
@@ -16,12 +18,9 @@ export type GenerationParams = {
   temperature: number;
 };
 
-type PromptInputStepProps = {
-  initialValues?: Partial<GenerationParams>;
-  onNext: (params: GenerationParams) => void;
-};
-
-export const PromptInputStep = ({ initialValues, onNext }: PromptInputStepProps) => {
+export const PromptInputStep = () => {
+  const { formData, process } = useTextToMusic();
+  const initialValues = formData.params;
   const [prompt, setPrompt] = useState(initialValues?.prompt || "");
   const [controls, setControls] = useState<MusicControlsState>({
     duration: initialValues?.duration || 10,
@@ -31,7 +30,7 @@ export const PromptInputStep = ({ initialValues, onNext }: PromptInputStepProps)
 
   const handleGenerate = () => {
     if (!prompt.trim()) return;
-    onNext({
+    process({
       prompt: prompt.trim(),
       duration: controls.duration,
       guidanceScale: controls.guidanceScale,
