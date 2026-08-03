@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -18,12 +17,7 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
-
-export type ScribeState = {
-  audioData?: Float32Array;
-  transcription?: string;
-  summary?: string;
-};
+import { useScribeContext } from "../context/scribe-context";
 
 const steps = [
   { id: "step-1", step: 1, title: "Audio Input", description: "Upload or record audio" },
@@ -33,15 +27,7 @@ const steps = [
 ];
 
 export const ScribeStepper = () => {
-  const [formData, setFormData] = useState<ScribeState>({});
-  const [activeStep, setActiveStep] = useState(1);
-
-  const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, steps.length));
-  const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 1));
-  const reset = () => {
-    setFormData({});
-    setActiveStep(1);
-  };
+  const { activeStep, setActiveStep, prevStep, reset } = useScribeContext();
 
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
@@ -100,38 +86,10 @@ export const ScribeStepper = () => {
                     value={stepData.step}
                     className="border-border/50 bg-secondary/20 my-4 block w-full flex-1 rounded-lg border p-6 ps-4 shadow-sm"
                   >
-                    {stepData.id === "step-1" && (
-                      <AudioInputStep
-                        onNext={(audioData) => {
-                          setFormData((prev) => ({ ...prev, audioData }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-2" && (
-                      <TranscriptionStep
-                        audioData={formData.audioData!}
-                        onNext={(transcription) => {
-                          setFormData((prev) => ({ ...prev, transcription }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-3" && (
-                      <SummarizationStep
-                        transcription={formData.transcription!}
-                        onNext={(summary) => {
-                          setFormData((prev) => ({ ...prev, summary }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-4" && (
-                      <ExportStep
-                        transcription={formData.transcription}
-                        summary={formData.summary}
-                      />
-                    )}
+                    {stepData.id === "step-1" && <AudioInputStep />}
+                    {stepData.id === "step-2" && <TranscriptionStep />}
+                    {stepData.id === "step-3" && <SummarizationStep />}
+                    {stepData.id === "step-4" && <ExportStep />}
                   </StepperContent>
 
                   {activeStep !== stepData.step && !isLast && (
@@ -157,3 +115,4 @@ export const ScribeStepper = () => {
     </div>
   );
 };
+

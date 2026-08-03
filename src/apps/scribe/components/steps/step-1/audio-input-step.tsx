@@ -5,17 +5,19 @@ import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
 import { FileUploadInput, MicrophoneInput } from ".";
 import { Muted } from "@/components/ui/typography";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
+import { useScribeContext } from "../../../context/scribe-context";
 
 const SCRIBE_SAMPLE_AUDIO: SampleMediaItem[] = [
   {
     name: "10-Minute Speech Recording",
     url: "/sample/speech-10min.mp3",
     type: "audio",
-    description: "~10 minutes â€¢ Spoken English",
+    description: "~10 minutes • Spoken English",
   },
 ];
 
-export const AudioInputStep = ({ onNext }: { onNext: (audioData: Float32Array) => void }) => {
+export const AudioInputStep = () => {
+  const { processAudio, nextStep } = useScribeContext();
   const [source, setSource] = useState<"file" | "mic">("file");
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -32,7 +34,9 @@ export const AudioInputStep = ({ onNext }: { onNext: (audioData: Float32Array) =
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
       const float32Array = audioBuffer.getChannelData(0); // Mono channel
-      onNext(float32Array);
+      
+      processAudio(float32Array);
+      nextStep();
     } catch (error) {
       console.error("Error processing audio", error);
       setErrorMsg("Failed to process audio. Please ensure the file is a valid audio format.");
@@ -92,3 +96,4 @@ export const AudioInputStep = ({ onNext }: { onNext: (audioData: Float32Array) =
     </div>
   );
 };
+
