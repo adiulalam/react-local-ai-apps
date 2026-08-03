@@ -1,12 +1,10 @@
-import { useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { InputStep } from "./steps/step-1/input-step";
 import { ProcessingStep } from "./steps/step-2/processing-step";
 import { ResultStep } from "./steps/step-3/result-step";
 import { H1, Muted, Small } from "@/components/ui/typography";
-import { type CaptionChunk } from "@/apps/video-captioning/utils/worker-message-handler";
+import { useVideoCaptioningContext } from "../context/video-captioning-context";
 import {
   Stepper,
   StepperContent,
@@ -25,23 +23,8 @@ const steps = [
   { id: "step-3", step: 3, title: "Result", description: "View video with captions" },
 ];
 
-export type VideoCaptioningState = {
-  videoUrl?: string;
-  videoBlob?: Blob;
-  chunks?: CaptionChunk[];
-};
-
 export const VideoCaptioningStepper = () => {
-  const [formData, setFormData] = useState<VideoCaptioningState>({});
-  const [activeStep, setActiveStep] = useState(1);
-
-  const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, steps.length));
-  const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 1));
-  const reset = () => {
-    if (formData.videoUrl) URL.revokeObjectURL(formData.videoUrl);
-    setFormData({});
-    setActiveStep(1);
-  };
+  const { activeStep, setActiveStep, prevStep, reset } = useVideoCaptioningContext();
 
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
@@ -100,26 +83,9 @@ export const VideoCaptioningStepper = () => {
                     value={stepData.step}
                     className="border-border/50 bg-secondary/20 my-4 block w-full flex-1 rounded-lg border p-6 ps-4 shadow-sm"
                   >
-                    {stepData.id === "step-1" && (
-                      <InputStep
-                        onNext={(data) => {
-                          setFormData((prev) => ({ ...prev, ...data }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-2" && (
-                      <ProcessingStep
-                        videoBlob={formData.videoBlob}
-                        onNext={(data) => {
-                          setFormData((prev) => ({ ...prev, ...data }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-3" && (
-                      <ResultStep videoUrl={formData.videoUrl} chunks={formData.chunks || []} />
-                    )}
+                    {stepData.id === "step-1" && <InputStep />}
+                    {stepData.id === "step-2" && <ProcessingStep />}
+                    {stepData.id === "step-3" && <ResultStep />}
                   </StepperContent>
 
                   {activeStep !== stepData.step && !isLast && (
