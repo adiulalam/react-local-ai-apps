@@ -1,7 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  type ReactNode,
+} from "react";
 import WhisperWorker from "@/apps/scribe/workers/whisper.worker?worker";
 import SummaryWorker from "@/apps/scribe/workers/summary.worker?worker";
-import { createWorkerMessageHandler, type WorkerStatus } from "@/apps/scribe/utils/worker-message-handler";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+} from "@/apps/scribe/utils/worker-message-handler";
 import { type ProgressInfo } from "@/components/ui/download-progress";
 import { type SummaryMode, SUMMARY_OPTIONS } from "@/types/summary";
 
@@ -50,11 +60,15 @@ export const ScribeProvider = ({ children }: { children: ReactNode }) => {
   const [activeStep, setActiveStep] = useState(1);
 
   const [whisperStatus, setWhisperStatus] = useState<WorkerStatus>("idle");
-  const [whisperProgressItems, setWhisperProgressItems] = useState<Record<string, ProgressInfo>>({});
+  const [whisperProgressItems, setWhisperProgressItems] = useState<Record<string, ProgressInfo>>(
+    {}
+  );
   const [whisperError, setWhisperError] = useState("");
 
   const [summaryStatus, setSummaryStatus] = useState<WorkerStatus>("idle");
-  const [summaryProgressItems, setSummaryProgressItems] = useState<Record<string, ProgressInfo>>({});
+  const [summaryProgressItems, setSummaryProgressItems] = useState<Record<string, ProgressInfo>>(
+    {}
+  );
   const [summaryError, setSummaryError] = useState("");
 
   const whisperWorker = useRef<Worker | null>(null);
@@ -84,7 +98,7 @@ export const ScribeProvider = ({ children }: { children: ReactNode }) => {
     setSummaryProgressItems({});
     setWhisperError("");
     setSummaryError("");
-    
+
     // terminate and recreate workers on reset
     whisperWorker.current?.terminate();
     summaryWorker.current?.terminate();
@@ -111,7 +125,8 @@ export const ScribeProvider = ({ children }: { children: ReactNode }) => {
     whisperListener.current = createWorkerMessageHandler({
       setStatus: setWhisperStatus,
       setProgressItems: setWhisperProgressItems,
-      setResultText: (text) => setFormData((prev) => ({ ...prev, transcription: text })),
+      setResultText: (updater) =>
+        setFormData((prev) => ({ ...prev, transcription: updater(prev.transcription || "") })),
       onReady: () => {
         if (!transcriptionStarted) {
           transcriptionStarted = true;
@@ -147,7 +162,8 @@ export const ScribeProvider = ({ children }: { children: ReactNode }) => {
     summaryListener.current = createWorkerMessageHandler({
       setStatus: setSummaryStatus,
       setProgressItems: setSummaryProgressItems,
-      setResultText: (text) => setFormData((prev) => ({ ...prev, summary: text })),
+      setResultText: (updater) =>
+        setFormData((prev) => ({ ...prev, summary: updater(prev.summary || "") })),
       onReady: () => {
         if (!summarizationStarted) {
           summarizationStarted = true;
@@ -194,4 +210,3 @@ export const ScribeProvider = ({ children }: { children: ReactNode }) => {
     </ScribeContext.Provider>
   );
 };
-

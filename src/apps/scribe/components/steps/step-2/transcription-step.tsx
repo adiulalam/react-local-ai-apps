@@ -15,7 +15,7 @@ export const TranscriptionStep = () => {
     setTranscription,
     nextStep,
   } = useScribeContext();
-  
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const transcription = formData.transcription || "";
 
@@ -68,4 +68,3 @@ export const TranscriptionStep = () => {
     </div>
   );
 };
-

@@ -12,7 +12,7 @@ const SCRIBE_SAMPLE_AUDIO: SampleMediaItem[] = [
     name: "10-Minute Speech Recording",
     url: "/sample/speech-10min.mp3",
     type: "audio",
-    description: "~10 minutes • Spoken English",
+    description: "~10 minutes ï¿½ Spoken English",
   },
 ];
 
@@ -34,7 +34,7 @@ export const AudioInputStep = () => {
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
       const float32Array = audioBuffer.getChannelData(0); // Mono channel
-      
+
       processAudio(float32Array);
       nextStep();
     } catch (error) {
@@ -96,4 +96,3 @@ export const AudioInputStep = () => {
     </div>
   );
 };
-

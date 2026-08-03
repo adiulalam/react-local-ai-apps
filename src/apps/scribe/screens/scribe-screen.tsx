@@ -12,4 +12,3 @@ const ScribeScreen = () => {
 };
 
 export default ScribeScreen;
-
