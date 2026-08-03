@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+﻿import { useState, useRef } from "react";
 import { ArrowRight, Image as ImageIcon, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Muted, Small } from "@/components/ui/typography";
@@ -9,10 +9,7 @@ import {
   FileUploadInput,
 } from "@/components/ui/file-upload";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
-
-interface ImageInputStepProps {
-  onNext: (imageDataUrl: string) => void;
-}
+import { useImageDepth } from "../../../context/image-depth-context";
 
 const SAMPLE_IMAGES: SampleMediaItem[] = [
   {
@@ -32,8 +29,9 @@ const SAMPLE_IMAGES: SampleMediaItem[] = [
   },
 ];
 
-export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
-  const [image, setImage] = useState<string | null>(null);
+export const ImageInputStep = () => {
+  const { formData, setFormData, nextStep } = useImageDepth();
+  const [image, setImage] = useState<string | null>(formData.imageDataUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (file: File) => {
@@ -42,6 +40,13 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
       setImage(reader.result as string);
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleNext = () => {
+    if (image) {
+      setFormData((prev) => ({ ...prev, imageDataUrl: image }));
+      nextStep();
+    }
   };
 
   return (
@@ -78,7 +83,7 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
             <img src={image} alt="Preview" className="max-h-64 rounded-md object-contain" />
           </div>
           <div className="flex w-full justify-end">
-            <Button onClick={() => onNext(image)}>
+            <Button onClick={handleNext}>
               Estimate Depth
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
