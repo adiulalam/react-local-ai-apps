@@ -50,6 +50,27 @@ export const VideoCaptioningProvider = ({ children }: { children: ReactNode }) =
     videoBlobRef.current = formData.videoBlob;
   }, [formData.videoBlob]);
 
+  async function startProcessingAudio() {
+    const blob = videoBlobRef.current;
+    if (!blob) return;
+
+    try {
+      const arrayBuffer = await blob.arrayBuffer();
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)({
+        sampleRate: 16000,
+      });
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      const float32Array = audioBuffer.getChannelData(0);
+
+      if (workerRef.current) {
+        workerRef.current.postMessage({ type: "process", audio: float32Array });
+      }
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Failed to process audio from video");
+    }
+  }
+
   useEffect(() => {
     workerRef.current = new VideoCaptioningWorker();
 
@@ -80,29 +101,14 @@ export const VideoCaptioningProvider = ({ children }: { children: ReactNode }) =
     };
   }, []);
 
-  const startProcessingAudio = async () => {
-    const blob = videoBlobRef.current;
-    if (!blob) return;
-
-    try {
-      const arrayBuffer = await blob.arrayBuffer();
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)({
-        sampleRate: 16000,
-      });
-      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      const float32Array = audioBuffer.getChannelData(0);
-
-      if (workerRef.current) {
-        workerRef.current.postMessage({ type: "process", audio: float32Array });
-      }
-    } catch (err) {
-      setStatus("error");
-      setErrorMsg(err instanceof Error ? err.message : "Failed to process audio from video");
-    }
-  };
-
   const processAudio = async () => {
-    if (!workerRef.current || status === "initializing" || status === "processing" || status === "loading") return;
+    if (
+      !workerRef.current ||
+      status === "initializing" ||
+      status === "processing" ||
+      status === "loading"
+    )
+      return;
     setStatus("initializing");
     setErrorMsg("");
     setCaptionProgress(null);

@@ -4,10 +4,11 @@ import { DownloadProgress } from "@/components/ui/download-progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Muted, Small } from "@/components/ui/typography";
-import { useVideoCaptioningContext } from "../../context/video-captioning-context";
+import { useVideoCaptioningContext } from "@/apps/video-captioning/context/video-captioning-context";
 
 export const ProcessingStep = () => {
-  const { status, errorMsg, progressItems, captionProgress, processAudio } = useVideoCaptioningContext();
+  const { status, errorMsg, progressItems, captionProgress, processAudio } =
+    useVideoCaptioningContext();
 
   useEffect(() => {
     processAudio();

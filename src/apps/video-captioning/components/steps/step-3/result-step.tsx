@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Large } from "@/components/ui/typography";
-import { useVideoCaptioningContext } from "../../context/video-captioning-context";
+import { type CaptionChunk } from "@/apps/video-captioning/utils/worker-message-handler";
+import { useVideoCaptioningContext } from "@/apps/video-captioning/context/video-captioning-context";
 
 export const ResultStep = () => {
   const { formData } = useVideoCaptioningContext();
@@ -13,7 +14,8 @@ export const ResultStep = () => {
     const time = videoRef.current.currentTime;
 
     const activeChunk = chunks.find(
-      (chunk) => chunk.timestamp && time >= chunk.timestamp[0] && time <= chunk.timestamp[1]
+      (chunk: CaptionChunk) =>
+        chunk.timestamp && time >= chunk.timestamp[0] && time <= chunk.timestamp[1]
     );
 
     if (activeChunk) {

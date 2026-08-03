@@ -9,7 +9,7 @@ import {
   FileUploadInput,
 } from "@/components/ui/file-upload";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
-import { useVideoCaptioningContext } from "../../context/video-captioning-context";
+import { useVideoCaptioningContext } from "@/apps/video-captioning/context/video-captioning-context";
 
 const VIDEO_CAPTIONING_SAMPLES: SampleMediaItem[] = [
   {
