@@ -9,6 +9,8 @@ import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-med
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Volume2 } from "lucide-react";
 
+import { useVoiceCloning } from "../../../context/voice-cloning-context";
+
 const VOICE_CLONING_SAMPLE_AUDIO: SampleMediaItem[] = [
   {
     name: "Reference Voice Recording",
@@ -18,11 +20,8 @@ const VOICE_CLONING_SAMPLE_AUDIO: SampleMediaItem[] = [
   },
 ];
 
-interface AudioInputStepProps {
-  onNext: (audioData: Float32Array, audioUrl?: string) => void;
-}
-
-export const AudioInputStep = ({ onNext }: AudioInputStepProps) => {
+export const AudioInputStep = () => {
+  const { nextStep, updateState } = useVoiceCloning();
   const [source, setSource] = useState<"file" | "mic">("file");
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -53,7 +52,8 @@ export const AudioInputStep = ({ onNext }: AudioInputStepProps) => {
 
   const handleContinue = () => {
     if (selectedAudioData) {
-      onNext(selectedAudioData, audioPreviewUrl || undefined);
+      updateState({ audioData: selectedAudioData, audioUrl: audioPreviewUrl || undefined });
+      nextStep();
     }
   };
 

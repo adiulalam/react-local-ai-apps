@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Muted, P, Small } from "@/components/ui/typography";
+import { useVoiceCloning } from "@/apps/voice-cloning/context/voice-cloning-context";
 
 export interface VoiceCloningParams {
   text: string;
@@ -13,18 +14,16 @@ export interface VoiceCloningParams {
   repetitionPenalty: number;
 }
 
-interface PromptInputStepProps {
-  initialValues?: VoiceCloningParams;
-  onNext: (params: VoiceCloningParams) => void;
-}
-
 const SAMPLE_PROMPTS = [
   "Hello! This is a synthetic voice generated entirely in your browser using local AI.",
   "The quick brown fox jumps over the lazy dog. Welcome to local zero-shot voice cloning!",
   "Technology makes it possible to create natural and expressive speech right from your local device.",
 ];
 
-export const PromptInputStep = ({ initialValues, onNext }: PromptInputStepProps) => {
+export const PromptInputStep = () => {
+  const { state, updateState, nextStep } = useVoiceCloning();
+  const initialValues = state.params;
+
   const [text, setText] = useState(
     initialValues?.text ||
       "Hello! This is a synthetic voice generated entirely in your browser using local AI."
@@ -38,12 +37,15 @@ export const PromptInputStep = ({ initialValues, onNext }: PromptInputStepProps)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) return;
-    onNext({
-      text,
-      exaggeration,
-      temperature,
-      repetitionPenalty,
+    updateState({
+      params: {
+        text,
+        exaggeration,
+        temperature,
+        repetitionPenalty,
+      },
     });
+    nextStep();
   };
 
   return (

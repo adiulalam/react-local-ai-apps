@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { H1, Muted, Small } from "@/components/ui/typography";
@@ -14,17 +13,10 @@ import {
   StepperTrigger,
 } from "@/components/ui/stepper";
 import { AudioInputStep } from "./steps/step-1";
-import { PromptInputStep, type VoiceCloningParams } from "./steps/step-2";
+import { PromptInputStep } from "./steps/step-2";
 import { GenerationStep } from "./steps/step-3";
 import { ExportStep } from "./steps/step-4";
-
-export type VoiceCloningState = {
-  audioData?: Float32Array;
-  audioUrl?: string;
-  params?: VoiceCloningParams;
-  audioBlob?: Blob;
-  samplingRate?: number;
-};
+import { useVoiceCloning } from "../context/voice-cloning-context";
 
 const steps = [
   {
@@ -54,15 +46,7 @@ const steps = [
 ];
 
 export const VoiceCloningStepper = () => {
-  const [formData, setFormData] = useState<VoiceCloningState>({});
-  const [activeStep, setActiveStep] = useState(1);
-
-  const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, steps.length));
-  const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 1));
-  const reset = () => {
-    setFormData({});
-    setActiveStep(1);
-  };
+  const { activeStep, prevStep, reset, state } = useVoiceCloning();
 
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
@@ -75,7 +59,7 @@ export const VoiceCloningStepper = () => {
 
       <Stepper
         value={activeStep}
-        onValueChange={setActiveStep}
+        onValueChange={() => {}}
         orientation="vertical"
         className="w-full space-y-4"
       >
@@ -123,43 +107,13 @@ export const VoiceCloningStepper = () => {
                     value={stepData.step}
                     className="border-border/50 bg-secondary/20 my-4 block w-full flex-1 rounded-lg border p-6 ps-4 shadow-sm"
                   >
-                    {stepData.id === "step-1" && (
-                      <AudioInputStep
-                        onNext={(audioData, audioUrl) => {
-                          setFormData((prev) => ({ ...prev, audioData, audioUrl }));
-                          nextStep();
-                        }}
-                      />
-                    )}
+                    {stepData.id === "step-1" && <AudioInputStep />}
 
-                    {stepData.id === "step-2" && (
-                      <PromptInputStep
-                        initialValues={formData.params}
-                        onNext={(params) => {
-                          setFormData((prev) => ({ ...prev, params }));
-                          nextStep();
-                        }}
-                      />
-                    )}
+                    {stepData.id === "step-2" && <PromptInputStep />}
 
-                    {stepData.id === "step-3" && formData.params && (
-                      <GenerationStep
-                        params={formData.params}
-                        audioData={formData.audioData}
-                        onNext={({ audioBlob, samplingRate }) => {
-                          setFormData((prev) => ({ ...prev, audioBlob, samplingRate }));
-                          nextStep();
-                        }}
-                      />
-                    )}
+                    {stepData.id === "step-3" && state.params && <GenerationStep />}
 
-                    {stepData.id === "step-4" && formData.audioBlob && (
-                      <ExportStep
-                        prompt={formData.params?.text || ""}
-                        audioBlob={formData.audioBlob}
-                        samplingRate={formData.samplingRate || 24000}
-                      />
-                    )}
+                    {stepData.id === "step-4" && state.audioBlob && <ExportStep />}
                   </StepperContent>
 
                   {activeStep !== stepData.step && !isLast && (

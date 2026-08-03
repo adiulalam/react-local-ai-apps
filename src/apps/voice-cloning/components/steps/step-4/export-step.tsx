@@ -1,13 +1,12 @@
 import { AudioPlayer } from "@/apps/voice-cloning/components/audio-player";
 import { P } from "@/components/ui/typography";
+import { useVoiceCloning } from "@/apps/voice-cloning/context/voice-cloning-context";
 
-type ExportStepProps = {
-  prompt: string;
-  audioBlob: Blob;
-  samplingRate: number;
-};
+export const ExportStep = () => {
+  const { state } = useVoiceCloning();
+  const { params, audioBlob, samplingRate } = state;
 
-export const ExportStep = ({ prompt, audioBlob, samplingRate }: ExportStepProps) => {
+  if (!audioBlob) return null;
   return (
     <div className="space-y-6">
       <P className="text-sm">
@@ -15,7 +14,11 @@ export const ExportStep = ({ prompt, audioBlob, samplingRate }: ExportStepProps)
         the audio file.
       </P>
 
-      <AudioPlayer audioBlob={audioBlob} prompt={prompt} samplingRate={samplingRate} />
+      <AudioPlayer
+        audioBlob={audioBlob}
+        prompt={params?.text || ""}
+        samplingRate={samplingRate || 24000}
+      />
     </div>
   );
 };
