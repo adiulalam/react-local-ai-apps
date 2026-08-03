@@ -1,62 +1,23 @@
-import { useState, useEffect, useRef } from "react";
-import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
+import { DownloadProgress } from "@/components/ui/download-progress";
 import { H3, Muted } from "@/components/ui/typography";
-import {
-  createWorkerMessageHandler,
-  type WorkerStatus,
-} from "../../../utils/worker-message-handler";
-import ImageCaptioningWorker from "@/apps/image-classifier/workers/image-captioning.worker?worker";
+import { useImageClassifier } from "../../../context/image-classifier-context";
 
-interface CaptionStepProps {
-  imageDataUrl: string;
-}
+export const CaptionStep = () => {
+  const {
+    imageDataUrl,
+    caption,
+    captionStatus: status,
+    captionError: errorMsg,
+    captionProgress: progressItems,
+  } = useImageClassifier();
 
-export const CaptionStep = ({ imageDataUrl }: CaptionStepProps) => {
-  const [status, setStatus] = useState<WorkerStatus>("initializing");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
-  const [caption, setCaption] = useState<string | null>(null);
-
-  const worker = useRef<Worker | null>(null);
-
-  useEffect(() => {
-    let processingStarted = false;
-
-    if (!imageDataUrl) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setStatus("error");
-      setErrorMsg("No image data provided. Please ensure previous steps completed successfully.");
-      return;
-    }
-
-    if (!worker.current) {
-      worker.current = new ImageCaptioningWorker();
-
-      const messageHandler = createWorkerMessageHandler<string>({
-        setStatus,
-        setProgressItems,
-        onReady: () => {
-          if (!processingStarted) {
-            processingStarted = true;
-            worker.current?.postMessage({ type: "process", image: imageDataUrl });
-          }
-        },
-        onComplete: (result) => {
-          setCaption(result);
-        },
-        setErrorMsg,
-      });
-
-      worker.current.addEventListener("message", messageHandler);
-
-      worker.current.postMessage({ type: "load" });
-    }
-
-    return () => {
-      worker.current?.terminate();
-      worker.current = null;
-    };
-  }, [imageDataUrl]);
+  if (!imageDataUrl) {
+    return (
+      <p className="text-destructive text-sm">
+        No image data provided. Please ensure previous steps completed successfully.
+      </p>
+    );
+  }
 
   return (
     <div className="space-y-4">
