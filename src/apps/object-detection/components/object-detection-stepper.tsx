@@ -1,6 +1,4 @@
-import { useState } from "react";
-import { ArrowLeft, RotateCcw } from "lucide-react";
-
+﻿import { ArrowLeft, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { InputStep } from "./steps/step-1";
 import { DetectionStep } from "./steps/step-2";
@@ -16,28 +14,15 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
+import { useObjectDetectionContext } from "@/apps/object-detection/context/object-detection-context";
 
 const steps = [
   { id: "step-1", step: 1, title: "Input Source", description: "Select video or webcam" },
   { id: "step-2", step: 2, title: "Object Detection", description: "Real-time AI detection" },
 ];
 
-export type ObjectDetectionState = {
-  videoUrl?: string;
-  useWebcam?: boolean;
-};
-
 export const ObjectDetectionStepper = () => {
-  const [formData, setFormData] = useState<ObjectDetectionState>({});
-  const [activeStep, setActiveStep] = useState(1);
-
-  const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, steps.length));
-  const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 1));
-  const reset = () => {
-    if (formData.videoUrl) URL.revokeObjectURL(formData.videoUrl);
-    setFormData({});
-    setActiveStep(1);
-  };
+  const { activeStep, prevStep, reset } = useObjectDetectionContext();
 
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
@@ -48,7 +33,7 @@ export const ObjectDetectionStepper = () => {
 
       <Stepper
         value={activeStep}
-        onValueChange={setActiveStep}
+        onValueChange={() => {}}
         orientation="vertical"
         className="w-full space-y-4"
       >
@@ -66,7 +51,7 @@ export const ObjectDetectionStepper = () => {
                   <StepperTrigger
                     render={
                       <Button
-                        variant={activeStep >= stepData.step ? "default" : "secondary"}
+                         variant={activeStep >= stepData.step ? "default" : "secondary"}
                         size="icon"
                         className="shrink-0 rounded-full"
                         aria-label={`Step ${stepData.step}: ${stepData.title}`}
@@ -96,17 +81,8 @@ export const ObjectDetectionStepper = () => {
                     value={stepData.step}
                     className="border-border/50 bg-secondary/20 my-4 block w-full flex-1 rounded-lg border p-6 ps-4 shadow-sm"
                   >
-                    {stepData.id === "step-1" && (
-                      <InputStep
-                        onNext={(data) => {
-                          setFormData((prev) => ({ ...prev, ...data }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-2" && (
-                      <DetectionStep videoUrl={formData.videoUrl} useWebcam={formData.useWebcam} />
-                    )}
+                    {stepData.id === "step-1" && <InputStep />}
+                    {stepData.id === "step-2" && <DetectionStep />}
                   </StepperContent>
 
                   {activeStep !== stepData.step && !isLast && (

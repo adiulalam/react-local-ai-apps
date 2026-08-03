@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+﻿import { useState, useRef } from "react";
 import { ArrowRight, Video as VideoIcon, UploadCloud, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Muted, Small } from "@/components/ui/typography";
@@ -9,10 +9,7 @@ import {
   FileUploadInput,
 } from "@/components/ui/file-upload";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
-
-interface InputStepProps {
-  onNext: (data: { videoUrl?: string; useWebcam?: boolean }) => void;
-}
+import { useObjectDetectionContext } from "@/apps/object-detection/context/object-detection-context";
 
 const OBJECT_DETECTION_SAMPLES: SampleMediaItem[] = [
   {
@@ -23,13 +20,19 @@ const OBJECT_DETECTION_SAMPLES: SampleMediaItem[] = [
   },
 ];
 
-export const InputStep = ({ onNext }: InputStepProps) => {
+export const InputStep = () => {
+  const { setFormData, nextStep } = useObjectDetectionContext();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (file: File) => {
     const url = URL.createObjectURL(file);
     setVideoUrl(url);
+  };
+
+  const handleNext = (data: { videoUrl?: string; useWebcam?: boolean }) => {
+    setFormData((prev) => ({ ...prev, ...data }));
+    nextStep();
   };
 
   return (
@@ -63,7 +66,7 @@ export const InputStep = ({ onNext }: InputStepProps) => {
             <Small className="block">Use Webcam</Small>
             <Muted>Real-time detection using your camera</Muted>
           </div>
-          <Button onClick={() => onNext({ useWebcam: true })} variant="outline">
+          <Button onClick={() => handleNext({ useWebcam: true })} variant="outline">
             <Camera className="mr-2 h-4 w-4" />
             Start Camera
           </Button>
@@ -80,7 +83,7 @@ export const InputStep = ({ onNext }: InputStepProps) => {
         <div className="flex flex-col items-center space-y-4">
           <video src={videoUrl} controls className="max-h-64 rounded-lg border object-contain" />
           <div className="flex w-full justify-end">
-            <Button onClick={() => onNext({ videoUrl })}>
+            <Button onClick={() => handleNext({ videoUrl })}>
               Start Detection
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
