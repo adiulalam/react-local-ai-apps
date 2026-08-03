@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { ArrowLeft, RotateCcw } from "lucide-react";
+﻿import { ArrowLeft, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ImageInputStep } from "./steps/step-1";
 import { RemovalStep } from "./steps/step-2";
 import { H1, Muted, Small } from "@/components/ui/typography";
+import { useBackgroundRemover } from "@/apps/background-remover/context/background-remover-context";
 import {
   Stepper,
   StepperContent,
@@ -17,25 +17,13 @@ import {
   StepperTrigger,
 } from "@/components/ui/stepper";
 
-export type BackgroundRemoverState = {
-  imageDataUrl?: string;
-};
-
 const steps = [
   { id: "step-1", step: 1, title: "Image Input", description: "Upload an image" },
   { id: "step-2", step: 2, title: "Background Removal", description: "Remove the background" },
 ];
 
 export const BackgroundRemoverStepper = () => {
-  const [formData, setFormData] = useState<BackgroundRemoverState>({});
-  const [activeStep, setActiveStep] = useState(1);
-
-  const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, steps.length));
-  const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 1));
-  const reset = () => {
-    setFormData({});
-    setActiveStep(1);
-  };
+  const { activeStep, setActiveStep, prevStep, reset } = useBackgroundRemover();
 
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
@@ -94,17 +82,8 @@ export const BackgroundRemoverStepper = () => {
                     value={stepData.step}
                     className="border-border/50 bg-secondary/20 my-4 block w-full flex-1 rounded-lg border p-6 ps-4 shadow-sm"
                   >
-                    {stepData.id === "step-1" && (
-                      <ImageInputStep
-                        onNext={(imageDataUrl) => {
-                          setFormData((prev) => ({ ...prev, imageDataUrl }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-2" && (
-                      <RemovalStep imageDataUrl={formData.imageDataUrl!} />
-                    )}
+                    {stepData.id === "step-1" && <ImageInputStep />}
+                    {stepData.id === "step-2" && <RemovalStep />}
                   </StepperContent>
 
                   {activeStep !== stepData.step && !isLast && (
