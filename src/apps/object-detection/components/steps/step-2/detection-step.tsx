@@ -5,7 +5,16 @@ import type { DetectionResult } from "@/apps/object-detection/utils/worker-messa
 import { useObjectDetectionContext } from "@/apps/object-detection/context/object-detection-context";
 
 export const DetectionStep = () => {
-  const { formData, status, errorMsg, progressItems, loadModel, processImage, setDetectionCallback, isModelLoaded } = useObjectDetectionContext();
+  const {
+    formData,
+    status,
+    errorMsg,
+    progressItems,
+    loadModel,
+    processImage,
+    setDetectionCallback,
+    isModelLoaded,
+  } = useObjectDetectionContext();
   const { videoUrl, useWebcam } = formData;
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);

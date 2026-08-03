@@ -51,7 +51,7 @@ export const ObjectDetectionStepper = () => {
                   <StepperTrigger
                     render={
                       <Button
-                         variant={activeStep >= stepData.step ? "default" : "secondary"}
+                        variant={activeStep >= stepData.step ? "default" : "secondary"}
                         size="icon"
                         className="shrink-0 rounded-full"
                         aria-label={`Step ${stepData.step}: ${stepData.title}`}

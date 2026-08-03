@@ -1,5 +1,17 @@
-﻿import { createContext, useContext, useState, useRef, useEffect, useCallback, type ReactNode } from "react";
-import { createWorkerMessageHandler, type WorkerStatus, type DetectionResult } from "@/apps/object-detection/utils/worker-message-handler";
+import {
+  createContext,
+  useContext,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from "react";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+  type DetectionResult,
+} from "@/apps/object-detection/utils/worker-message-handler";
 import type { ProgressInfo } from "@/components/ui/download-progress";
 import ObjectDetectionWorker from "@/apps/object-detection/workers/object-detection.worker?worker";
 
@@ -29,14 +41,14 @@ const ObjectDetectionContext = createContext<ObjectDetectionContextType | undefi
 export const ObjectDetectionProvider = ({ children }: { children: ReactNode }) => {
   const [formData, setFormData] = useState<ObjectDetectionState>({});
   const [activeStep, setActiveStep] = useState(1);
-  
+
   const [status, setStatus] = useState<WorkerStatus>("initializing");
   const [isModelLoaded, setIsModelLoaded] = useState(false);
   const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
   const [errorMsg, setErrorMsg] = useState("");
-  
+
   const workerRef = useRef<Worker | null>(null);
-  const detectionCallbackRef = useRef<(result: DetectionResult[]) => void>();
+  const detectionCallbackRef = useRef<((result: DetectionResult[]) => void) | undefined>(undefined);
 
   const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, 2));
   const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 1));
@@ -53,7 +65,7 @@ export const ObjectDetectionProvider = ({ children }: { children: ReactNode }) =
   // Initialize Worker on mount, terminate on unmount
   useEffect(() => {
     workerRef.current = new ObjectDetectionWorker();
-    
+
     const messageHandler = createWorkerMessageHandler<DetectionResult[]>({
       setStatus,
       setProgressItems,
@@ -68,9 +80,9 @@ export const ObjectDetectionProvider = ({ children }: { children: ReactNode }) =
       },
       setErrorMsg,
     });
-    
+
     workerRef.current.addEventListener("message", messageHandler);
-    
+
     return () => {
       workerRef.current?.terminate();
     };
