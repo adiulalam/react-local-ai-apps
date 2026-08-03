@@ -1,11 +1,11 @@
-﻿import React, {
+import React, {
   createContext,
   useContext,
   useState,
   useEffect,
   useRef,
   useCallback,
-  ReactNode,
+  type ReactNode,
 } from "react";
 import {
   createWorkerMessageHandler,
