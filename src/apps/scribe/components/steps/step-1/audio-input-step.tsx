@@ -12,7 +12,7 @@ const SCRIBE_SAMPLE_AUDIO: SampleMediaItem[] = [
     name: "10-Minute Speech Recording",
     url: "/sample/speech-10min.mp3",
     type: "audio",
-    description: "~10 minutes � Spoken English",
+    description: "~10 minutes • Spoken English",
   },
 ];
 
