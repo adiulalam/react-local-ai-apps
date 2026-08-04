@@ -17,7 +17,9 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
-import { useScribeContext } from "../context/scribe-context";
+import { useScribeFormContext } from "../context/scribe-context";
+import { useWhisperContext } from "../context/whisper-context";
+import { useSummaryContext } from "../context/summary-context";
 
 const steps = [
   { id: "step-1", step: 1, title: "Audio Input", description: "Upload or record audio" },
@@ -27,7 +29,15 @@ const steps = [
 ];
 
 export const ScribeStepper = () => {
-  const { activeStep, setActiveStep, prevStep, reset } = useScribeContext();
+  const { activeStep, setActiveStep, prevStep, reset: formReset } = useScribeFormContext();
+  const { resetWorker: resetWhisper } = useWhisperContext();
+  const { resetWorker: resetSummary } = useSummaryContext();
+
+  const handleReset = () => {
+    formReset();
+    resetWhisper();
+    resetSummary();
+  };
 
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
@@ -106,7 +116,7 @@ export const ScribeStepper = () => {
             <ArrowLeft />
             Back
           </Button>
-          <Button variant="outline" onClick={reset}>
+          <Button variant="outline" onClick={handleReset}>
             <RotateCcw />
             Start Over
           </Button>

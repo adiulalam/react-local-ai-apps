@@ -4,17 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DownloadProgress } from "@/components/ui/download-progress";
 import { Muted } from "@/components/ui/typography";
-import { useScribeContext } from "../../../context/scribe-context";
+import { useScribeFormContext } from "../../../context/scribe-context";
+import { useWhisperContext } from "../../../context/whisper-context";
 
 export const TranscriptionStep = () => {
-  const {
-    formData,
-    whisperStatus: status,
-    whisperError: errorMsg,
-    whisperProgressItems: progressItems,
-    setTranscription,
-    nextStep,
-  } = useScribeContext();
+  const { formData, setTranscription, nextStep } = useScribeFormContext();
+  const { status, error: errorMsg, progressItems } = useWhisperContext();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const transcription = formData.transcription || "";

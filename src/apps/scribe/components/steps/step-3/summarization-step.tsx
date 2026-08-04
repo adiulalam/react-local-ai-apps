@@ -3,18 +3,12 @@ import { DownloadProgress } from "@/components/ui/download-progress";
 import { ModeSelector } from "./mode-selector";
 import { SummaryDisplay } from "./summary-display";
 import { type SummaryMode } from "@/types/summary";
-import { useScribeContext } from "../../../context/scribe-context";
+import { useScribeFormContext } from "../../../context/scribe-context";
+import { useSummaryContext } from "../../../context/summary-context";
 
 export const SummarizationStep = () => {
-  const {
-    formData,
-    summaryStatus: status,
-    summaryError: errorMsg,
-    summaryProgressItems: progressItems,
-    generateSummary,
-    setSummary,
-    nextStep,
-  } = useScribeContext();
+  const { formData, setSummary, nextStep } = useScribeFormContext();
+  const { status, error: errorMsg, progressItems, generateSummary } = useSummaryContext();
 
   const [mode, setMode] = useState<SummaryMode>("Default");
   const transcription = formData.transcription || "";
