@@ -1,13 +1,11 @@
 import { AudioPlayer } from "@/apps/text-to-music/components/audio-player";
+import { useTextToMusic } from "../../../context/text-to-music-context";
 
-type ExportStepProps = {
-  prompt: string;
-  duration: number;
-  audioBlob: Blob;
-  samplingRate: number;
-};
-
-export const ExportStep = ({ prompt, duration, audioBlob, samplingRate }: ExportStepProps) => {
+export const ExportStep = () => {
+  const { formData } = useTextToMusic();
+  const { params, audioBlob, samplingRate } = formData;
+  if (!params || !audioBlob || !samplingRate) return null;
+  const { prompt, duration } = params;
   return (
     <div className="space-y-6">
       <AudioPlayer
