@@ -1,12 +1,11 @@
 import { ExportBlock } from "./export-block";
 import { Muted } from "@/components/ui/typography";
+import { useScribeFormContext } from "../../../context/scribe-context";
 
-interface ExportStepProps {
-  transcription?: string;
-  summary?: string;
-}
+export const ExportStep = () => {
+  const { formData } = useScribeFormContext();
+  const { transcription, summary } = formData;
 
-export const ExportStep = ({ transcription, summary }: ExportStepProps) => {
   if (!transcription && !summary) {
     return (
       <div className="p-8 text-center">

@@ -1,75 +1,24 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
+import { DownloadProgress } from "@/components/ui/download-progress";
 import { Muted } from "@/components/ui/typography";
-import {
-  createWorkerMessageHandler,
-  type WorkerStatus,
-} from "@/apps/scribe/utils/worker-message-handler";
-import WhisperWorker from "@/apps/scribe/workers/whisper.worker?worker";
+import { useScribeFormContext } from "../../../context/scribe-context";
+import { useWhisperContext } from "../../../context/whisper-context";
 
-interface TranscriptionStepProps {
-  audioData: Float32Array;
-  onNext: (transcription: string) => void;
-}
+export const TranscriptionStep = () => {
+  const { formData, setTranscription, nextStep } = useScribeFormContext();
+  const { status, error: errorMsg, progressItems } = useWhisperContext();
 
-export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps) => {
-  const [transcription, setTranscription] = useState("");
-  const [status, setStatus] = useState<WorkerStatus>("initializing");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
-
-  const worker = useRef<Worker | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const transcription = formData.transcription || "";
 
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
     }
   }, [transcription]);
-
-  useEffect(() => {
-    let transcriptionStarted = false;
-
-    if (!audioData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setStatus("error");
-      setErrorMsg("No audio data provided. Please ensure Step 1 completed successfully.");
-      return;
-    }
-
-    if (!worker.current) {
-      // Instantiate worker
-      worker.current = new WhisperWorker();
-
-      const messageHandler = createWorkerMessageHandler({
-        setStatus,
-        setProgressItems,
-        setResultText: setTranscription,
-        onReady: () => {
-          if (!transcriptionStarted) {
-            transcriptionStarted = true;
-            worker.current?.postMessage({ type: "process", audio: audioData });
-          }
-        },
-        onComplete: (result) => setTranscription(result),
-        setErrorMsg,
-      });
-
-      worker.current.addEventListener("message", messageHandler);
-
-      // Start the worker model load
-      worker.current.postMessage({ type: "load" });
-    }
-
-    return () => {
-      // Clean up the worker if the component completely unmounts
-      worker.current?.terminate();
-      worker.current = null;
-    };
-  }, [audioData]);
 
   return (
     <div className="space-y-4">
@@ -104,7 +53,7 @@ export const TranscriptionStep = ({ audioData, onNext }: TranscriptionStepProps)
             }
           />
           <div className="flex justify-end">
-            <Button onClick={() => onNext(transcription)} disabled={status !== "complete"}>
+            <Button onClick={nextStep} disabled={status !== "complete"}>
               Continue to Summarization
               <ArrowRight />
             </Button>
