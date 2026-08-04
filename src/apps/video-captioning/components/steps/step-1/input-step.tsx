@@ -9,10 +9,7 @@ import {
   FileUploadInput,
 } from "@/components/ui/file-upload";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
-
-interface InputStepProps {
-  onNext: (data: { videoUrl?: string; videoBlob?: Blob }) => void;
-}
+import { useVideoCaptioningContext } from "@/apps/video-captioning/context/video-captioning-context";
 
 const VIDEO_CAPTIONING_SAMPLES: SampleMediaItem[] = [
   {
@@ -23,7 +20,8 @@ const VIDEO_CAPTIONING_SAMPLES: SampleMediaItem[] = [
   },
 ];
 
-export const InputStep = ({ onNext }: InputStepProps) => {
+export const InputStep = () => {
+  const { setFormData, nextStep } = useVideoCaptioningContext();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -79,7 +77,8 @@ export const InputStep = ({ onNext }: InputStepProps) => {
             <Button
               onClick={() => {
                 if (videoBlob && videoUrl) {
-                  onNext({ videoUrl, videoBlob });
+                  setFormData({ videoUrl, videoBlob });
+                  nextStep();
                 }
               }}
             >

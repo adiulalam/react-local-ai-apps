@@ -1,13 +1,11 @@
 import { useRef, useState } from "react";
-import { type CaptionChunk } from "@/apps/video-captioning/utils/worker-message-handler";
 import { Large } from "@/components/ui/typography";
+import { type CaptionChunk } from "@/apps/video-captioning/utils/worker-message-handler";
+import { useVideoCaptioningContext } from "@/apps/video-captioning/context/video-captioning-context";
 
-interface ResultStepProps {
-  videoUrl?: string;
-  chunks: CaptionChunk[];
-}
-
-export const ResultStep = ({ videoUrl, chunks }: ResultStepProps) => {
+export const ResultStep = () => {
+  const { formData } = useVideoCaptioningContext();
+  const { videoUrl, chunks = [] } = formData;
   const videoRef = useRef<HTMLVideoElement>(null);
   const [currentCaption, setCurrentCaption] = useState<string>("");
 
@@ -16,7 +14,8 @@ export const ResultStep = ({ videoUrl, chunks }: ResultStepProps) => {
     const time = videoRef.current.currentTime;
 
     const activeChunk = chunks.find(
-      (chunk) => chunk.timestamp && time >= chunk.timestamp[0] && time <= chunk.timestamp[1]
+      (chunk: CaptionChunk) =>
+        chunk.timestamp && time >= chunk.timestamp[0] && time <= chunk.timestamp[1]
     );
 
     if (activeChunk) {
