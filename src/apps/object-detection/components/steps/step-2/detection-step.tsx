@@ -95,7 +95,7 @@ export const DetectionStep = () => {
   useEffect(() => {
     if (!isModelLoaded) {
       loadModel();
-    } else if (status === "idle") {
+    } else if (status === "idle" || status === "complete") {
       processFrame();
     }
   }, [isModelLoaded, loadModel, status, processFrame]);
