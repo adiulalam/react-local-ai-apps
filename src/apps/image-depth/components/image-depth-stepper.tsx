@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { ImageInputStep } from "./steps/step-1/image-input-step";
 import { DepthStep } from "./steps/step-2/depth-step";
@@ -16,10 +14,7 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
-
-export type ImageDepthState = {
-  imageDataUrl?: string;
-};
+import { useImageDepth } from "../context/image-depth-context";
 
 const steps = [
   { id: "step-1", step: 1, title: "Image Input", description: "Upload an image" },
@@ -27,15 +22,7 @@ const steps = [
 ];
 
 export const ImageDepthStepper = () => {
-  const [formData, setFormData] = useState<ImageDepthState>({});
-  const [activeStep, setActiveStep] = useState(1);
-
-  const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, steps.length));
-  const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 1));
-  const reset = () => {
-    setFormData({});
-    setActiveStep(1);
-  };
+  const { activeStep, prevStep, reset } = useImageDepth();
 
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
@@ -46,7 +33,7 @@ export const ImageDepthStepper = () => {
 
       <Stepper
         value={activeStep}
-        onValueChange={setActiveStep}
+        onValueChange={() => {}}
         orientation="vertical"
         className="w-full space-y-4"
       >
@@ -94,17 +81,8 @@ export const ImageDepthStepper = () => {
                     value={stepData.step}
                     className="border-border/50 bg-secondary/20 my-4 block w-full flex-1 rounded-lg border p-6 ps-4 shadow-sm"
                   >
-                    {stepData.id === "step-1" && (
-                      <ImageInputStep
-                        onNext={(imageDataUrl) => {
-                          setFormData((prev) => ({ ...prev, imageDataUrl }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-2" && (
-                      <DepthStep imageDataUrl={formData.imageDataUrl!} />
-                    )}
+                    {stepData.id === "step-1" && <ImageInputStep />}
+                    {stepData.id === "step-2" && <DepthStep />}
                   </StepperContent>
 
                   {activeStep !== stepData.step && !isLast && (

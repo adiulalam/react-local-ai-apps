@@ -1,21 +1,13 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+﻿import { useState, useEffect, useCallback } from "react";
 import { Download, Eye, ArrowRightLeft } from "lucide-react";
-import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
+import { DownloadProgress } from "@/components/ui/download-progress";
 import { H3, Muted, Small } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Spinner } from "@/components/ui/spinner";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
-import {
-  createWorkerMessageHandler,
-  type WorkerStatus,
-  type DepthResult,
-} from "@/apps/image-depth/utils/worker-message-handler";
-import ImageDepthWorker from "@/apps/image-depth/workers/image-depth.worker?worker";
-
-interface DepthStepProps {
-  imageDataUrl: string;
-}
+import { type DepthResult } from "@/apps/image-depth/utils/worker-message-handler";
+import { useImageDepth } from "../../../context/image-depth-context";
 
 type ColormapType = "inferno" | "viridis" | "plasma" | "turbo" | "grayscale" | "spectral";
 
@@ -88,17 +80,13 @@ const getColormapRGB = (
   }
 };
 
-export const DepthStep = ({ imageDataUrl }: DepthStepProps) => {
-  const [status, setStatus] = useState<WorkerStatus>("initializing");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
-  const [rawDepth, setRawDepth] = useState<DepthResult | null>(null);
+export const DepthStep = () => {
+  const { formData, status, errorMsg, progressItems, rawDepth, processImage } = useImageDepth();
+  const imageDataUrl = formData.imageDataUrl;
 
   const [colormap, setColormap] = useState<ColormapType>("inferno");
   const [invert, setInvert] = useState(false);
   const [resultImage, setResultImage] = useState<string | null>(null);
-
-  const worker = useRef<Worker | null>(null);
 
   const renderDepthCanvas = useCallback(
     (depthData: DepthResult, cmap: ColormapType, inv: boolean) => {
@@ -129,42 +117,10 @@ export const DepthStep = ({ imageDataUrl }: DepthStepProps) => {
   );
 
   useEffect(() => {
-    let processingStarted = false;
-
-    if (!imageDataUrl) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setStatus("error");
-      setErrorMsg("No image data provided. Please ensure Step 1 completed successfully.");
-      return;
+    if (imageDataUrl && status === "idle") {
+      processImage(imageDataUrl);
     }
-
-    if (!worker.current) {
-      worker.current = new ImageDepthWorker();
-
-      const messageHandler = createWorkerMessageHandler<DepthResult>({
-        setStatus,
-        setProgressItems,
-        onReady: () => {
-          if (!processingStarted) {
-            processingStarted = true;
-            worker.current?.postMessage({ type: "process", image: imageDataUrl });
-          }
-        },
-        onComplete: (result) => {
-          setRawDepth(result);
-        },
-        setErrorMsg,
-      });
-
-      worker.current.addEventListener("message", messageHandler);
-      worker.current.postMessage({ type: "load" });
-    }
-
-    return () => {
-      worker.current?.terminate();
-      worker.current = null;
-    };
-  }, [imageDataUrl]);
+  }, [imageDataUrl, status, processImage]);
 
   useEffect(() => {
     if (rawDepth) {
@@ -177,12 +133,20 @@ export const DepthStep = ({ imageDataUrl }: DepthStepProps) => {
     if (resultImage) {
       const link = document.createElement("a");
       link.href = resultImage;
-      link.download = `depth-map-${colormap}.png`;
+      link.download = "depth-map.png";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
   };
+
+  if (!imageDataUrl) {
+    return (
+      <Muted className="text-destructive">
+        No image data provided. Please ensure Step 1 completed successfully.
+      </Muted>
+    );
+  }
 
   return (
     <div className="space-y-4">
