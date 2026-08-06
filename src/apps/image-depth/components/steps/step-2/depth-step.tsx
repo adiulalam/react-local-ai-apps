@@ -133,7 +133,7 @@ export const DepthStep = () => {
     if (resultImage) {
       const link = document.createElement("a");
       link.href = resultImage;
-      link.download = "depth-map-.png";
+      link.download = "depth-map.png";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
