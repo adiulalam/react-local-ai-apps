@@ -1,26 +1,24 @@
-import { useEffect, useRef, useState, useCallback } from "react";
-import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
+import { useEffect, useRef, useCallback } from "react";
+import { DownloadProgress } from "@/components/ui/download-progress";
 import { Muted, Small } from "@/components/ui/typography";
-import {
-  createWorkerMessageHandler,
-  type WorkerStatus,
-  type DetectionResult,
-} from "@/apps/object-detection/utils/worker-message-handler";
-import ObjectDetectionWorker from "@/apps/object-detection/workers/object-detection.worker?worker";
+import type { DetectionResult } from "@/apps/object-detection/utils/worker-message-handler";
+import { useObjectDetectionContext } from "@/apps/object-detection/context/object-detection-context";
 
-interface DetectionStepProps {
-  videoUrl?: string;
-  useWebcam?: boolean;
-}
-
-export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
+export const DetectionStep = () => {
+  const {
+    formData,
+    status,
+    errorMsg,
+    progressItems,
+    loadModel,
+    processImage,
+    setDetectionCallback,
+    isModelLoaded,
+  } = useObjectDetectionContext();
+  const { videoUrl, useWebcam } = formData;
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const workerRef = useRef<Worker | null>(null);
-
-  const [status, setStatus] = useState<WorkerStatus>("initializing");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
+  const hasStartedProcessing = useRef(false);
 
   const drawBoxes = useCallback((predictions: DetectionResult[]) => {
     if (!canvasRef.current || !videoRef.current) return;
@@ -33,8 +31,6 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
     ctx.clearRect(0, 0, width, height);
 
     predictions.forEach((pred) => {
-      // The box format depends on the model. Usually it's { xmin, ymin, xmax, ymax }
-      // Since we requested percentage: true, coordinates are 0-1
       const { xmin, ymin, xmax, ymax } = pred.box;
       const x = xmin * width;
       const y = ymin * height;
@@ -45,11 +41,9 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
       ctx.lineWidth = 3;
       ctx.strokeRect(x, y, w, h);
 
-      // Label background
       ctx.fillStyle = "rgba(0, 255, 255, 0.5)";
       ctx.fillRect(x, y - 20, ctx.measureText(pred.label).width + 50, 20);
 
-      // Label text
       ctx.fillStyle = "#000000";
       ctx.font = "14px Arial";
       ctx.fillText(`${pred.label} (${(pred.score * 100).toFixed(1)}%)`, x + 5, y - 5);
@@ -58,7 +52,7 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
 
   const processFrame = useCallback(() => {
     function doProcess() {
-      if (!videoRef.current || !canvasRef.current || !workerRef.current) return;
+      if (!videoRef.current || !canvasRef.current) return;
 
       const video = videoRef.current;
       if (video.readyState < 2) {
@@ -66,14 +60,12 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
         return;
       }
 
-      // Set display canvas dimensions to match video exactly
       const { videoWidth, videoHeight } = video;
       if (canvasRef.current.width !== videoWidth) {
         canvasRef.current.width = videoWidth;
         canvasRef.current.height = videoHeight;
       }
 
-      // Create a temporary canvas and scale down the image for faster IPC and processing
       const MAX_DIM = 480;
       const scale = Math.min(MAX_DIM / videoWidth, MAX_DIM / videoHeight, 1);
       const tempWidth = videoWidth * scale;
@@ -86,39 +78,29 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
       if (!ctx) return;
 
       ctx.drawImage(video, 0, 0, tempWidth, tempHeight);
-      const imageData = tempCanvas.toDataURL("image/jpeg", 0.5); // lower quality for speed
+      const imageData = tempCanvas.toDataURL("image/jpeg", 0.5);
 
-      workerRef.current.postMessage({ type: "process", image: imageData, threshold: 0.5 });
+      processImage(imageData, 0.5);
     }
 
     doProcess();
-  }, []);
+  }, [processImage]);
 
-  // Initialize Worker
   useEffect(() => {
-    workerRef.current = new ObjectDetectionWorker();
-
-    const messageHandler = createWorkerMessageHandler<DetectionResult[]>({
-      setStatus,
-      setProgressItems,
-      onReady: () => {
-        setStatus("idle");
-        processFrame();
-      },
-      onComplete: async (result) => {
-        drawBoxes(result);
-        requestAnimationFrame(processFrame);
-      },
-      setErrorMsg,
+    setDetectionCallback((result) => {
+      drawBoxes(result);
+      requestAnimationFrame(processFrame);
     });
+  }, [drawBoxes, processFrame, setDetectionCallback]);
 
-    workerRef.current.addEventListener("message", messageHandler);
-    workerRef.current.postMessage({ type: "load" });
-
-    return () => {
-      workerRef.current?.terminate();
-    };
-  }, [drawBoxes, processFrame]);
+  useEffect(() => {
+    if (!isModelLoaded) {
+      loadModel();
+    } else if (!hasStartedProcessing.current && (status === "idle" || status === "complete")) {
+      hasStartedProcessing.current = true;
+      processFrame();
+    }
+  }, [isModelLoaded, loadModel, status, processFrame]);
 
   // Setup Video Stream
   useEffect(() => {
@@ -139,8 +121,7 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
           }
         })
         .catch(() => {
-          setStatus("error");
-          setErrorMsg("Failed to access webcam. Please check permissions.");
+          console.error("Failed to access webcam. Please check permissions.");
         });
     } else if (videoUrl) {
       videoRef.current.src = videoUrl;
@@ -153,8 +134,6 @@ export const DetectionStep = ({ videoUrl, useWebcam }: DetectionStepProps) => {
       if (stream) stream.getTracks().forEach((t) => t.stop());
     };
   }, [useWebcam, videoUrl]);
-
-  // Start processing is now handled in onReady
 
   return (
     <div className="flex flex-col items-center space-y-4">
