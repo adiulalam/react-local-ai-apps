@@ -9,7 +9,7 @@ if (env.backends.onnx.wasm) {
 }
 
 const task: PipelineType = "image-classification";
-const model = "Xenova/mobilenet_v2";
+const model = "Xenova/resnet-50";
 let instance: Promise<AllTasks["image-classification"]> | null = null;
 
 const getInstance = async (progress_callback: (info: unknown) => void) => {
