@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { ArrowRight, Image as ImageIcon, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useBackgroundRemover } from "@/apps/background-remover/context/background-remover-context";
 import { Muted, Small } from "@/components/ui/typography";
 import {
   FileUploadRoot,
@@ -9,10 +10,6 @@ import {
   FileUploadInput,
 } from "@/components/ui/file-upload";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
-
-interface ImageInputStepProps {
-  onNext: (imageDataUrl: string) => void;
-}
 
 const BG_REMOVER_SAMPLE_IMAGES: SampleMediaItem[] = [
   {
@@ -32,7 +29,8 @@ const BG_REMOVER_SAMPLE_IMAGES: SampleMediaItem[] = [
   },
 ];
 
-export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
+export const ImageInputStep = () => {
+  const { setFormData, nextStep } = useBackgroundRemover();
   const [image, setImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -76,7 +74,12 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
         <div className="flex flex-col items-center space-y-4">
           <img src={image} alt="Preview" className="max-h-64 rounded-lg object-contain" />
           <div className="flex w-full justify-end">
-            <Button onClick={() => onNext(image)}>
+            <Button
+              onClick={() => {
+                setFormData((prev) => ({ ...prev, imageDataUrl: image }));
+                nextStep();
+              }}
+            >
               Remove Background
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
