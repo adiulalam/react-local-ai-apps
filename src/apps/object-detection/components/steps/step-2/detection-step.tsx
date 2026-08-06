@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { DownloadProgress } from "@/components/ui/download-progress";
 import { Muted, Small } from "@/components/ui/typography";
 import type { DetectionResult } from "@/apps/object-detection/utils/worker-message-handler";
@@ -18,6 +18,7 @@ export const DetectionStep = () => {
   const { videoUrl, useWebcam } = formData;
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const hasStartedProcessing = useRef(false);
 
   const drawBoxes = useCallback((predictions: DetectionResult[]) => {
     if (!canvasRef.current || !videoRef.current) return;
@@ -95,7 +96,8 @@ export const DetectionStep = () => {
   useEffect(() => {
     if (!isModelLoaded) {
       loadModel();
-    } else if (status === "idle" || status === "complete") {
+    } else if (!hasStartedProcessing.current && (status === "idle" || status === "complete")) {
+      hasStartedProcessing.current = true;
       processFrame();
     }
   }, [isModelLoaded, loadModel, status, processFrame]);
