@@ -1,15 +1,11 @@
 import { DownloadProgress } from "@/components/ui/download-progress";
 import { H3, Muted } from "@/components/ui/typography";
-import { useImageClassifier } from "../../../context/image-classifier-context";
+import { useImageClassifierFormContext } from "../../../context/image-classifier-context";
+import { useImageCaptioningContext } from "../../../context/image-captioning-context";
 
 export const CaptionStep = () => {
-  const {
-    imageDataUrl,
-    caption,
-    captionStatus: status,
-    captionError: errorMsg,
-    captionProgress: progressItems,
-  } = useImageClassifier();
+  const { imageDataUrl, caption } = useImageClassifierFormContext();
+  const { status, error: errorMsg, progressItems } = useImageCaptioningContext();
 
   if (!imageDataUrl) {
     return (

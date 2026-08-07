@@ -9,6 +9,8 @@ import {
   FileUploadInput,
 } from "@/components/ui/file-upload";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
+import { useImageClassifierFormContext } from "@/apps/image-classifier/context/image-classifier-context";
+import { useImageClassificationContext } from "@/apps/image-classifier/context/image-classification-context";
 
 const CLASSIFICATION_SAMPLE_IMAGES: SampleMediaItem[] = [
   {
@@ -28,10 +30,9 @@ const CLASSIFICATION_SAMPLE_IMAGES: SampleMediaItem[] = [
   },
 ];
 
-import { useImageClassifier } from "../../../context/image-classifier-context";
-
 export const ImageInputStep = () => {
-  const { classifyImage, nextStep } = useImageClassifier();
+  const { nextStep } = useImageClassifierFormContext();
+  const { classifyImage } = useImageClassificationContext();
   const [image, setImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 

@@ -1,7 +1,9 @@
 import { ArrowLeft, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useImageClassifier } from "../context/image-classifier-context";
+import { useImageClassifierFormContext } from "../context/image-classifier-context";
+import { useImageClassificationContext } from "../context/image-classification-context";
+import { useImageCaptioningContext } from "../context/image-captioning-context";
 import { ImageInputStep } from "./steps/step-1";
 import { ClassificationStep } from "./steps/step-2";
 import { CaptionStep } from "./steps/step-3";
@@ -25,7 +27,16 @@ const steps = [
 ];
 
 export const ImageClassifierStepper = () => {
-  const { activeStep, setActiveStep, prevStep, reset } = useImageClassifier();
+  const { activeStep, setActiveStep, prevStep, reset } = useImageClassifierFormContext();
+  const { resetWorker: resetClassificationWorker } = useImageClassificationContext();
+  const { resetWorker: resetCaptionWorker } = useImageCaptioningContext();
+
+  const handleReset = () => {
+    reset();
+    resetClassificationWorker();
+    resetCaptionWorker();
+  };
+
   return (
     <div className="bg-card mx-auto w-full max-w-4xl space-y-8 rounded-xl border p-6 shadow-sm">
       <div className="mb-4">
@@ -102,7 +113,7 @@ export const ImageClassifierStepper = () => {
             <ArrowLeft />
             Back
           </Button>
-          <Button variant="outline" onClick={reset}>
+          <Button variant="outline" onClick={handleReset}>
             <RotateCcw />
             Start Over
           </Button>
