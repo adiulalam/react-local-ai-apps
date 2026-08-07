@@ -24,7 +24,9 @@ test.describe("Image Classifier E2E", () => {
 
     // 4. Caption step
     // Wait for caption description to appear
-    await expect(page.getByRole("heading", { name: "Caption Description", level: 3 })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Caption Description", level: 3 })
+    ).toBeVisible();
     // Also expect some italic text which is the caption
     await expect(page.getByTestId("caption-text")).not.toBeEmpty();
   });
