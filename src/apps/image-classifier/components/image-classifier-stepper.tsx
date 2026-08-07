@@ -1,12 +1,13 @@
-import { useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useImageClassifierFormContext } from "../context/image-classifier-context";
+import { useImageClassificationContext } from "../context/image-classification-context";
+import { useImageCaptioningContext } from "../context/image-captioning-context";
 import { ImageInputStep } from "./steps/step-1";
 import { ClassificationStep } from "./steps/step-2";
 import { CaptionStep } from "./steps/step-3";
 import { H1, Muted, Small } from "@/components/ui/typography";
-import type { ClassificationResult } from "../utils/worker-message-handler";
 import {
   Stepper,
   StepperContent,
@@ -19,11 +20,6 @@ import {
   StepperTrigger,
 } from "@/components/ui/stepper";
 
-export type ImageClassifierState = {
-  imageDataUrl?: string;
-  results?: ClassificationResult[];
-};
-
 const steps = [
   { id: "step-1", step: 1, title: "Image Input", description: "Upload an image" },
   { id: "step-2", step: 2, title: "Classification", description: "Classify the image" },
@@ -31,14 +27,14 @@ const steps = [
 ];
 
 export const ImageClassifierStepper = () => {
-  const [formData, setFormData] = useState<ImageClassifierState>({});
-  const [activeStep, setActiveStep] = useState(1);
+  const { activeStep, setActiveStep, prevStep, reset } = useImageClassifierFormContext();
+  const { resetWorker: resetClassificationWorker } = useImageClassificationContext();
+  const { resetWorker: resetCaptionWorker } = useImageCaptioningContext();
 
-  const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, steps.length));
-  const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 1));
-  const reset = () => {
-    setFormData({});
-    setActiveStep(1);
+  const handleReset = () => {
+    reset();
+    resetClassificationWorker();
+    resetCaptionWorker();
   };
 
   return (
@@ -98,26 +94,9 @@ export const ImageClassifierStepper = () => {
                     value={stepData.step}
                     className="border-border/50 bg-secondary/20 my-4 block w-full flex-1 rounded-lg border p-6 ps-4 shadow-sm"
                   >
-                    {stepData.id === "step-1" && (
-                      <ImageInputStep
-                        onNext={(imageDataUrl) => {
-                          setFormData((prev) => ({ ...prev, imageDataUrl }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-2" && (
-                      <ClassificationStep
-                        imageDataUrl={formData.imageDataUrl!}
-                        onNext={(results) => {
-                          setFormData((prev) => ({ ...prev, results }));
-                          nextStep();
-                        }}
-                      />
-                    )}
-                    {stepData.id === "step-3" && (
-                      <CaptionStep imageDataUrl={formData.imageDataUrl!} />
-                    )}
+                    {stepData.id === "step-1" && <ImageInputStep />}
+                    {stepData.id === "step-2" && <ClassificationStep />}
+                    {stepData.id === "step-3" && <CaptionStep />}
                   </StepperContent>
 
                   {activeStep !== stepData.step && !isLast && (
@@ -134,7 +113,7 @@ export const ImageClassifierStepper = () => {
             <ArrowLeft />
             Back
           </Button>
-          <Button variant="outline" onClick={reset}>
+          <Button variant="outline" onClick={handleReset}>
             <RotateCcw />
             Start Over
           </Button>

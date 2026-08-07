@@ -9,10 +9,8 @@ import {
   FileUploadInput,
 } from "@/components/ui/file-upload";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
-
-interface ImageInputStepProps {
-  onNext: (imageDataUrl: string) => void;
-}
+import { useImageClassifierFormContext } from "@/apps/image-classifier/context/image-classifier-context";
+import { useImageClassificationContext } from "@/apps/image-classifier/context/image-classification-context";
 
 const CLASSIFICATION_SAMPLE_IMAGES: SampleMediaItem[] = [
   {
@@ -32,7 +30,9 @@ const CLASSIFICATION_SAMPLE_IMAGES: SampleMediaItem[] = [
   },
 ];
 
-export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
+export const ImageInputStep = () => {
+  const { nextStep } = useImageClassifierFormContext();
+  const { classifyImage } = useImageClassificationContext();
   const [image, setImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -76,7 +76,12 @@ export const ImageInputStep = ({ onNext }: ImageInputStepProps) => {
         <div className="flex flex-col items-center space-y-4">
           <img src={image} alt="Preview" className="max-h-64 rounded-lg object-contain" />
           <div className="flex w-full justify-end">
-            <Button onClick={() => onNext(image)}>
+            <Button
+              onClick={() => {
+                classifyImage(image);
+                nextStep();
+              }}
+            >
               Classify image
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>

@@ -1,68 +1,24 @@
-import { useState, useEffect, useRef } from "react";
 import { ArrowRight } from "lucide-react";
-import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
+import { DownloadProgress } from "@/components/ui/download-progress";
 import { Progress } from "@/components/ui/progress";
 import { H3, Muted } from "@/components/ui/typography";
-import {
-  createWorkerMessageHandler,
-  type WorkerStatus,
-  type ClassificationResult,
-} from "../../../utils/worker-message-handler";
-
 import { Button } from "@/components/ui/button";
-import ImageClassificationWorker from "@/apps/image-classifier/workers/image-classification.worker?worker";
+import { useImageClassifierFormContext } from "../../../context/image-classifier-context";
+import { useImageClassificationContext } from "../../../context/image-classification-context";
+import { useImageCaptioningContext } from "../../../context/image-captioning-context";
 
-interface ClassificationStepProps {
-  imageDataUrl: string;
-  onNext: (results: ClassificationResult[]) => void;
-}
+export const ClassificationStep = () => {
+  const { imageDataUrl, results, nextStep } = useImageClassifierFormContext();
+  const { status, error: errorMsg, progressItems } = useImageClassificationContext();
+  const { generateCaption } = useImageCaptioningContext();
 
-export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepProps) => {
-  const [status, setStatus] = useState<WorkerStatus>("initializing");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
-  const [results, setResults] = useState<ClassificationResult[] | null>(null);
-
-  const worker = useRef<Worker | null>(null);
-
-  useEffect(() => {
-    let processingStarted = false;
-
-    if (!imageDataUrl) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setStatus("error");
-      setErrorMsg("No image data provided. Please ensure Step 1 completed successfully.");
-      return;
-    }
-
-    if (!worker.current) {
-      worker.current = new ImageClassificationWorker();
-
-      const messageHandler = createWorkerMessageHandler({
-        setStatus,
-        setProgressItems,
-        onReady: () => {
-          if (!processingStarted) {
-            processingStarted = true;
-            worker.current?.postMessage({ type: "process", image: imageDataUrl });
-          }
-        },
-        onComplete: (classificationResults) => {
-          setResults(classificationResults);
-        },
-        setErrorMsg,
-      });
-
-      worker.current.addEventListener("message", messageHandler);
-
-      worker.current.postMessage({ type: "load" });
-    }
-
-    return () => {
-      worker.current?.terminate();
-      worker.current = null;
-    };
-  }, [imageDataUrl]);
+  if (!imageDataUrl) {
+    return (
+      <p className="text-destructive text-sm">
+        No image data provided. Please ensure Step 1 completed successfully.
+      </p>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -109,7 +65,12 @@ export const ClassificationStep = ({ imageDataUrl, onNext }: ClassificationStepP
               ))}
             </ul>
             <div className="mt-4 flex justify-end">
-              <Button onClick={() => onNext(results)}>
+              <Button
+                onClick={() => {
+                  generateCaption(imageDataUrl);
+                  nextStep();
+                }}
+              >
                 Next: Generate Caption
                 <ArrowRight />
               </Button>
