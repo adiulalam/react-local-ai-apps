@@ -16,7 +16,7 @@ import { AudioInputStep } from "./steps/step-1";
 import { PromptInputStep } from "./steps/step-2";
 import { GenerationStep } from "./steps/step-3";
 import { ExportStep } from "./steps/step-4";
-import { useVoiceCloning } from "../context/voice-cloning-context";
+import { useVoiceCloning } from "@/apps/voice-cloning/context/voice-cloning-context";
 
 const steps = [
   {

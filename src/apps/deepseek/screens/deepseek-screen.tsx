@@ -6,7 +6,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Lightbulb, Play, RefreshCw } from "lucide-react";
 import { Deepseek } from "@/components/icons/deepseek";
 import { H1, Muted, Large, Small } from "@/components/ui/typography";
-import { createWorkerMessageHandler, type WorkerStatus } from "../utils/worker-message-handler";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+} from "@/apps/deepseek/utils/worker-message-handler";
 import { cn } from "@/lib/utils";
 import DeepseekWorker from "@/apps/deepseek/workers/deepseek.worker?worker";
 

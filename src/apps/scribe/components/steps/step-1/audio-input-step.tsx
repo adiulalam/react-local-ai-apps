@@ -5,8 +5,8 @@ import { FieldGroup, Field, FieldLabel } from "@/components/ui/field";
 import { FileUploadInput, MicrophoneInput } from ".";
 import { Muted } from "@/components/ui/typography";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
-import { useScribeFormContext } from "../../../context/scribe-context";
-import { useWhisperContext } from "../../../context/whisper-context";
+import { useScribeFormContext } from "@/apps/scribe/context/scribe-context";
+import { useWhisperContext } from "@/apps/scribe/context/whisper-context";
 
 const SCRIBE_SAMPLE_AUDIO: SampleMediaItem[] = [
   {

@@ -1,4 +1,4 @@
-import { useTextToMusic } from "../../../context/text-to-music-context";
+import { useTextToMusic } from "@/apps/text-to-music/context/text-to-music-context";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DownloadProgress } from "@/components/ui/download-progress";

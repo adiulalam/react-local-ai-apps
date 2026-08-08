@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { DownloadProgress } from "@/components/ui/download-progress";
 import { Muted } from "@/components/ui/typography";
-import { useScribeFormContext } from "../../../context/scribe-context";
-import { useWhisperContext } from "../../../context/whisper-context";
+import { useScribeFormContext } from "@/apps/scribe/context/scribe-context";
+import { useWhisperContext } from "@/apps/scribe/context/whisper-context";
 
 export const TranscriptionStep = () => {
   const { formData, setTranscription, nextStep } = useScribeFormContext();

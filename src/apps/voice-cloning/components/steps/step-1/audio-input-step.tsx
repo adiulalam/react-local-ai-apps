@@ -9,7 +9,7 @@ import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-med
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Volume2 } from "lucide-react";
 
-import { useVoiceCloning } from "../../../context/voice-cloning-context";
+import { useVoiceCloning } from "@/apps/voice-cloning/context/voice-cloning-context";
 
 const VOICE_CLONING_SAMPLE_AUDIO: SampleMediaItem[] = [
   {

@@ -1,4 +1,4 @@
-import { useTextToMusic } from "../context/text-to-music-context";
+import { useTextToMusic } from "@/apps/text-to-music/context/text-to-music-context";
 import { ArrowLeft, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { H1, Muted, Small } from "@/components/ui/typography";

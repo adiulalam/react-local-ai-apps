@@ -14,7 +14,7 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
-import { useImageDepth } from "../context/image-depth-context";
+import { useImageDepth } from "@/apps/image-depth/context/image-depth-context";
 
 const steps = [
   { id: "step-1", step: 1, title: "Image Input", description: "Upload an image" },

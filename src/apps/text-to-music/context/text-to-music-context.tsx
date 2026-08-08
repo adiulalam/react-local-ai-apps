@@ -6,7 +6,7 @@ import {
 } from "@/apps/text-to-music/utils/worker-message-handler";
 import MusicGenWorker from "@/apps/text-to-music/workers/musicgen.worker?worker";
 import type { ProgressInfo } from "@/components/ui/download-progress";
-import type { GenerationParams } from "../components/steps/step-1";
+import type { GenerationParams } from "@/apps/text-to-music/components/steps/step-1";
 
 export type TextToMusicState = {
   params?: GenerationParams;

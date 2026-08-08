@@ -9,7 +9,7 @@ import {
   type MusicControlsState,
 } from "@/apps/text-to-music/components/music-controls";
 
-import { useTextToMusic } from "../../../context/text-to-music-context";
+import { useTextToMusic } from "@/apps/text-to-music/context/text-to-music-context";
 
 export type GenerationParams = {
   prompt: string;

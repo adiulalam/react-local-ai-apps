@@ -4,7 +4,7 @@ import { InputStep } from "./steps/step-1/input-step";
 import { ProcessingStep } from "./steps/step-2/processing-step";
 import { ResultStep } from "./steps/step-3/result-step";
 import { H1, Muted, Small } from "@/components/ui/typography";
-import { useVideoCaptioningContext } from "../context/video-captioning-context";
+import { useVideoCaptioningContext } from "@/apps/video-captioning/context/video-captioning-context";
 import {
   Stepper,
   StepperContent,

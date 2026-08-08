@@ -1,5 +1,5 @@
 import { AudioPlayer } from "@/apps/text-to-music/components/audio-player";
-import { useTextToMusic } from "../../../context/text-to-music-context";
+import { useTextToMusic } from "@/apps/text-to-music/context/text-to-music-context";
 
 export const ExportStep = () => {
   const { formData } = useTextToMusic();

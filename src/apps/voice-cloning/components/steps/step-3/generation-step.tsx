@@ -3,7 +3,7 @@ import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { DownloadProgress } from "@/components/ui/download-progress";
 import { GenerationProgress } from "@/apps/voice-cloning/components/generation-progress";
-import { useVoiceCloning } from "../../../context/voice-cloning-context";
+import { useVoiceCloning } from "@/apps/voice-cloning/context/voice-cloning-context";
 
 export const GenerationStep = () => {
   const {

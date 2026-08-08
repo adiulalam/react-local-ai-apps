@@ -1,7 +1,7 @@
 import { DownloadProgress } from "@/components/ui/download-progress";
 import { H3, Muted } from "@/components/ui/typography";
-import { useImageClassifierFormContext } from "../../../context/image-classifier-context";
-import { useImageCaptioningContext } from "../../../context/image-captioning-context";
+import { useImageClassifierFormContext } from "@/apps/image-classifier/context/image-classifier-context";
+import { useImageCaptioningContext } from "@/apps/image-classifier/context/image-captioning-context";
 
 export const CaptionStep = () => {
   const { imageDataUrl, caption } = useImageClassifierFormContext();

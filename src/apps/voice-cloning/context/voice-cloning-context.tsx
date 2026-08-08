@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import type { ReactNode } from "react";
-import type { VoiceCloningParams } from "../components/steps/step-2";
+import type { VoiceCloningParams } from "@/apps/voice-cloning/components/steps/step-2";
 import type { ProgressInfo } from "@/components/ui/download-progress";
 import type { WorkerStatus } from "@/apps/voice-cloning/utils/worker-message-handler";
 import VoiceCloningWorker from "@/apps/voice-cloning/workers/voice-cloning.worker?worker";

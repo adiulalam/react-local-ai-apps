@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Spinner } from "@/components/ui/spinner";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { type DepthResult } from "@/apps/image-depth/utils/worker-message-handler";
-import { useImageDepth } from "../../../context/image-depth-context";
+import { useImageDepth } from "@/apps/image-depth/context/image-depth-context";
 
 type ColormapType = "inferno" | "viridis" | "plasma" | "turbo" | "grayscale" | "spectral";
 

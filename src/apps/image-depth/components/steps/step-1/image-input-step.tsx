@@ -9,7 +9,7 @@ import {
   FileUploadInput,
 } from "@/components/ui/file-upload";
 import { SampleMediaPicker, type SampleMediaItem } from "@/components/sample-media-picker";
-import { useImageDepth } from "../../../context/image-depth-context";
+import { useImageDepth } from "@/apps/image-depth/context/image-depth-context";
 
 const SAMPLE_IMAGES: SampleMediaItem[] = [
   {

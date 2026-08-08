@@ -1,6 +1,6 @@
 import { ExportBlock } from "./export-block";
 import { Muted } from "@/components/ui/typography";
-import { useScribeFormContext } from "../../../context/scribe-context";
+import { useScribeFormContext } from "@/apps/scribe/context/scribe-context";
 
 export const ExportStep = () => {
   const { formData } = useScribeFormContext();

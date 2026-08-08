@@ -6,7 +6,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Lightbulb, Play, RefreshCw } from "lucide-react";
 import { Qwen } from "@/components/icons/qwen";
 import { H1, Muted, Large, Small } from "@/components/ui/typography";
-import { createWorkerMessageHandler, type WorkerStatus } from "../utils/worker-message-handler";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+} from "@/apps/qwen3/utils/worker-message-handler";
 import { cn } from "@/lib/utils";
 import QwenWorker from "@/apps/qwen3/workers/qwen.worker?worker";
 

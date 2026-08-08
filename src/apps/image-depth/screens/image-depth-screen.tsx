@@ -1,5 +1,5 @@
-﻿import { ImageDepthStepper } from "../components/image-depth-stepper";
-import { ImageDepthProvider } from "../context/image-depth-context";
+﻿import { ImageDepthStepper } from "@/apps/image-depth/components/image-depth-stepper";
+import { ImageDepthProvider } from "@/apps/image-depth/context/image-depth-context";
 
 const ImageDepthScreen = () => {
   return (

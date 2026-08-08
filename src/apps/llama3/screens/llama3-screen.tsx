@@ -6,7 +6,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Play, RefreshCw } from "lucide-react";
 import { Llama } from "@/components/icons/llama";
 import { H1, Muted, Large, Small } from "@/components/ui/typography";
-import { createWorkerMessageHandler, type WorkerStatus } from "../utils/worker-message-handler";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+} from "@/apps/llama3/utils/worker-message-handler";
 import LlamaWorker from "@/apps/llama3/workers/llama.worker?worker";
 
 const IS_WEBGPU_AVAILABLE = !!navigator.gpu;

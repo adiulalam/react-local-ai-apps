@@ -24,8 +24,15 @@ import {
 } from "lucide-react";
 import { H1, Muted, Large, Small } from "@/components/ui/typography";
 import { ChatProgress, type ProgressItem } from "@/components/chat";
-import { createWorkerMessageHandler, type WorkerStatus } from "../utils/worker-message-handler";
-import { SOURCE_LANGUAGES, TARGET_LANGUAGES, getLanguageName } from "../utils/languages";
+import {
+  createWorkerMessageHandler,
+  type WorkerStatus,
+} from "@/apps/translate-gemma/utils/worker-message-handler";
+import {
+  SOURCE_LANGUAGES,
+  TARGET_LANGUAGES,
+  getLanguageName,
+} from "@/apps/translate-gemma/utils/languages";
 import TranslateWorker from "@/apps/translate-gemma/workers/translate-gemma.worker?worker";
 
 const IS_WEBGPU_AVAILABLE = !!navigator.gpu;

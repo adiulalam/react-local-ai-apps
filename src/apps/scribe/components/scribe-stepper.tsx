@@ -17,9 +17,9 @@ import {
   StepperTitle,
   StepperTrigger,
 } from "@/components/ui/stepper";
-import { useScribeFormContext } from "../context/scribe-context";
-import { useWhisperContext } from "../context/whisper-context";
-import { useSummaryContext } from "../context/summary-context";
+import { useScribeFormContext } from "@/apps/scribe/context/scribe-context";
+import { useWhisperContext } from "@/apps/scribe/context/whisper-context";
+import { useSummaryContext } from "@/apps/scribe/context/summary-context";
 
 const steps = [
   { id: "step-1", step: 1, title: "Audio Input", description: "Upload or record audio" },

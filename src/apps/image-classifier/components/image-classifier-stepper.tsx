@@ -1,9 +1,9 @@
 import { ArrowLeft, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { useImageClassifierFormContext } from "../context/image-classifier-context";
-import { useImageClassificationContext } from "../context/image-classification-context";
-import { useImageCaptioningContext } from "../context/image-captioning-context";
+import { useImageClassifierFormContext } from "@/apps/image-classifier/context/image-classifier-context";
+import { useImageClassificationContext } from "@/apps/image-classifier/context/image-classification-context";
+import { useImageCaptioningContext } from "@/apps/image-classifier/context/image-captioning-context";
 import { ImageInputStep } from "./steps/step-1";
 import { ClassificationStep } from "./steps/step-2";
 import { CaptionStep } from "./steps/step-3";

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
-import type { ClassificationResult } from "../utils/worker-message-handler";
+import type { ClassificationResult } from "@/apps/image-classifier/utils/worker-message-handler";
 
 interface ImageClassifierFormContextValue {
   activeStep: number;

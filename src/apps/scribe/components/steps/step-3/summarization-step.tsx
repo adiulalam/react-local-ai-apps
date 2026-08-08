@@ -3,8 +3,8 @@ import { DownloadProgress } from "@/components/ui/download-progress";
 import { ModeSelector } from "./mode-selector";
 import { SummaryDisplay } from "./summary-display";
 import { type SummaryMode } from "@/types/summary";
-import { useScribeFormContext } from "../../../context/scribe-context";
-import { useSummaryContext } from "../../../context/summary-context";
+import { useScribeFormContext } from "@/apps/scribe/context/scribe-context";
+import { useSummaryContext } from "@/apps/scribe/context/summary-context";
 
 export const SummarizationStep = () => {
   const { formData, setSummary, nextStep } = useScribeFormContext();
