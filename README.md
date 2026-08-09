@@ -6,57 +6,33 @@ Built with **React**, **TypeScript**, **Vite**, and **Shadcn UI**, this reposito
 
 ## Available Apps
 
-### [Background Remover](src/apps/background-remover/README.md)
+### Audio
 
-Remove the background from images locally.
+- **[Local Scribe](src/apps/scribe/README.md)**: Transcribe audio directly in your browser using local AI.
+- **[Text to Music](src/apps/text-to-music/README.md)**: Generate music from text prompts.
+- **[Voice Cloning](src/apps/voice-cloning/README.md)**: Clone voices locally in the browser.
 
-### [DeepSeek](src/apps/deepseek/README.md)
+### Image
 
-Chat with the DeepSeek language model entirely in your browser.
+- **[Image Classifier](src/apps/image-classifier/README.md)**: Classify images into different categories.
+- **[Background Remover](src/apps/background-remover/README.md)**: Remove the background from images locally.
+- **[Image Depth](src/apps/image-depth/README.md)**: Estimate depth from 2D images.
 
-### [Image Classifier](src/apps/image-classifier/README.md)
+### Video
 
-Classify images into different categories.
+- **[Object Detection](src/apps/object-detection/README.md)**: Detect and bound objects in images.
+- **[Video Captioning](src/apps/video-captioning/README.md)**: Automatically generate captions for videos.
 
-### [Image Depth](src/apps/image-depth/README.md)
+### Text
 
-Estimate depth from 2D images.
+- **[Tokenizer Playground](src/apps/tokenizer-playground/README.md)**: Playground for testing and understanding tokenizers.
+- **[Translate (Gemma)](src/apps/translate-gemma/README.md)**: Translate text using the Gemma model.
 
-### [Llama 3](src/apps/llama3/README.md)
+### Chat
 
-Chat with the Llama 3 language model locally.
-
-### [Object Detection](src/apps/object-detection/README.md)
-
-Detect and bound objects in images.
-
-### [Qwen 3](src/apps/qwen3/README.md)
-
-Interact with the Qwen 3 language model.
-
-### [Local Scribe](src/apps/scribe/README.md)
-
-Transcribe audio directly in your browser using local AI.
-
-### [Text to Music](src/apps/text-to-music/README.md)
-
-Generate music from text prompts.
-
-### [Tokenizer Playground](src/apps/tokenizer-playground/README.md)
-
-Playground for testing and understanding tokenizers.
-
-### [Translate (Gemma)](src/apps/translate-gemma/README.md)
-
-Translate text using the Gemma model.
-
-### [Video Captioning](src/apps/video-captioning/README.md)
-
-Automatically generate captions for videos.
-
-### [Voice Cloning](src/apps/voice-cloning/README.md)
-
-Clone voices locally in the browser.
+- **[Qwen 3 - 0.6B](src/apps/qwen3/README.md)**: Interact with the Qwen 3 language model.
+- **[DeepSeek R1 - 1.5B](src/apps/deepseek/README.md)**: Chat with the DeepSeek language model entirely in your browser.
+- **[Llama 3.2 - 1B](src/apps/llama3/README.md)**: Chat with the Llama 3 language model locally.
 
 ## Screenshots Showcase
 
