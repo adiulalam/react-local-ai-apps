@@ -1,75 +1,96 @@
-# React + TypeScript + Vite
+# React Local AI Apps
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to **React Local AI Apps**, a unified platform containing multiple fully local AI applications. These apps run entirely in your browser, ensuring maximum privacy and zero API costs.
 
-Currently, two official plugins are available:
+Built with **React**, **TypeScript**, **Vite**, and **Shadcn UI**, this repository leverages libraries like `@huggingface/transformers` to bring powerful AI capabilities directly to your device.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Available Apps
 
-## React Compiler
+### [Background Remover](src/apps/background-remover/README.md)
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+Remove the background from images locally.
 
-Note: This will impact Vite dev & build performances.
+### [DeepSeek](src/apps/deepseek/README.md)
 
-## Expanding the ESLint configuration
+Chat with the DeepSeek language model entirely in your browser.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### [Image Classifier](src/apps/image-classifier/README.md)
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+Classify images into different categories.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### [Image Depth](src/apps/image-depth/README.md)
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+Estimate depth from 2D images.
+
+### [Llama 3](src/apps/llama3/README.md)
+
+Chat with the Llama 3 language model locally.
+
+### [Object Detection](src/apps/object-detection/README.md)
+
+Detect and bound objects in images.
+
+### [Qwen 3](src/apps/qwen3/README.md)
+
+Interact with the Qwen 3 language model.
+
+### [Local Scribe](src/apps/scribe/README.md)
+
+Transcribe audio directly in your browser using local AI.
+
+### [Text to Music](src/apps/text-to-music/README.md)
+
+Generate music from text prompts.
+
+### [Tokenizer Playground](src/apps/tokenizer-playground/README.md)
+
+Playground for testing and understanding tokenizers.
+
+### [Translate (Gemma)](src/apps/translate-gemma/README.md)
+
+Translate text using the Gemma model.
+
+### [Video Captioning](src/apps/video-captioning/README.md)
+
+Automatically generate captions for videos.
+
+### [Voice Cloning](src/apps/voice-cloning/README.md)
+
+Clone voices locally in the browser.
+
+## Screenshots Showcase
+
+Below are some highlights from our applications:
+
+![Scribe](public/screenshots/scribe-1.png)
+![Background Remover](public/screenshots/background-remover-1.png)
+![Object Detection](public/screenshots/object-detection-1.png)
+![Llama 3](public/screenshots/llama3-1.png)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js installed
+
+### Installation
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+Run the dev server:
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```bash
+npm run dev
 ```
+
+## Technologies Used
+
+- React 19
+- Vite
+- Tailwind CSS
+- Shadcn UI
+- Transformers.js
