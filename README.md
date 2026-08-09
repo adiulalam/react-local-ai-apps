@@ -60,12 +60,12 @@ Clone voices locally in the browser.
 
 ## Screenshots Showcase
 
-Below are some highlights from our applications:
+Below are some highlights from the applications:
 
 ![Scribe](public/screenshots/scribe-1.png)
 ![Background Remover](public/screenshots/background-remover-1.png)
 ![Object Detection](public/screenshots/object-detection-1.png)
-![Llama 3](public/screenshots/llama3-1.png)
+![Llama 3](public/screenshots/llama3-2.png)
 
 ## Getting Started
 
