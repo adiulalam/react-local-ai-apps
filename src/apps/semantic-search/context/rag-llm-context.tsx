@@ -11,7 +11,6 @@ import type { SearchMatch } from "../utils/similarity";
 interface RAGLLMContextType {
   status: WorkerStatus;
   progressItems: Record<string, ProgressInfo>;
-  streamingText: string;
   tps: number | undefined;
   numTokens: number;
   error: string;
@@ -35,44 +34,40 @@ export const RAGLLMProvider = ({ children }: { children: ReactNode }) => {
   const { setFormData } = useSemanticSearchContext();
   const [status, setStatus] = useState<WorkerStatus>("idle");
   const [progressItems, setProgressItems] = useState<Record<string, ProgressInfo>>({});
-  const [streamingText, setStreamingText] = useState("");
   const [tps, setTps] = useState<number | undefined>(undefined);
   const [numTokens, setNumTokens] = useState(0);
   const [error, setError] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
 
   const workerRef = useRef<Worker | null>(null);
-  const currentQuestionRef = useRef<string>("");
-  const currentCitationsRef = useRef<number[]>([]);
 
   useEffect(() => {
     workerRef.current = new RAGLLMWorker();
+    workerRef.current.postMessage({ type: "check" });
 
     const handler = createRAGWorkerMessageHandler({
       setStatus,
       setProgressItems,
       onUpdate: (chunk, currentTps, currentTokens) => {
-        setStreamingText((prev) => prev + chunk);
         if (currentTps !== undefined) setTps(currentTps);
         if (currentTokens !== undefined) setNumTokens(currentTokens);
+
+        setFormData((prev) => {
+          const msgs = [...prev.chatMessages];
+          if (msgs.length === 0) return prev;
+          const lastIndex = msgs.length - 1;
+          const lastMsg = msgs[lastIndex];
+          if (lastMsg && lastMsg.role === "assistant") {
+            msgs[lastIndex] = {
+              ...lastMsg,
+              content: lastMsg.content + (chunk || ""),
+            };
+          }
+          return { ...prev, chatMessages: msgs };
+        });
       },
-      onComplete: (fullResult) => {
+      onComplete: () => {
         setIsGenerating(false);
-        const finalAnswer = fullResult || streamingText;
-        const newAssistantMessage: ChatMessage = {
-          id: `msg-${Date.now()}-assistant`,
-          role: "assistant",
-          content: finalAnswer.trim(),
-          citations: currentCitationsRef.current,
-          timestamp: Date.now(),
-        };
-
-        setFormData((prev) => ({
-          ...prev,
-          chatMessages: [...prev.chatMessages, newAssistantMessage],
-        }));
-
-        setStreamingText("");
       },
       setErrorMsg: (errMsg) => {
         setIsGenerating(false);
@@ -86,12 +81,12 @@ export const RAGLLMProvider = ({ children }: { children: ReactNode }) => {
       workerRef.current?.terminate();
       workerRef.current = null;
     };
-  }, [setFormData, streamingText]);
+  }, [setFormData]);
 
   const resetWorker = () => {
+    workerRef.current?.postMessage({ type: "reset" });
     setStatus("idle");
     setProgressItems({});
-    setStreamingText("");
     setTps(undefined);
     setNumTokens(0);
     setError("");
@@ -108,44 +103,51 @@ export const RAGLLMProvider = ({ children }: { children: ReactNode }) => {
     if (!trimmedQuestion) return;
 
     setError("");
-    setStreamingText("");
     setIsGenerating(true);
     setTps(undefined);
     setNumTokens(0);
-    currentQuestionRef.current = trimmedQuestion;
 
     const citationIndexes = relevantMatches.map((m) => m.chunk.index + 1);
-    currentCitationsRef.current = citationIndexes;
 
-    // Add user message to chat history
-    const newUserMessage: ChatMessage = {
+    // 1. Append user message and an initial empty assistant message
+    const userMsg: ChatMessage = {
       id: `msg-${Date.now()}-user`,
       role: "user",
       content: trimmedQuestion,
       timestamp: Date.now(),
     };
 
+    const assistantMsg: ChatMessage = {
+      id: `msg-${Date.now()}-assistant`,
+      role: "assistant",
+      content: "",
+      citations: citationIndexes,
+      timestamp: Date.now(),
+    };
+
     setFormData((prev) => ({
       ...prev,
-      chatMessages: [...prev.chatMessages, newUserMessage],
+      chatMessages: [...prev.chatMessages, userMsg, assistantMsg],
     }));
 
-    // Build context prompt
+    // 2. Build structured document context for RAG
     const contextContent =
       relevantMatches.length > 0
         ? relevantMatches
             .map(
-              (m) => `[Chunk ${m.chunk.index + 1} (${m.percentage}% relevance)]:\n${m.chunk.text}`
+              (m) =>
+                `--- Document Passage [Chunk ${m.chunk.index + 1}] (${m.percentage}% match) ---\n${m.chunk.text}`
             )
             .join("\n\n")
-        : "No relevant chunks found.";
+        : "No direct matching document passages found.";
 
-    const systemPrompt = `You are a local AI assistant answering questions about a document using Retrieval-Augmented Generation (RAG).
-Answer the user's question accurately and concisely based ONLY on the provided context chunks below.
-When referencing specific facts, include the chunk citation in square brackets like [Chunk 1] or [Chunk 2].
-If the context does not contain enough information to answer the question, state honestly: "Based on the provided document, there is not enough information to answer this question." Do not make up facts.
+    const systemPrompt = `You are a helpful and accurate local AI research assistant.
+Answer the user's question clearly, thoroughly, and factually using ONLY the provided document passages.
+Cite the relevant passage numbers like [Chunk 1] or [Chunk 2] when referencing facts from the text.
+Use formatting (bullet points, clear paragraphs) to make your answer easy to read.
+If the provided document does not contain enough information to answer the question, state: "Based on the provided document, there is not enough information to answer this question."
 
-Document Context:
+Document Passages:
 ${contextContent}`;
 
     const messages = [
@@ -164,7 +166,6 @@ ${contextContent}`;
       value={{
         status,
         progressItems,
-        streamingText,
         tps,
         numTokens,
         error,

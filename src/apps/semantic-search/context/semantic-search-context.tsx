@@ -72,7 +72,7 @@ export const SemanticSearchProvider = ({ children }: { children: ReactNode }) =>
   const [activeStep, setActiveStep] = useState(1);
   const [formData, setFormData] = useState<SemanticSearchFormData>(defaultFormData);
 
-  const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, 4));
+  const nextStep = () => setActiveStep((prev) => Math.min(prev + 1, 2));
   const prevStep = () => setActiveStep((prev) => Math.max(prev - 1, 1));
 
   const reset = () => {

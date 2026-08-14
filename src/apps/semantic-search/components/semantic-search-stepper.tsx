@@ -16,34 +16,20 @@ import { useSemanticSearchContext } from "@/apps/semantic-search/context/semanti
 import { useEmbeddingContext } from "@/apps/semantic-search/context/embedding-context";
 import { useRAGLLMContext } from "@/apps/semantic-search/context/rag-llm-context";
 import { DocumentInputStep } from "./steps/step-1";
-import { VectorIndexingStep } from "./steps/step-2";
-import { SemanticSearchStep } from "./steps/step-3";
-import { LocalRAGChatStep } from "./steps/step-4";
+import { SemanticSearchChatStep } from "./steps/step-2";
 
 const steps = [
   {
     id: "step-1",
     step: 1,
     title: "Document Input",
-    description: "Upload, paste text, or pick sample document",
+    description: "Upload a file or paste document text",
   },
   {
     id: "step-2",
     step: 2,
-    title: "Vector Indexing",
-    description: "Embed document chunks with Transformers.js",
-  },
-  {
-    id: "step-3",
-    step: 3,
-    title: "Semantic Search",
-    description: "Find and highlight relevant passages instantly",
-  },
-  {
-    id: "step-4",
-    step: 4,
-    title: "Local RAG Chat",
-    description: "Chat with verified context and citations",
+    title: "Search & Ask AI",
+    description: "Search passages and ask questions offline",
   },
 ];
 
@@ -118,9 +104,7 @@ export const SemanticSearchStepper = () => {
                     className="border-border/50 bg-secondary/20 my-4 block w-full flex-1 rounded-lg border p-6 ps-4 shadow-xs"
                   >
                     {stepData.id === "step-1" && <DocumentInputStep />}
-                    {stepData.id === "step-2" && <VectorIndexingStep />}
-                    {stepData.id === "step-3" && <SemanticSearchStep />}
-                    {stepData.id === "step-4" && <LocalRAGChatStep />}
+                    {stepData.id === "step-2" && <SemanticSearchChatStep />}
                   </StepperContent>
 
                   {activeStep !== stepData.step && !isLast && (

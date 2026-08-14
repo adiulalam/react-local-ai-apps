@@ -6,7 +6,7 @@ import {
 } from "@/apps/semantic-search/utils/worker-message-handler";
 import { type ProgressInfo } from "@/components/ui/download-progress";
 import { useSemanticSearchContext } from "./semantic-search-context";
-import { rankChunksBySimilarity } from "../utils/similarity";
+import { rankChunksBySimilarity, type SearchMatch } from "../utils/similarity";
 import type { DocumentChunk } from "../utils/text-chunker";
 
 interface IndexingProgress {
@@ -22,7 +22,7 @@ interface EmbeddingContextType {
   error: string;
   isSearching: boolean;
   startEmbedding: (chunks: DocumentChunk[]) => Promise<Float32Array[]>;
-  searchQuery: (query: string) => Promise<void>;
+  searchQuery: (query: string) => Promise<SearchMatch[]>;
   resetWorker: () => void;
 }
 
@@ -106,11 +106,11 @@ export const EmbeddingProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const searchQuery = async (query: string): Promise<void> => {
+  const searchQuery = async (query: string): Promise<SearchMatch[]> => {
     const trimmed = query.trim();
     if (!trimmed) {
       setFormData((prev) => ({ ...prev, searchQuery: "", searchResults: [] }));
-      return;
+      return [];
     }
 
     setIsSearching(true);
@@ -139,8 +139,11 @@ export const EmbeddingProvider = ({ children }: { children: ReactNode }) => {
         searchResults: matches,
         selectedChunkId: matches.length > 0 ? matches[0].chunk.id : null,
       }));
+
+      return matches;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to execute semantic search");
+      return [];
     } finally {
       setIsSearching(false);
     }

@@ -1,1 +1,1 @@
-export * from "./vector-indexing-step";
+export * from "./semantic-search-chat-step";
