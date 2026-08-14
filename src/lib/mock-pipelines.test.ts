@@ -9,6 +9,7 @@ import {
   getMockBackgroundRemover,
   getMockLLM,
   getMockMusicgen,
+  getMockFeatureExtraction,
 } from "./mock-pipelines";
 
 describe("mock-pipelines", () => {
@@ -143,5 +144,20 @@ describe("mock-pipelines", () => {
 
     const modelResult = await modelWithConfig.generate({});
     expect(modelResult.data).toBeInstanceOf(Float32Array);
+  });
+
+  it("should return a working feature-extraction mock", async () => {
+    const progressCallback = vi.fn();
+    const mockPipeline = await getMockFeatureExtraction("test-model", progressCallback);
+
+    expect(progressCallback).toHaveBeenCalledTimes(2);
+
+    const result = (await mockPipeline("test-sentence")) as unknown as {
+      data: Float32Array;
+      dims: number[];
+    };
+    expect(result).toBeDefined();
+    expect(result.data).toBeInstanceOf(Float32Array);
+    expect(result.data.length).toBe(384);
   });
 });

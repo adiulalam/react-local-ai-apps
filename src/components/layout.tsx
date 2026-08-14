@@ -15,6 +15,7 @@ import {
   Type,
   Box,
   Languages,
+  FileSearch,
 } from "lucide-react";
 import {
   NavigationMenu,
@@ -155,6 +156,14 @@ export const Layout = () => {
                 >
                   <Languages className="size-4" />
                   TranslateGemma
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/semantic-search" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/semantic-search")}
+                >
+                  <FileSearch className="size-4" />
+                  Semantic Search (RAG)
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>

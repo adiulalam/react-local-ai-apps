@@ -13,6 +13,7 @@ import { objectDetectionRoute } from "@/apps/object-detection/screens/route";
 import { videoCaptioningRoute } from "@/apps/video-captioning/screens/route";
 import { tokenizerRoute } from "@/apps/tokenizer-playground/screens/route";
 import { translateGemmaRoute } from "@/apps/translate-gemma/screens/route";
+import { semanticSearchRoute } from "@/apps/semantic-search/screens/route";
 
 const router = createBrowserRouter([
   {
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
       videoCaptioningRoute,
       tokenizerRoute,
       translateGemmaRoute,
+      semanticSearchRoute,
     ],
   },
 ]);
