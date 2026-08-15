@@ -1,4 +1,9 @@
+import "katex/dist/katex.min.css";
 import { type RefObject } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import { Bot, User, Copy, Check, Quote, Sparkles, Zap, Square, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -87,14 +92,25 @@ export const ChatAnswersPane = ({
                       : "bg-secondary/40 text-foreground border-border/50 border"
                   }`}
                 >
-                  {msg.content ? (
+                  {msg.role === "assistant" ? (
+                    msg.content ? (
+                      <div className="prose prose-sm dark:prose-invert text-foreground prose-p:my-1 prose-p:leading-relaxed prose-headings:my-1.5 prose-headings:font-semibold prose-ul:my-1 prose-ul:pl-4 prose-ol:my-1 prose-ol:pl-4 prose-li:my-0.5 prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-[11px] prose-pre:bg-muted prose-pre:border prose-pre:p-2.5 prose-pre:rounded-lg max-w-none text-xs leading-relaxed">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm, remarkMath]}
+                          rehypePlugins={[rehypeKatex]}
+                        >
+                          {msg.content}
+                        </ReactMarkdown>
+                      </div>
+                    ) : isLatestAssistant ? (
+                      <div className="text-muted-foreground flex items-center gap-2">
+                        <Sparkles className="text-primary size-3 animate-spin" />
+                        <span>Analyzing document and generating answer...</span>
+                      </div>
+                    ) : null
+                  ) : (
                     <p className="whitespace-pre-line">{msg.content}</p>
-                  ) : isLatestAssistant ? (
-                    <div className="text-muted-foreground flex items-center gap-2">
-                      <Sparkles className="text-primary size-3 animate-spin" />
-                      <span>Analyzing document and generating answer...</span>
-                    </div>
-                  ) : null}
+                  )}
 
                   {/* Citations list for assistant messages */}
                   {msg.role === "assistant" &&
