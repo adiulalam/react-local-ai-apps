@@ -4,10 +4,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import { Bot, User, Copy, Check, Quote, Sparkles, Zap, Square, ChevronRight } from "lucide-react";
+import { Bot, User, Copy, Check, Quote, Zap, Square, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { H4, P, Small } from "@/components/ui/typography";
+import { H4, P, Muted, Small } from "@/components/ui/typography";
+import { Spinner } from "@/components/ui/spinner";
 import type { ChatMessage } from "@/apps/semantic-search/context/semantic-search-context";
 import type { SearchMatch } from "@/apps/semantic-search/utils/similarity";
 import type { DocumentChunk } from "@/apps/semantic-search/utils/text-chunker";
@@ -104,12 +105,14 @@ export const ChatAnswersPane = ({
                       </div>
                     ) : isLatestAssistant ? (
                       <div className="text-muted-foreground flex items-center gap-2 py-1">
-                        <Sparkles className="text-primary size-3.5 animate-spin" />
+                        <Spinner className="text-primary size-3.5" />
                         <span>Analyzing document and generating answer...</span>
                       </div>
                     ) : null
                   ) : (
-                    <p className="whitespace-pre-line">{msg.content}</p>
+                    <P className="leading-relaxed whitespace-pre-line not-first:mt-0">
+                      {msg.content}
+                    </P>
                   )}
 
                   {/* Citations list for assistant messages */}
@@ -205,9 +208,9 @@ export const ChatAnswersPane = ({
                 Close
               </Button>
             </div>
-            <p className="text-muted-foreground line-clamp-3 font-mono text-[11px] leading-relaxed">
+            <Muted className="line-clamp-3 font-mono text-[11px] leading-relaxed not-first:mt-0">
               {chunks[inspectedChunk - 1]?.text || "Source excerpt"}
-            </p>
+            </Muted>
           </div>
         )}
 

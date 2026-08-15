@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { format } from "date-fns";
 import { Bot, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -117,7 +118,7 @@ export const SemanticSearchChatStep = () => {
   const handleExportMarkdown = () => {
     let md = `# Local Document Search & Q&A Report\n\n`;
     md += `**Document:** ${formData.documentName || "Document"}\n`;
-    md += `**Date:** ${new Date().toLocaleString()}\n`;
+    md += `**Date:** ${format(new Date(), "PPpp")}\n`;
     md += `**Total Chunks:** ${formData.chunks.length}\n\n---\n\n`;
 
     formData.chatMessages.forEach((msg) => {

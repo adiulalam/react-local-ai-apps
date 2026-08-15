@@ -1,7 +1,7 @@
 import { type RefObject } from "react";
 import { Target } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Small } from "@/components/ui/typography";
+import { P, Small } from "@/components/ui/typography";
 import type { DocumentChunk } from "@/apps/semantic-search/utils/text-chunker";
 import type { SearchMatch } from "@/apps/semantic-search/utils/similarity";
 
@@ -73,9 +73,9 @@ export const DocumentViewerPane = ({
                 )}
               </div>
 
-              <p className="text-foreground font-sans text-xs leading-relaxed whitespace-pre-line sm:text-sm">
+              <P className="text-foreground font-sans text-xs leading-relaxed whitespace-pre-line not-first:mt-0 sm:text-sm">
                 {chunk.text}
-              </p>
+              </P>
             </div>
           );
         })}

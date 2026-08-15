@@ -1,8 +1,8 @@
-import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { H3, Muted } from "@/components/ui/typography";
+import { Spinner } from "@/components/ui/spinner";
 import { DownloadProgress, type ProgressInfo } from "@/components/ui/download-progress";
 import type { WorkerStatus } from "@/apps/semantic-search/utils/worker-message-handler";
 
@@ -43,7 +43,7 @@ export const IndexingStatusView = ({
           <CardContent className="space-y-3 p-6">
             <div className="flex items-center justify-between text-sm font-medium">
               <div className="flex items-center gap-2">
-                <Sparkles className="text-primary size-4 animate-spin" />
+                <Spinner className="text-primary size-4" />
                 <span>Indexing {chunksCount} document sections...</span>
               </div>
               <span className="font-mono text-xs">{indexingProgress.percentage}%</span>

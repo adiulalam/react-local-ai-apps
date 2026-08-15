@@ -163,7 +163,7 @@ export const Layout = () => {
                   active={location.pathname.startsWith("/semantic-search")}
                 >
                   <FileSearch className="size-4" />
-                  Semantic Search (RAG)
+                  Semantic Search
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>

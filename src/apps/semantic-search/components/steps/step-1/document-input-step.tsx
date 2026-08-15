@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { H3, H4, Muted, Small } from "@/components/ui/typography";
+import { Spinner } from "@/components/ui/spinner";
 import { useSemanticSearchContext } from "@/apps/semantic-search/context/semantic-search-context";
 import { parseFileContent, extractTextFromPdf } from "@/apps/semantic-search/utils/document-parser";
 import { chunkText } from "@/apps/semantic-search/utils/text-chunker";
@@ -212,7 +213,7 @@ export const DocumentInputStep = () => {
 
           {isParsing && (
             <div className="bg-muted/50 flex items-center justify-center gap-2 rounded-lg p-4">
-              <Sparkles className="text-primary size-4 animate-spin" />
+              <Spinner className="text-primary size-4" />
               <Small>Reading and extracting document text...</Small>
             </div>
           )}
@@ -290,7 +291,7 @@ export const DocumentInputStep = () => {
 
           {isParsing && (
             <div className="bg-muted/50 flex items-center justify-center gap-2 rounded-lg p-4">
-              <Sparkles className="text-primary size-4 animate-spin" />
+              <Spinner className="text-primary size-4" />
               <Small>Loading and extracting sample PDF text...</Small>
             </div>
           )}

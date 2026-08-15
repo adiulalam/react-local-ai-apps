@@ -2,6 +2,7 @@ import { Search, Sparkles, Download, RotateCcw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { H4, Muted, Small } from "@/components/ui/typography";
+import { Spinner } from "@/components/ui/spinner";
 
 interface SearchHeaderBarProps {
   documentName: string;
@@ -88,7 +89,7 @@ export const SearchHeaderBar = ({
             className="shrink-0 gap-1.5 px-4"
           >
             {isGenerating || isSearching ? (
-              <Sparkles className="size-4 animate-spin" />
+              <Spinner className="size-4" />
             ) : (
               <Search className="size-4" />
             )}
