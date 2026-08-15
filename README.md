@@ -25,6 +25,7 @@ Built with **React**, **TypeScript**, **Vite**, and **Shadcn UI**, this reposito
 
 ### Text
 
+- **[Semantic Search (RAG)](src/apps/semantic-search/README.md)**: Search documents with natural language and chat with local RAG.
 - **[Tokenizer Playground](src/apps/tokenizer-playground/README.md)**: Playground for testing and understanding tokenizers.
 - **[Translate (Gemma)](src/apps/translate-gemma/README.md)**: Translate text using the Gemma model.
 

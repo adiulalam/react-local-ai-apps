@@ -237,3 +237,43 @@ export const getMockVoiceCloning = async (
 
   return [mockProcessor, mockModel];
 };
+
+export const getMockFeatureExtraction = async (
+  model: string,
+  progress_callback?: (info: unknown) => void
+): Promise<AllTasks["feature-extraction"]> => {
+  if (progress_callback) {
+    progress_callback({ status: "initiate", name: model, file: "mock" });
+    progress_callback({ status: "ready", name: model, file: "mock" });
+  }
+
+  const generateVector = (text: string): { data: Float32Array; dims: number[] } => {
+    const arr = new Float32Array(384);
+    let hash = 0;
+    for (let i = 0; i < text.length; i++) {
+      hash = (hash << 5) - hash + text.charCodeAt(i);
+      hash |= 0;
+    }
+    for (let i = 0; i < 384; i++) {
+      arr[i] = Math.sin(hash + i * 0.1);
+    }
+    let norm = 0;
+    for (let i = 0; i < 384; i++) {
+      norm += arr[i] * arr[i];
+    }
+    norm = Math.sqrt(norm) || 1;
+    for (let i = 0; i < 384; i++) {
+      arr[i] /= norm;
+    }
+    return { data: arr, dims: [1, 384] };
+  };
+
+  const mockExtractor = async (text: string | string[]) => {
+    if (Array.isArray(text)) {
+      return text.map((t) => generateVector(t));
+    }
+    return generateVector(text);
+  };
+
+  return mockExtractor as unknown as AllTasks["feature-extraction"];
+};
