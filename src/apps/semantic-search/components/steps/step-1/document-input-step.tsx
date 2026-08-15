@@ -197,6 +197,7 @@ export const DocumentInputStep = () => {
           <label className="border-border/80 bg-background/50 hover:border-primary/60 hover:bg-muted/40 group flex min-h-44 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-all">
             <input
               type="file"
+              data-testid="document-file-input"
               accept=".pdf,.docx,.doc,.txt,.md,.markdown,.json,.csv,.tsv"
               onChange={handleFileUpload}
               className="hidden"

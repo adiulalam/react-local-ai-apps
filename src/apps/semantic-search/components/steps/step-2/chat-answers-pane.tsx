@@ -7,7 +7,7 @@ import rehypeKatex from "rehype-katex";
 import { Bot, User, Copy, Check, Quote, Zap, Square, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { H4, P, Muted, Small } from "@/components/ui/typography";
+import { H3, P, Muted, Small } from "@/components/ui/typography";
 import { Spinner } from "@/components/ui/spinner";
 import type { ChatMessage } from "@/apps/semantic-search/context/semantic-search-context";
 import type { SearchMatch } from "@/apps/semantic-search/utils/similarity";
@@ -59,7 +59,7 @@ export const ChatAnswersPane = ({
           {chatMessages.length === 0 && (
             <div className="flex h-full min-h-[320px] flex-col items-center justify-center py-12 text-center">
               <Bot className="text-muted-foreground mb-3 size-10 opacity-30" />
-              <H4 className="text-sm font-semibold">Ready to Search & Answer</H4>
+              <H3 className="text-sm font-semibold">Ready to Search & Answer</H3>
               <P className="text-muted-foreground mt-1.5 max-w-md text-xs sm:text-sm">
                 Type a question or select a suggestion above. The AI answers strictly using the
                 document passages and cites exact source chunks.
@@ -87,6 +87,7 @@ export const ChatAnswersPane = ({
                 )}
 
                 <div
+                  data-testid={msg.role === "assistant" ? "assistant-message" : "user-message"}
                   className={`group relative max-w-[85%] rounded-xl p-3.5 leading-relaxed ${
                     msg.role === "user"
                       ? "bg-primary text-primary-foreground text-xs font-medium sm:text-sm"

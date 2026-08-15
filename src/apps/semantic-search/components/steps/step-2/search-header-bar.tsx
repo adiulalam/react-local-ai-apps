@@ -1,7 +1,7 @@
 import { Search, Sparkles, Download, RotateCcw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { H4, Muted, Small } from "@/components/ui/typography";
+import { H2, Muted, Small } from "@/components/ui/typography";
 import { Spinner } from "@/components/ui/spinner";
 
 interface SearchHeaderBarProps {
@@ -42,7 +42,7 @@ export const SearchHeaderBar = ({
             <FileText className="size-4" />
           </div>
           <div>
-            <H4 className="text-sm font-semibold">{documentName || "Document"}</H4>
+            <H2 className="text-sm font-semibold">{documentName || "Document"}</H2>
             <Muted className="text-xs">
               {chunksCount} sections indexed • Ready for search & Q&A
             </Muted>
