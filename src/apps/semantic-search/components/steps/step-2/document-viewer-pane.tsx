@@ -21,7 +21,7 @@ export const DocumentViewerPane = ({
   onChunkClick,
 }: DocumentViewerPaneProps) => {
   return (
-    <div className="space-y-2 lg:col-span-6">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
         <Small className="text-xs font-semibold">Document Text & Live Highlights</Small>
         <Badge variant="secondary" className="text-[10px]">
@@ -29,7 +29,7 @@ export const DocumentViewerPane = ({
         </Badge>
       </div>
 
-      <div className="border-border/70 bg-card max-h-[500px] space-y-3 overflow-y-auto rounded-xl border p-3.5 shadow-inner">
+      <div className="border-border/70 bg-card max-h-[680px] min-h-[520px] space-y-3.5 overflow-y-auto rounded-xl border p-4 shadow-inner">
         {chunks.map((chunk) => {
           const match = searchResults.find((m) => m.chunk.id === chunk.id);
           const isSelected = selectedChunkId === chunk.id;
@@ -55,9 +55,9 @@ export const DocumentViewerPane = ({
                 }
               }}
               onClick={() => onChunkClick(chunk.id)}
-              className={`relative cursor-pointer rounded-lg border p-3 transition-all ${matchBg}`}
+              className={`relative cursor-pointer rounded-lg border p-4 transition-all ${matchBg}`}
             >
-              <div className="mb-1.5 flex items-center justify-between">
+              <div className="mb-2 flex items-center justify-between">
                 <Badge variant="outline" className="font-mono text-[10px]">
                   Chunk #{chunk.index + 1}
                 </Badge>
@@ -73,7 +73,7 @@ export const DocumentViewerPane = ({
                 )}
               </div>
 
-              <p className="text-foreground font-sans text-xs leading-relaxed whitespace-pre-line">
+              <p className="text-foreground font-sans text-xs leading-relaxed whitespace-pre-line sm:text-sm">
                 {chunk.text}
               </p>
             </div>

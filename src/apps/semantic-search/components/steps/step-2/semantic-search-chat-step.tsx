@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef } from "react";
+import { Bot, FileText } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { useSemanticSearchContext } from "@/apps/semantic-search/context/semantic-search-context";
 import { useEmbeddingContext } from "@/apps/semantic-search/context/embedding-context";
 import { useRAGLLMContext } from "@/apps/semantic-search/context/rag-llm-context";
@@ -22,6 +25,7 @@ export const SemanticSearchChatStep = () => {
 
   const { tps, isGenerating, generateAnswer, interrupt } = useRAGLLMContext();
 
+  const [activeTab, setActiveTab] = useState<string>("chat");
   const [inputQuery, setInputQuery] = useState(formData.searchQuery || "");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [inspectedChunk, setInspectedChunk] = useState<number | null>(null);
@@ -66,6 +70,7 @@ export const SemanticSearchChatStep = () => {
       setInputQuery("");
     }
 
+    setActiveTab("chat");
     const matches = await searchQuery(q);
     await generateAnswer(q, matches);
   };
@@ -81,11 +86,14 @@ export const SemanticSearchChatStep = () => {
   };
 
   const scrollToChunk = (chunkId: string) => {
+    setActiveTab("document");
     highlightChunk(chunkId);
-    const element = chunkRefs.current[chunkId];
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    setTimeout(() => {
+      const element = chunkRefs.current[chunkId];
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 100);
   };
 
   const handleCopyMessage = (content: string, id: string) => {
@@ -164,30 +172,54 @@ export const SemanticSearchChatStep = () => {
         onClear={handleClearHistory}
       />
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-        <DocumentViewerPane
-          chunks={formData.chunks}
-          searchResults={formData.searchResults}
-          selectedChunkId={formData.selectedChunkId}
-          chunkRefs={chunkRefs}
-          onChunkClick={scrollToChunk}
-        />
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-4">
+        <TabsList className="grid h-10 w-full grid-cols-2 p-1">
+          <TabsTrigger value="chat" className="gap-2 text-xs sm:text-sm">
+            <Bot className="size-4" />
+            <span>AI Answers & Verified Sources</span>
+            {formData.chatMessages.length > 0 && (
+              <Badge variant="secondary" className="ml-1 px-1.5 py-0 text-[10px]">
+                {formData.chatMessages.length}
+              </Badge>
+            )}
+          </TabsTrigger>
 
-        <ChatAnswersPane
-          chatMessages={formData.chatMessages}
-          searchResults={formData.searchResults}
-          chunks={formData.chunks}
-          isGenerating={isGenerating}
-          tps={tps}
-          copiedId={copiedId}
-          inspectedChunk={inspectedChunk}
-          messagesEndRef={messagesEndRef}
-          onInterrupt={interrupt}
-          onCopyMessage={handleCopyMessage}
-          onInspectChunk={setInspectedChunk}
-          onScrollToChunk={scrollToChunk}
-        />
-      </div>
+          <TabsTrigger value="document" className="gap-2 text-xs sm:text-sm">
+            <FileText className="size-4" />
+            <span>Document Text & Live Highlights</span>
+            <Badge variant="secondary" className="ml-1 px-1.5 py-0 text-[10px]">
+              {formData.chunks.length}
+            </Badge>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="chat" className="mt-0">
+          <ChatAnswersPane
+            chatMessages={formData.chatMessages}
+            searchResults={formData.searchResults}
+            chunks={formData.chunks}
+            isGenerating={isGenerating}
+            tps={tps}
+            copiedId={copiedId}
+            inspectedChunk={inspectedChunk}
+            messagesEndRef={messagesEndRef}
+            onInterrupt={interrupt}
+            onCopyMessage={handleCopyMessage}
+            onInspectChunk={setInspectedChunk}
+            onScrollToChunk={scrollToChunk}
+          />
+        </TabsContent>
+
+        <TabsContent value="document" className="mt-0">
+          <DocumentViewerPane
+            chunks={formData.chunks}
+            searchResults={formData.searchResults}
+            selectedChunkId={formData.selectedChunkId}
+            chunkRefs={chunkRefs}
+            onChunkClick={scrollToChunk}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
