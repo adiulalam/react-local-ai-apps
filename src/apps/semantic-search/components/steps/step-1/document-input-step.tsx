@@ -170,9 +170,6 @@ export const DocumentInputStep = () => {
               Supports <strong>PDF (.pdf)</strong>, <strong>Word (.docx)</strong>, Markdown (.md),
               Text (.txt), CSV (.csv), and JSON (.json).
             </Muted>
-            <Badge variant="secondary" className="mt-3 text-xs">
-              100% Offline • Zero Cloud Uploads
-            </Badge>
           </label>
 
           {isParsing && (

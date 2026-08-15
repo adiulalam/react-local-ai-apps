@@ -1,7 +1,6 @@
-import { Search, Sparkles, Download, RotateCcw, ShieldCheck, FileText } from "lucide-react";
+import { Search, Sparkles, Download, RotateCcw, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { H4, Muted, Small } from "@/components/ui/typography";
 
 interface SearchHeaderBarProps {
@@ -42,13 +41,7 @@ export const SearchHeaderBar = ({
             <FileText className="size-4" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <H4 className="text-sm font-semibold">{documentName || "Document"}</H4>
-              <Badge variant="secondary" className="gap-1 text-[10px]">
-                <ShieldCheck className="size-3 text-emerald-500" />
-                <span>100% Offline</span>
-              </Badge>
-            </div>
+            <H4 className="text-sm font-semibold">{documentName || "Document"}</H4>
             <Muted className="text-xs">
               {chunksCount} sections indexed • Ready for search & Q&A
             </Muted>
