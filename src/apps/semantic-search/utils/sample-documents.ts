@@ -1,15 +1,18 @@
 export interface SampleDocumentItem {
   name: string;
   category: string;
+  type: "pdf" | "text";
   description: string;
   sampleQueries: string[];
-  text: string;
+  text?: string;
+  url?: string;
 }
 
 export const SAMPLE_DOCUMENTS: SampleDocumentItem[] = [
   {
     name: "In-Browser AI & Local LLMs Whitepaper",
     category: "AI Architecture",
+    type: "text",
     description:
       "Deep dive into WebGPU acceleration, ONNX Runtime WASM, Transformers.js, and zero-data-leakage client-side AI.",
     sampleQueries: [
@@ -41,6 +44,7 @@ Because all document parsing, vector indexing, similarity calculations, and gene
   {
     name: "Neural Network Attention & Transformers Primer",
     category: "Machine Learning",
+    type: "text",
     description:
       "A technical guide covering multi-head self-attention, query-key-value vectors, positional encodings, and feed-forward layers.",
     sampleQueries: [
@@ -69,27 +73,16 @@ Because transformers do not process tokens sequentially like RNNs or CNNs, they 
 Each sub-layer within a Transformer block features a residual skip connection followed by Layer Normalization (or RMSNorm). Residual connections facilitate uninterrupted gradient flow during backpropagation, enabling stable training of networks with hundreds of layers.`,
   },
   {
-    name: "Global Clean Energy & Grid Transition Report",
-    category: "Energy & Infrastructure",
+    name: "Vehicle Owner & Maintenance Manual",
+    category: "Automotive Manual",
+    type: "pdf",
     description:
-      "Overview of solar PV efficiency, offshore wind developments, battery energy storage systems (BESS), and modern grid management.",
+      "Official car manual covering scheduled maintenance intervals, oil specifications, warning indicators, and tire care.",
+    url: "/sample/car-manual.pdf",
     sampleQueries: [
-      "What is the role of Battery Energy Storage Systems (BESS)?",
-      "How are smart grids handling intermittent renewable energy?",
-      "What efficiency improvements have been made in solar perovskites?",
+      "What are the recommended maintenance intervals and oil change guidelines?",
+      "What should I do if a dashboard warning light or indicator comes on?",
+      "How do I check and adjust tire pressure or handle a flat tire?",
     ],
-    text: `# Global Renewable Energy and Grid Modernization Report
-
-## Clean Energy Generation Trends
-The global transition toward carbon-neutral power systems has accelerated significantly. Solar photovoltaic (PV) installations and offshore wind farms now represent the fastest-growing sources of electricity generation worldwide. Recent perovskite-silicon tandem solar cells have achieved laboratory conversion efficiencies exceeding 33%, unlocking unprecedented power yield per square meter.
-
-## Grid Intermittency and Energy Storage Systems
-Because solar and wind generation depend on weather and diurnal cycles, energy storage plays an indispensable stabilizing role. Grid-scale Battery Energy Storage Systems (BESS), primarily utilizing lithium iron phosphate (LFP) and emerging sodium-ion chemistries, provide rapid sub-second frequency regulation, peak shaving, and four-to-eight hour energy shifting capabilities.
-
-## High-Voltage Direct Current (HVDC) Transmission
-To transport massive volumes of electricity from remote offshore wind fields and desert solar installations to metropolitan industrial hubs, utilities are deploying High-Voltage Direct Current (HVDC) transmission lines. HVDC reduces transmission losses across long distances compared to traditional alternating current (AC) lines and allows asynchronous grid interconnects.
-
-## Smart Grid AI Dispatch and Demand Response
-Artificial intelligence algorithms forecast renewable generation outputs and consumer demand curves up to 48 hours in advance. Autonomous demand response protocols automatically coordinate electric vehicle charging clusters, industrial cooling systems, and residential heat pumps to absorb excess generation during peak midday solar periods.`,
   },
 ];

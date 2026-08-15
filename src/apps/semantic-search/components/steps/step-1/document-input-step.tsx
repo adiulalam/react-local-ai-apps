@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { H3, H4, Muted, Small } from "@/components/ui/typography";
 import { useSemanticSearchContext } from "@/apps/semantic-search/context/semantic-search-context";
-import { parseFileContent } from "@/apps/semantic-search/utils/document-parser";
+import { parseFileContent, extractTextFromPdf } from "@/apps/semantic-search/utils/document-parser";
 import { chunkText } from "@/apps/semantic-search/utils/text-chunker";
 import {
   SAMPLE_DOCUMENTS,
@@ -88,22 +88,60 @@ export const DocumentInputStep = () => {
     });
   };
 
-  const handleSelectSample = (sample: SampleDocumentItem) => {
+  const handleSelectSample = async (sample: SampleDocumentItem) => {
     setSelectedSampleName(sample.name);
-    setPastedText(sample.text);
     setParseError(null);
 
-    const generatedChunks = chunkText(sample.text, formData.chunkingOptions);
-    setFormData((prev) => ({
-      ...prev,
-      documentName: sample.name,
-      documentType: "sample",
-      documentText: sample.text,
-      chunks: generatedChunks,
-      chunkEmbeddings: [],
-      searchResults: [],
-      searchQuery: sample.sampleQueries[0] || "",
-    }));
+    if (sample.url) {
+      setIsParsing(true);
+      try {
+        const response = await fetch(sample.url);
+        if (!response.ok) {
+          throw new Error(`Failed to load sample document (${response.statusText})`);
+        }
+        const arrayBuffer = await response.arrayBuffer();
+        const { text, pageCount } = await extractTextFromPdf(arrayBuffer);
+        if (!text.trim()) {
+          throw new Error("No readable text could be extracted from sample PDF.");
+        }
+
+        const generatedChunks = chunkText(text, formData.chunkingOptions);
+        setFormData((prev) => ({
+          ...prev,
+          documentName: sample.name,
+          documentType: "pdf",
+          documentSize: arrayBuffer.byteLength,
+          documentText: text,
+          pageCount,
+          chunks: generatedChunks,
+          chunkEmbeddings: [],
+          searchResults: [],
+          searchQuery: sample.sampleQueries[0] || "",
+        }));
+        setPastedText(text);
+      } catch (err) {
+        setParseError(err instanceof Error ? err.message : "Failed to load sample PDF");
+      } finally {
+        setIsParsing(false);
+      }
+      return;
+    }
+
+    if (sample.text) {
+      const sampleText = sample.text;
+      setPastedText(sampleText);
+      const generatedChunks = chunkText(sampleText, formData.chunkingOptions);
+      setFormData((prev) => ({
+        ...prev,
+        documentName: sample.name,
+        documentType: "sample",
+        documentText: sampleText,
+        chunks: generatedChunks,
+        chunkEmbeddings: [],
+        searchResults: [],
+        searchQuery: sample.sampleQueries[0] || "",
+      }));
+    }
   };
 
   const totalWords = formData.documentText
@@ -207,7 +245,7 @@ export const DocumentInputStep = () => {
         </TabsContent>
 
         {/* Tab 3: Sample Documents */}
-        <TabsContent value="samples" className="mt-4 space-y-3">
+        <TabsContent value="samples" className="mt-4 space-y-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {SAMPLE_DOCUMENTS.map((sample) => {
               const isSelected = selectedSampleName === sample.name;
@@ -221,8 +259,20 @@ export const DocumentInputStep = () => {
                 >
                   <CardHeader className="p-4 pb-2">
                     <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-[10px]">
-                        {sample.category}
+                      <Badge variant="outline" className="gap-1 text-[10px]">
+                        {sample.type === "pdf" ? (
+                          <>
+                            <FileText className="size-3 text-red-500" />
+                            <span>PDF</span>
+                          </>
+                        ) : (
+                          <>
+                            <FileCode className="size-3 text-blue-500" />
+                            <span>Text</span>
+                          </>
+                        )}
+                        <span className="text-muted-foreground">•</span>
+                        <span>{sample.category}</span>
                       </Badge>
                       {isSelected && <CheckCircle2 className="text-primary size-4" />}
                     </div>
@@ -237,6 +287,20 @@ export const DocumentInputStep = () => {
               );
             })}
           </div>
+
+          {isParsing && (
+            <div className="bg-muted/50 flex items-center justify-center gap-2 rounded-lg p-4">
+              <Sparkles className="text-primary size-4 animate-spin" />
+              <Small>Loading and extracting sample PDF text...</Small>
+            </div>
+          )}
+
+          {parseError && (
+            <div className="bg-destructive/10 text-destructive flex items-center gap-2 rounded-lg p-3 text-sm">
+              <AlertCircle className="size-4 shrink-0" />
+              <span>{parseError}</span>
+            </div>
+          )}
         </TabsContent>
       </Tabs>
 
