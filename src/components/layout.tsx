@@ -16,6 +16,7 @@ import {
   Box,
   Languages,
   FileSearch,
+  AudioLines,
 } from "lucide-react";
 import {
   NavigationMenu,
@@ -130,6 +131,14 @@ export const Layout = () => {
                 >
                   <Captions className="size-4" />
                   Video Captioning
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/video-describer" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/video-describer")}
+                >
+                  <AudioLines className="size-4" />
+                  Video Describer
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
