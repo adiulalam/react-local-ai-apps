@@ -19,6 +19,7 @@ const getInstance = async (progress_callback: (info: unknown) => void) => {
     } else {
       instance = pipeline(task, model, {
         progress_callback,
+        device: "webgpu",
         dtype: "fp32",
       }) as Promise<AllTasks["image-to-text"]>;
     }
@@ -35,7 +36,7 @@ export const describeFrame = async (
     postMessage({ type: "processing" });
 
     const results = await captioner(image, {
-      max_new_tokens: isTestEnv ? 20 : 40,
+      max_new_tokens: isTestEnv ? 20 : 25,
     });
 
     const caption =

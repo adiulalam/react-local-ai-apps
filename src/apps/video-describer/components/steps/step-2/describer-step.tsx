@@ -41,19 +41,24 @@ export const DescriberStep = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const autoNarrateTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastNarrationTimeRef = useRef(0);
 
-  // Capture frame from video element and send to Web Worker
+  // Capture current frame from video element and send to Web Worker for fast description
   const captureAndDescribe = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
     const video = videoRef.current;
 
     if (video.readyState < 2) return;
 
+    // Do not queue overlapping processing frames
+    if (status === "processing") return;
+
     const { videoWidth, videoHeight, currentTime } = video;
     if (!videoWidth || !videoHeight) return;
 
     const canvas = canvasRef.current;
-    const MAX_DIM = 512;
+    // Scale frame down to 256px (matching ViT image model input size for instant inference)
+    const MAX_DIM = 256;
     const scale = Math.min(MAX_DIM / videoWidth, MAX_DIM / videoHeight, 1);
     const targetWidth = Math.round(videoWidth * scale);
     const targetHeight = Math.round(videoHeight * scale);
@@ -65,27 +70,33 @@ export const DescriberStep = () => {
     if (!ctx) return;
 
     ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
-    const imageData = canvas.toDataURL("image/jpeg", 0.7);
+    const imageData = canvas.toDataURL("image/jpeg", 0.65);
 
+    lastNarrationTimeRef.current = Date.now();
     describeFrame(imageData, useWebcam ? undefined : Math.round(currentTime));
-  }, [describeFrame, useWebcam]);
+  }, [describeFrame, status, useWebcam]);
 
-  // Load model when entering step
+  // Load model on step entry
   useEffect(() => {
     if (!isModelLoaded) {
       loadModel();
     }
   }, [isModelLoaded, loadModel]);
 
-  // Handle Auto-Narration Timer
+  // Auto-Narration Timer loop: periodically scans current frame while video is playing
   useEffect(() => {
     if (isAutoNarrate && isModelLoaded && status !== "loading") {
-      // Capture first frame immediately
-      captureAndDescribe();
-
       autoNarrateTimerRef.current = setInterval(() => {
-        captureAndDescribe();
-      }, narrationInterval * 1000);
+        const video = videoRef.current;
+        if (!video) return;
+
+        const isVideoActive = useWebcam || (!video.paused && !video.ended);
+        const timeSinceLast = (Date.now() - lastNarrationTimeRef.current) / 1000;
+
+        if (isVideoActive && timeSinceLast >= narrationInterval && status !== "processing") {
+          captureAndDescribe();
+        }
+      }, 1000);
     } else {
       if (autoNarrateTimerRef.current) {
         clearInterval(autoNarrateTimerRef.current);
@@ -99,12 +110,22 @@ export const DescriberStep = () => {
         autoNarrateTimerRef.current = null;
       }
     };
-  }, [isAutoNarrate, isModelLoaded, status, narrationInterval, captureAndDescribe]);
+  }, [isAutoNarrate, isModelLoaded, status, narrationInterval, useWebcam, captureAndDescribe]);
+
+  // Handle Video element events to keep Audio Narration in strict sync
+  const handleVideoPause = useCallback(() => {
+    stopSpeech();
+  }, [stopSpeech]);
+
+  const handleVideoSeeked = useCallback(() => {
+    stopSpeech();
+  }, [stopSpeech]);
 
   // Setup Video / Webcam Stream only once model is loaded
   useEffect(() => {
     if (!isModelLoaded || !videoRef.current) return;
 
+    const videoEl = videoRef.current;
     let stream: MediaStream | null = null;
 
     if (useWebcam) {
@@ -123,17 +144,24 @@ export const DescriberStep = () => {
           console.error("Failed to access webcam. Please check permissions.");
         });
     } else if (videoUrl) {
-      videoRef.current.src = videoUrl;
-      videoRef.current.play().catch((e) => {
+      videoEl.src = videoUrl;
+      videoEl.play().catch((e) => {
         if (e.name !== "AbortError") console.error("Video play error:", e);
       });
     }
 
+    videoEl.addEventListener("pause", handleVideoPause);
+    videoEl.addEventListener("seeking", handleVideoSeeked);
+    videoEl.addEventListener("seeked", handleVideoSeeked);
+
     return () => {
+      videoEl.removeEventListener("pause", handleVideoPause);
+      videoEl.removeEventListener("seeking", handleVideoSeeked);
+      videoEl.removeEventListener("seeked", handleVideoSeeked);
       if (stream) stream.getTracks().forEach((t) => t.stop());
       stopSpeech();
     };
-  }, [isModelLoaded, useWebcam, videoUrl, stopSpeech]);
+  }, [isModelLoaded, useWebcam, videoUrl, handleVideoPause, handleVideoSeeked, stopSpeech]);
 
   // If model is still downloading or initializing, show download progress only
   if (!isModelLoaded && (status === "initializing" || status === "loading")) {
@@ -188,7 +216,7 @@ export const DescriberStep = () => {
               {status === "processing" ? "Analyzing..." : "Describe Scene Now"}
             </Button>
 
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap items-center gap-6">
               {/* Auto-Narrate Switch */}
               <div className="flex items-center space-x-2">
                 <Switch
@@ -235,11 +263,11 @@ export const DescriberStep = () => {
                 <Switch id="voice-tts" checked={isTtsEnabled} onCheckedChange={setIsTtsEnabled} />
                 <Label htmlFor="voice-tts" className="cursor-pointer text-sm font-medium">
                   {isTtsEnabled ? (
-                    <span className="text-primary flex items-center gap-1">
+                    <span className="text-primary flex items-center gap-1.5">
                       <Volume2 className="h-4 w-4" /> Voice Narration
                     </span>
                   ) : (
-                    <span className="text-muted-foreground flex items-center gap-1">
+                    <span className="text-muted-foreground flex items-center gap-1.5">
                       <VolumeX className="h-4 w-4" /> Muted
                     </span>
                   )}
