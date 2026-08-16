@@ -13,10 +13,10 @@ import { useVideoDescriberContext } from "@/apps/video-describer/context/video-d
 
 const VIDEO_DESCRIBER_SAMPLES: SampleMediaItem[] = [
   {
-    name: "People Walking",
-    url: "/sample/people-walking.mp4",
+    name: "Travel Montage",
+    url: "/sample/travel-montage.mkv",
     type: "video",
-    description: "Pedestrian street video",
+    description: "Fast multi-scene travel clip",
   },
 ];
 
