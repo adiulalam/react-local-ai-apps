@@ -52,7 +52,7 @@ export const RemovalStep = () => {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-4">
             <H3>Original Image</H3>
-            <div className="bg-background flex items-center justify-center overflow-hidden rounded-lg border bg-[url('/checkerboard.png')] bg-repeat p-2">
+            <div className="bg-background flex items-center justify-center overflow-hidden rounded-lg border p-2">
               <img
                 src={imageDataUrl}
                 alt="Original"
@@ -63,15 +63,18 @@ export const RemovalStep = () => {
 
           <div className="flex flex-col gap-4">
             <H3>Result</H3>
-            <div className="bg-background flex items-center justify-center overflow-hidden rounded-lg border bg-[url('/checkerboard.png')] bg-repeat p-2">
+            <div
+              className="bg-background flex items-center justify-center overflow-hidden rounded-lg border p-2"
+              style={{
+                backgroundImage:
+                  "repeating-conic-gradient(rgba(128, 128, 128, 0.15) 0% 25%, transparent 0% 50%)",
+                backgroundSize: "20px 20px",
+              }}
+            >
               <img
                 src={resultImage}
                 alt="Background Removed"
                 className="max-h-64 rounded-md bg-transparent object-contain"
-                style={{
-                  backgroundImage: "repeating-conic-gradient(#e5e7eb 0% 25%, #f9fafb 0% 50%)",
-                  backgroundSize: "20px 20px",
-                }}
               />
             </div>
             <div className="mt-4 flex justify-end">
