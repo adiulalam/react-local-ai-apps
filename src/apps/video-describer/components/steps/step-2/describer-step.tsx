@@ -296,7 +296,10 @@ export const DescriberStep = () => {
 
               {currentDescription ? (
                 <div className="space-y-3">
-                  <P className="bg-muted/40 rounded-lg p-3 text-base leading-relaxed font-medium">
+                  <P
+                    data-testid="description-text"
+                    className="bg-muted/40 rounded-lg p-3 text-base leading-relaxed font-medium"
+                  >
                     "{currentDescription}"
                   </P>
                   <div className="flex justify-end">
