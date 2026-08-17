@@ -22,6 +22,7 @@ Built with **React**, **TypeScript**, **Vite**, and **Shadcn UI**, this reposito
 
 - **[Object Detection](src/apps/object-detection/README.md)**: Detect and bound objects in images.
 - **[Video Captioning](src/apps/video-captioning/README.md)**: Automatically generate captions for videos.
+- **[Video Describer](src/apps/video-describer/README.md)**: Real-time visual scene narration and audio description powered by local AI.
 
 ### Text
 

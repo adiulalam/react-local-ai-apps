@@ -1,0 +1,76 @@
+import { pipeline, env, type PipelineType, type AllTasks } from "@huggingface/transformers";
+import { isTestEnv } from "@/lib/utils";
+import { getMockImageToText } from "@/lib/mock-pipelines";
+
+env.allowLocalModels = isTestEnv;
+env.useBrowserCache = !isTestEnv;
+if (env.backends.onnx.wasm) {
+  env.backends.onnx.wasm.proxy = false;
+}
+
+const task: PipelineType = "image-to-text";
+const model = "Xenova/vit-gpt2-image-captioning";
+let instance: Promise<AllTasks["image-to-text"]> | null = null;
+
+const getInstance = async (progress_callback: (info: unknown) => void) => {
+  if (instance === null) {
+    if (isTestEnv) {
+      instance = getMockImageToText(model, progress_callback);
+    } else {
+      instance = pipeline(task, model, {
+        progress_callback,
+        device: "webgpu",
+        dtype: "fp32",
+      }) as Promise<AllTasks["image-to-text"]>;
+    }
+  }
+  return instance;
+};
+
+export const describeFrame = async (
+  captioner: AllTasks["image-to-text"],
+  image: string,
+  postMessage: (msg: { type: string; result?: unknown; error?: string }) => void
+) => {
+  try {
+    postMessage({ type: "processing" });
+
+    const results = await captioner(image, {
+      max_new_tokens: isTestEnv ? 20 : 25,
+    });
+
+    const caption =
+      Array.isArray(results) && results.length > 0
+        ? results[0].generated_text
+        : "No description generated.";
+
+    postMessage({ type: "complete", result: caption });
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err.message : "Unknown error during frame description";
+    postMessage({ type: "error", error });
+  }
+};
+
+self.addEventListener("message", async (event) => {
+  const { type, image } = event.data;
+
+  if (type === "load") {
+    try {
+      await getInstance((x) => {
+        self.postMessage({ type: "progress", data: x });
+      });
+      self.postMessage({ type: "ready" });
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : "Unknown error loading model";
+      self.postMessage({ type: "error", error });
+    }
+  } else if (type === "process") {
+    try {
+      const captioner = await getInstance(() => {});
+      await describeFrame(captioner, image, (msg) => self.postMessage(msg));
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : "Unknown error setting up captioning";
+      self.postMessage({ type: "error", error });
+    }
+  }
+});

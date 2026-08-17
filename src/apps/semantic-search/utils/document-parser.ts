@@ -1,16 +1,3 @@
-import * as pdfjsLib from "pdfjs-dist";
-import mammoth from "mammoth";
-
-// Configure pdfjs worker if available
-try {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.mjs",
-    import.meta.url
-  ).toString();
-} catch {
-  // Ignore in test or worker-less environments
-}
-
 export interface ParsedDocument {
   name: string;
   type: string;
@@ -22,6 +9,20 @@ export interface ParsedDocument {
 export const extractTextFromPdf = async (
   arrayBuffer: ArrayBuffer
 ): Promise<{ text: string; pageCount: number }> => {
+  const pdfjsLib = await import("pdfjs-dist");
+
+  // Configure pdfjs worker if available
+  try {
+    if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+        "pdfjs-dist/build/pdf.worker.mjs",
+        import.meta.url
+      ).toString();
+    }
+  } catch {
+    // Ignore in test or worker-less environments
+  }
+
   const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
   const pdf = await loadingTask.promise;
   const numPages = pdf.numPages;
@@ -43,6 +44,8 @@ export const extractTextFromPdf = async (
 };
 
 export const extractTextFromDocx = async (arrayBuffer: ArrayBuffer): Promise<string> => {
+  const mammothModule = await import("mammoth");
+  const mammoth = mammothModule.default ?? mammothModule;
   const result = await mammoth.extractRawText({ arrayBuffer });
   return result.value;
 };
