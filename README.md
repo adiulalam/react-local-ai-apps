@@ -65,6 +65,16 @@ Run the dev server:
 npm run dev
 ```
 
+### Docker
+
+Build and run using Docker Compose:
+
+```bash
+npm run docker
+```
+
+The application will be accessible at `http://localhost:8080` by default. You can override the port by setting the `PORT` environment variable (e.g. `PORT=3000 npm run docker` or defining `PORT=3000` in `.env`).
+
 ## Technologies Used
 
 - React 19

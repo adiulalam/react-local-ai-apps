@@ -1,0 +1,9 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: react-local-ai-apps
+    ports:
+      - "${PORT:-8080}:80"
+    restart: unless-stopped

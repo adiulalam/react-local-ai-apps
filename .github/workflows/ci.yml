@@ -67,3 +67,32 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+  deploy:
+    name: Deploy
+    needs: build-and-test # Runs only after all CI steps (typecheck, lint, unit tests, build, e2e) pass
+    runs-on: ubuntu-24.04
+    # Disabled for now. When ready to enable, change to:
+    # if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: false
+    steps:
+      - name: Execute remote SSH commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DOCKER_HOST }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          key: ${{ secrets.DOCKER_SSH_PRIVATE_KEY }}
+          script: |
+            set -e # Exit immediately if a command exits with a non-zero status
+
+            cd portfolio/
+            echo 'Inside portfolio directory'
+
+            # Pull latest changes
+            git fetch origin
+            git reset --hard origin/main
+            echo 'Pulled latest changes from main branch'
+
+            # Build and run the Docker container
+            npm run docker
+            echo 'Container up and running'
