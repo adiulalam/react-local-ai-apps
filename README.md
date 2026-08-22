@@ -35,6 +35,7 @@ Built with **React**, **TypeScript**, **Vite**, and **Shadcn UI**, this reposito
 - **[Qwen 3 - 0.6B](src/apps/qwen3/README.md)**: Interact with the Qwen 3 language model.
 - **[DeepSeek R1 - 1.5B](src/apps/deepseek/README.md)**: Chat with the DeepSeek language model entirely in your browser.
 - **[Llama 3.2 - 1B](src/apps/llama3/README.md)**: Chat with the Llama 3 language model locally.
+- **[Gemma 4 - E2B](src/apps/gemma4/README.md)**: Chat with the Gemma 4 language model locally.
 
 ## Screenshots Showcase
 

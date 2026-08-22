@@ -32,6 +32,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { Qwen } from "@/components/icons/qwen";
 import { Deepseek } from "@/components/icons/deepseek";
 import { Llama } from "@/components/icons/llama";
+import { Gemma } from "@/components/icons/gemma";
 
 export const Layout = () => {
   const location = useLocation();
@@ -207,6 +208,14 @@ export const Layout = () => {
                 >
                   <Llama className="size-4" />
                   Llama 3.2 - 1B
+                </NavigationMenuLink>
+                <NavigationMenuLink
+                  render={<Link to="/gemma4" />}
+                  className="w-full justify-start"
+                  active={location.pathname.startsWith("/gemma4")}
+                >
+                  <Gemma className="size-4" />
+                  Gemma 4 - E2B
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
