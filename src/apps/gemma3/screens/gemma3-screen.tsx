@@ -9,8 +9,8 @@ import { H1, Muted, Large, Small } from "@/components/ui/typography";
 import {
   createWorkerMessageHandler,
   type WorkerStatus,
-} from "@/apps/gemma4/utils/worker-message-handler";
-import GemmaWorker from "@/apps/gemma4/workers/gemma.worker?worker";
+} from "@/apps/gemma3/utils/worker-message-handler";
+import GemmaWorker from "@/apps/gemma3/workers/gemma.worker?worker";
 
 const IS_WEBGPU_AVAILABLE = !!navigator.gpu;
 
@@ -20,7 +20,7 @@ interface Message {
   answerIndex?: number;
 }
 
-const Gemma4Screen = () => {
+const Gemma3Screen = () => {
   const worker = useRef<Worker | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -113,9 +113,9 @@ const Gemma4Screen = () => {
           <div className="bg-primary/10 mb-4 flex h-20 w-20 items-center justify-center rounded-full">
             <Gemma className="text-primary h-10 w-10" />
           </div>
-          <H1 className="text-3xl">Gemma 4 - E2B</H1>
+          <H1 className="text-3xl">Gemma 3 - 1B</H1>
           <Muted className="max-w-lg text-center text-base">
-            An instruction-tuned model based on Gemma 4 that runs locally in your browser with
+            An instruction-tuned model based on Gemma 3 that runs locally in your browser with
             WebGPU acceleration. Everything runs entirely on your device, meaning no data is sent to
             a server.
           </Muted>
@@ -149,7 +149,7 @@ const Gemma4Screen = () => {
           <ScrollArea className="w-full flex-1 overflow-hidden">
             {messages.length === 0 ? (
               <div className="flex h-full min-h-[50vh] flex-col items-center justify-center space-y-4">
-                <H1 className="sr-only">Gemma 4 - E2B</H1>
+                <H1 className="sr-only">Gemma 3 - 1B</H1>
                 <Gemma className="text-muted-foreground h-16 w-16 opacity-20" />
                 <Muted>Model loaded! Start chatting below.</Muted>
               </div>
@@ -202,4 +202,4 @@ const Gemma4Screen = () => {
   );
 };
 
-export default Gemma4Screen;
+export default Gemma3Screen;

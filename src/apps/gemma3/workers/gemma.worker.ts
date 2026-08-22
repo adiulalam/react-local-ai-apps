@@ -17,7 +17,7 @@ if (env.backends.onnx.wasm) {
   env.backends.onnx.wasm.proxy = false;
 }
 
-const MODEL_ID = "onnx-community/gemma-4-E2B-it-ONNX";
+const MODEL_ID = "onnx-community/gemma-3-1b-it-ONNX";
 
 let tokenizerPromise: Promise<PreTrainedTokenizer> | null = null;
 let modelPromise: Promise<PreTrainedModel> | null = null;

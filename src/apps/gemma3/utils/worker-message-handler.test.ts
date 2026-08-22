@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { createWorkerMessageHandler, type WorkerCallbacks } from "./worker-message-handler";
 
-describe("gemma4 worker-message-handler", () => {
+describe("gemma3 worker-message-handler", () => {
   const callbacks = {
     setStatus: vi.fn(),
     setLoadingMessage: vi.fn(),

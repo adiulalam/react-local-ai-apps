@@ -9,7 +9,7 @@ import { imageDepthRoute } from "@/apps/image-depth/screens/route";
 import { qwen3Route } from "@/apps/qwen3/screens/route";
 import { deepseekRoute } from "@/apps/deepseek/screens/route";
 import { llama3Route } from "@/apps/llama3/screens/route";
-import { gemma4Route } from "@/apps/gemma4/screens/route";
+import { gemma3Route } from "@/apps/gemma3/screens/route";
 import { objectDetectionRoute } from "@/apps/object-detection/screens/route";
 import { videoCaptioningRoute } from "@/apps/video-captioning/screens/route";
 import { videoDescriberRoute } from "@/apps/video-describer/screens/route";
@@ -35,7 +35,7 @@ const router = createBrowserRouter([
       qwen3Route,
       deepseekRoute,
       llama3Route,
-      gemma4Route,
+      gemma3Route,
       objectDetectionRoute,
       videoCaptioningRoute,
       videoDescriberRoute,

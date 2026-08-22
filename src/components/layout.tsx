@@ -210,12 +210,12 @@ export const Layout = () => {
                   Llama 3.2 - 1B
                 </NavigationMenuLink>
                 <NavigationMenuLink
-                  render={<Link to="/gemma4" />}
+                  render={<Link to="/gemma3" />}
                   className="w-full justify-start"
-                  active={location.pathname.startsWith("/gemma4")}
+                  active={location.pathname.startsWith("/gemma3")}
                 >
                   <Gemma className="size-4" />
-                  Gemma 4 - E2B
+                  Gemma 3 - 1B
                 </NavigationMenuLink>
               </NavigationMenuContent>
             </NavigationMenuItem>
