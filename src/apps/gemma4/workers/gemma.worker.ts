@@ -142,7 +142,7 @@ const generate = async ({ messages }: GenerateData) => {
       ...inputs,
       do_sample: false,
       repetition_penalty: 1.1,
-      max_new_tokens: isTestEnv ? 300 : 8192,
+      max_new_tokens: isTestEnv ? 300 : 2048,
       streamer,
       stopping_criteria,
       return_dict_in_generate: true,
